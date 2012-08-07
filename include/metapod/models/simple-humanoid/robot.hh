@@ -40,7 +40,9 @@ namespace metapod
       public:
         // Global constants or variable of the robot
         enum { NBDOF = 35 };
+        enum { NBBODIES = 30 };
         static Eigen::Matrix< FloatType, NBDOF, NBDOF > H;
+        static Eigen::Matrix< FloatType, 6*NBBODIES, NBDOF > J;
         typedef Eigen::Matrix< FloatType, NBDOF, 1 > confVector;
 
         // Definition of the multibody tree as a type.

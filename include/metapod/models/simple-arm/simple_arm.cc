@@ -44,6 +44,8 @@ namespace metapod
   {
     // Initialization of the robot global constants
     Eigen::Matrix< FloatType, Robot::NBDOF, Robot::NBDOF > Robot::H;
+    Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF > Robot::J
+        = Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF >::Zero();
 
     INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(SHOULDER, 1, 0, 0);
     const std::string SHOULDER::name = "SHOULDER";
