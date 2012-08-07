@@ -39,6 +39,8 @@ namespace metapod
   {
     // Initialization of the robot global constants
     Eigen::Matrix< FloatType, Robot::NBDOF, Robot::NBDOF > Robot::H;
+    Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF > Robot::J
+        = Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF >::Zero();
 
     // Init WAIST
     INITIALIZE_JOINT_FREE_FLYER(WAIST);

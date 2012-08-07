@@ -183,6 +183,31 @@ namespace metapod
         }                                                             \
         std::cout << "jac_point_robot (without bcalc): "              \
                   << timer.get()/double(N1*N2) << "µs\n";             \
+        timer.reinit();                                               \
+        for(int i=0; i<N1; i++)                                       \
+        {                                                             \
+          q = confVector::Random();                                   \
+          timer.start();                                              \
+          for(int j=0; j<N2; j++)                                     \
+          {                                                           \
+            metapod::jac< robot::Robot, true >::run(q);              \
+          }                                                           \
+          timer.stop();                                               \
+        }                                                             \
+        std::cout << "jac: " << timer.get()/double(N1*N2) << "µs\n"; \
+        timer.reinit();                                               \
+        for(int i=0; i<N1; i++)                                       \
+        {                                                             \
+          q = confVector::Random();                                   \
+          timer.start();                                              \
+          for(int j=0; j<N2; j++)                                     \
+          {                                                           \
+            metapod::jac< robot::Robot, false >::run(q);             \
+          }                                                           \
+          timer.stop();                                               \
+        }                                                             \
+        std::cout << "jac (without jcalc): "                         \
+                  << timer.get()/double(N1*N2) << "µs\n";             \
         std::cout << std::endl;                                       \
     }                                                                       
 

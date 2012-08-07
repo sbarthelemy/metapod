@@ -35,6 +35,8 @@ namespace metapod
   namespace sample_15_dof
   {
     Eigen::Matrix< FloatType, Robot::NBDOF, Robot::NBDOF > Robot::H;
+    Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF > Robot::J
+        = Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF >::Zero();
 
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(J0);
     const std::string J0::name = "J0";

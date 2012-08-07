@@ -29,6 +29,7 @@
 # include "metapod/algos/crba.hh"
 # include "metapod/algos/jac_point.hh"
 # include "metapod/algos/jac_point_chain.hh"
+# include "metapod/algos/jac.hh"
 
 # include "robot.hh"
 

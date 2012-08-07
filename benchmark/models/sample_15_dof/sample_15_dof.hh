@@ -29,6 +29,7 @@
 # include "metapod/tools/common.hh"
 # include "metapod/algos/rnea.hh"
 # include "metapod/algos/crba.hh"
+# include "metapod/algos/jac.hh"
 
 # include "robot.hh"
 
