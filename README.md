@@ -8,25 +8,20 @@ for a particular robot at compile-time.
 It makes use of R. Featherstone's Spatial Algebra to describe forces, motions
 and inertias (cf. Rigid Body Dynamics Algorithms, Roy Featherstone).
 
-As of today, the following algorithms have been implemented:
- - RNEA (Recursive Newton Euler Algorithm) for inverse dynamics
- - CRBA (Composite Rigid Body Algorithm) to compute the Joint-Space Inertia
-    Matrix.
+The metapod project was initiated at JRL/LAAS, CNRS/AIST. This version
+is a fork, used at Aldebaran Robotics.
+
+While the upstream metapod, uses jrl-cmake as a build system, the Aldebaran
+Robotics fork uses
+[qibuild](www.aldebaran-robotics.com/documentation/qibuild/index.html).
 
 Setup
 -----
 
-To compile this package, it is recommended to create a separate build
-directory:
+Install qibuild then
 
-    mkdir _build
-    cd _build
-    cmake [OPTIONS] ..
-    make install
-
-Please note that CMake produces a `CMakeCache.txt` file which should
-be deleted to reconfigure a package from scratch.
-
+    qc --release
+    qm --release
 
 ### Dependencies
 
@@ -38,6 +33,6 @@ your machine.
    - Boost (>=1.48.0)
      Boost Test is used in the test suite
  - System tools:
-   - CMake (>=2.6)
-   - pkg-config
+   - CMake (>=2.8)
+   - qibuild
    - usual compilation tools (GCC/G++, make, etc.)
