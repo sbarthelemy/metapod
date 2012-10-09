@@ -18,35 +18,27 @@
 #
 # Creation: 14/06/2011
 
+qi_create_lib(simple_humanoid SHARED
+    ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-humanoid/simple_humanoid.cc
+    ${${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS})
+qi_use_lib(simple_humanoid metapod EIGEN3)
+qi_stage_lib(simple_humanoid)
+
+qi_create_lib(simple_arm SHARED
+    ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-arm/simple_arm.cc
+    ${${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS})
+qi_use_lib(simple_arm metapod EIGEN3)
+qi_stage_lib(simple_arm)
+
+
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/)
-
 # Make Boost.Test generates the main function in test cases.
-ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
-
-ADD_LIBRARY(simple_humanoid SHARED ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-humanoid/simple_humanoid.cc)
-ADD_LIBRARY(simple_arm SHARED ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-arm/simple_arm.cc)
-
-# ADD_TESTCASE(NAME)
-# ------------------------
-#
-# Define a test named `NAME'.
-#
-# This macro will create a binary from `NAME.cc', link it against
-# Boost and add it to the test suite.
-#
-MACRO(ADD_TESTCASE NAME SOURCE_FILE)
-    ADD_EXECUTABLE(${NAME} ${SOURCE_FILE})
-  ADD_TEST(${NAME} ${RUNTIME_OUTPUT_DIRECTORY}/${NAME})
-
-  # Link against Boost.
-  TARGET_LINK_LIBRARIES(${NAME} ${Boost_LIBRARIES})
-
-  # Link against the test models.
-  TARGET_LINK_LIBRARIES(${NAME} simple_humanoid simple_arm)
-ENDMACRO(ADD_TESTCASE)
+add_definitions(-DBOOST_TEST_MAIN)
+# note: the following line is needed if we link with the dynamic version
+#       of libboost_test_exec_monitor
+#add_definitions(-DBOOST_TEST_DYN_LINK)
 
 # the "use_model" subfolder is included once per tested model. The tests
 # defined within it should use the "CURRENT_MODEL" macro to use the
