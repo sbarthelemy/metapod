@@ -26,6 +26,49 @@
 
 namespace metapod
 {
+  // Create a FIXED joint class
+  # define JOINT_FIXED(classname)                                   \
+    class classname                                                 \
+    {                                                               \
+      public:                                                       \
+      enum { NBDOF = 0 };                                           \
+      static const std::string name;                                \
+      static const int label;                                       \
+      static const int positionInConf;                              \
+      static const Spatial::Transform Xt;                           \
+      static const Spatial::Transform sXp;                          \
+      /*static Spatial::Transform Xj;*/                             \
+      static Spatial::Motion cj;                                    \
+      static const Spatial::Motion vj;                              \
+      static const Eigen::Matrix< FloatType, 6, 0 > S;              \
+      static const Eigen::Matrix< FloatType, 6, 0 > dotS;           \
+      static Spatial::Force f;                                      \
+      static Eigen::Matrix< FloatType, 0, 1 > torque;               \
+      static Eigen::Matrix< FloatType, 6, 0 > F;                    \
+                                                                    \
+      static void jcalc(                                            \
+          const Eigen::Matrix< FloatType, 0, 1 > & qi,              \
+          const Eigen::Matrix< FloatType, 0, 1 > & dqi);            \
+    };                                                              \
+    inline void classname::jcalc(                                   \
+        const Eigen::Matrix< FloatType, 0, 1 > & qi,                \
+        const Eigen::Matrix< FloatType, 0, 1 > & dqi)               \
+    {                                                               \
+    }                                                               \
+    struct e_n_d__w_i_t_h__s_e_m_i_c_o_l_o_n
+
+  # define INITIALIZE_JOINT_FIXED(classname)                        \
+    /* sXp = Xj*Xt; */                                              \
+    const Spatial::Transform classname::sXp = classname::Xt;        \
+    /*Spatial::Transform classname::Xj = Spatial::Transform();*/    \
+    Spatial::Motion classname::cj;                                  \
+    const Spatial::Motion classname::vj;                            \
+    /* const Spatial::Motion classname::vj = vector6d::Zero(); */   \
+    const Eigen::Matrix< FloatType, 6, 0 > classname::S;            \
+    const Eigen::Matrix< FloatType, 6, 0 > classname::dotS;         \
+    Spatial::Force classname::f;                                    \
+    Eigen::Matrix< FloatType, 0, 1 > classname::torque;             \
+    Eigen::Matrix< FloatType, 6, 0 > classname::F                                           \
 
   // Create a REVOLUTE_AXIS_ANY joint class
   # define JOINT_REVOLUTE_AXIS_ANY(classname, axisx, axisy, axisz)  \

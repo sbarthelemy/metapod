@@ -27,7 +27,7 @@
 
 namespace metapod
 {
-  enum { FREE_FLYER, REVOLUTE_AXIS_X, REVOLUTE_AXIS_ANY };
+  enum { FREE_FLYER, REVOLUTE_AXIS_X, REVOLUTE_AXIS_ANY, FIXED};
 
   void createBody(std::ofstream & body_hh,
                   std::ofstream & init_cc,
@@ -95,6 +95,10 @@ namespace metapod
             << ", " << axis_x << ", " << axis_y << ", " << axis_z << ");\n";
         init_cc << tab << "INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(" << name
             << ", " << axis_x << ", " << axis_y << ", " << axis_z << ");\n";
+        break;
+      case FIXED:
+        joint_hh << tab << "JOINT_FIXED(" << name ");\n";
+        init_cc << tab << "INITIALIZE_JOINT_FIXED(" << name << ");\n";
         break;
     }
     init_cc
