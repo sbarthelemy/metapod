@@ -47,9 +47,15 @@ namespace metapod
     Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF > Robot::J
         = Eigen::Matrix< FloatType, 6*Robot::NBBODIES, Robot::NBDOF >::Zero();
 
+    INITIALIZE_JOINT_FIXED(BASEJOINT);
+    const std::string BASEJOINT::name = "BASEJOINT";
+    const int BASEJOINT::label = 1;
+    const int BASEJOINT::positionInConf = 0;
+    const Spatial::Transform BASEJOINT::Xt = Spatial::Transform();
+
     INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(SHOULDER, 1, 0, 0);
     const std::string SHOULDER::name = "SHOULDER";
-    const int SHOULDER::label = 1;
+    const int SHOULDER::label = 2;
     const int SHOULDER::positionInConf = 0;
     const Spatial::Transform SHOULDER::Xt = Spatial::Transform(
       matrix3dMaker(0, 0, 1,
@@ -59,7 +65,7 @@ namespace metapod
 
     INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(ELBOW, 1, 0, 0);
     const std::string ELBOW::name = "ELBOW";
-    const int ELBOW::label = 2;
+    const int ELBOW::label = 3;
     const int ELBOW::positionInConf = 1;
     const Spatial::Transform ELBOW::Xt = Spatial::Transform(
       matrix3dMaker(1, 0, 0,
@@ -69,7 +75,7 @@ namespace metapod
 
     INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(WRIST, 1, 0, 0);
     const std::string WRIST::name = "WRIST";
-    const int WRIST::label = 3;
+    const int WRIST::label = 4;
     const int WRIST::positionInConf = 2;
     const Spatial::Transform WRIST::Xt = Spatial::Transform(
       matrix3dMaker(1, 0, 0,
@@ -77,9 +83,22 @@ namespace metapod
                     0, 0, 1),
       vector3d(0, 0, -0.4));
 
+    INITIALIZE_BODY(WORLD);
+    const std::string WORLD::name = "WORLD";
+    const int WORLD::label = 0;
+    const FloatType WORLD::mass = 2.75;
+    const vector3d WORLD::CoM = vector3d(0, 0, -0.225);
+    const matrix3d WORLD::inertie = matrix3dMaker(
+      4.68703125e-02, 0.0,            0.0,
+      0.0,            4.68703125e-02, 0.0,
+      0.0,            0.0,            9.28125000e-04);
+    Spatial::Inertia WORLD::I = spatialInertiaMaker(WORLD::mass,
+                                                    WORLD::CoM,
+                                                    WORLD::inertie);
+
     INITIALIZE_BODY(ARM);
     const std::string ARM::name = "ARM";
-    const int ARM::label = 0;
+    const int ARM::label = 1;
     const FloatType ARM::mass = 2.75;
     const vector3d ARM::CoM = vector3d(0, 0, -0.225);
     const matrix3d ARM::inertie = matrix3dMaker(
@@ -92,7 +111,7 @@ namespace metapod
 
     INITIALIZE_BODY(FOREARM);
     const std::string FOREARM::name = "FOREARM";
-    const int FOREARM::label = 1;
+    const int FOREARM::label = 2;
     const FloatType FOREARM::mass = 1.75;
     const vector3d FOREARM::CoM = vector3d(0, 0, -0.2);
     const matrix3d FOREARM::inertie = matrix3dMaker(
@@ -105,13 +124,13 @@ namespace metapod
 
     INITIALIZE_BODY(HAND);
     const std::string HAND::name = "HAND";
-    const int HAND::label = 2;
+    const int HAND::label = 3;
     const FloatType HAND::mass = 0.5;
-    const vector3d HAND::CoM = vector3d(0, 0, -0.075);
+    const vector3d HAND::CoM = vector3d(0, 0, 0);
     const matrix3d HAND::inertie = matrix3dMaker(
-      9.46875000e-04, 0.0,            0.0,
-      0.0,            9.46875000e-04, 0.0,
-      0.0,            0.0,            1.87500000e-05);
+      0.0,            0.0,            0.0,
+      0.0,            0.0,            0.0,
+      0.0,            0.0,            0.0);
     Spatial::Inertia HAND::I = spatialInertiaMaker(HAND::mass,
                                                    HAND::CoM,
                                                    HAND::inertie);
