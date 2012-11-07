@@ -92,7 +92,7 @@ set_target_properties(metapod PROPERTIES LINKER_LANGUAGE CXX)
 qi_stage_header_only_lib(metapod)
 add_subdirectory(tests)
 
-option(BENCHMARK "Build the benchmarking tool" OFF)
+option(BENCHMARK "Build the benchmarking tool" ON)
 if(${BENCHMARK})
   add_subdirectory(benchmark)
 endif(${BENCHMARK})
