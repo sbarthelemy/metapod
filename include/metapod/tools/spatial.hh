@@ -1,6 +1,7 @@
 // Copyright 2012,
 //
 // Maxime Reis
+// Antonio El Khoury
 //
 // JRL/LAAS, CNRS/AIST
 //
@@ -133,6 +134,7 @@ namespace metapod
 
         // Setters
         void w(const vector3d & v) { m_w = v; }
+        void v(const vector3d & v) { m_v = v; }
 
         // Arithmetic operators
         Motion & operator=(const vector6d & v)
@@ -284,6 +286,11 @@ namespace metapod
                          + skew(tmp)*skew(m_r))*m_E.transpose());
         }
 
+        vector3d apply(const vector3d& p) const
+        {
+          return m_E*(p - m_r);
+        }
+
         matrix6d toMatrix() const
         {
           matrix6d M;
@@ -337,15 +344,33 @@ namespace metapod
                          - skew(tmp2)*skew(m_r));
         }
 
+        vector3d applyInv(const vector3d& p) const
+        {
+          return m_E.transpose()*p + m_r;
+        }
+
         Transform inverse() const
         {
           return Transform(m_E.transpose(), -m_E*m_r);
         }
 
         // Arithmetic operators
+        Transform operator*(const FloatType & a) const
+        {
+          return Transform(a*m_E, a*m_r);
+        }
+
         Transform operator*(const Transform & X) const
         {
           return Transform(m_E*X.E(), X.r() + X.E().transpose()*m_r);
+        }
+
+        // Specialization of transform multiplication.Compute
+        // transform pXA from BXA, with p vector expressed in B
+        // coordinates: pXA = pXB*BXA
+        Transform toPointFrame(const vector3d& p) const
+        {
+          return Transform (m_E, m_r + m_E.transpose()*p);
         }
 
         Motion operator*(const Motion & mv) const

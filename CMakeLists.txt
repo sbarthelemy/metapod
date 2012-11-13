@@ -49,6 +49,8 @@ set(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
 set(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
+  include/${PROJECT_NAME}/algos/jac_point.hh
+  include/${PROJECT_NAME}/algos/jac_point_chain.hh
   )
 
 set(${PROJECT_NAME}_TOOLS_HEADERS
@@ -61,6 +63,7 @@ set(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/print.hh
   include/${PROJECT_NAME}/tools/jcalc.hh
   include/${PROJECT_NAME}/tools/bcalc.hh
+  include/${PROJECT_NAME}/tools/deepest_common_body.hh
   )
 
 # prefix all the elements of a list, in place.

@@ -1,7 +1,8 @@
-// Copyright 2011, 2012,
+// Copyright 2012,
 //
-// Maxime Reis (JRL/LAAS, CNRS/AIST)
-// Sébastien Barthélémy (Aldebaran Robotics)
+// Antonio El Khoury
+//
+// JRL/LAAS, CNRS/AIST
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -16,10 +17,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * This test solves the forward kinematics problem on a test model with a
- * reference configuration, then compares the computed transforms with the
- * reference ones
+/* 
+ * This test computes the jacobian on a test model with a reference
+ * configuration, then compares the computed jacobian with the
+ * reference jacobian
  */
 
 // Common test tools
@@ -28,7 +29,7 @@
 using namespace metapod;
 using namespace CURRENT_MODEL_NAMESPACE;
 
-BOOST_AUTO_TEST_CASE (test_bcalc)
+BOOST_AUTO_TEST_CASE (test_jac_point_chain)
 {
   // Set configuration vectors (q) to reference values.
   Robot::confVector q;
@@ -36,14 +37,14 @@ BOOST_AUTO_TEST_CASE (test_bcalc)
   initConf< Robot >::run(qconf, q);
   qconf.close();
 
-  // Apply the body calculations to the metapod multibody and print
-  // the result in a log file.
-  bcalc< Robot >::run(q);
-  const char result_file[] = "bcalc.log";
+  // Compute the jacobian and print the result in a log file.
+  jac_point_chain_robot< Robot >::jacobian_t J;
+  jac_point_chain_robot< Robot >::run(q, J);
+  const char result_file[] = "jac_point_chain.log";
   std::ofstream log(result_file, std::ofstream::out);
-  printTransforms<Robot::Tree>(log);
+  log << J << std::endl;;
   log.close();
 
   // Compare results with reference file
-  compareLogs(result_file, TEST_DIRECTORY "/bcalc.ref", 1e-3);
+  compareLogs(result_file, TEST_DIRECTORY "/jac_point_chain.ref", 1e-3);
 }
