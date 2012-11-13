@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 
+# Copyright 2011, 2012,
 #
 # Maxime Reis,
 # Antonio El Khoury
@@ -19,52 +19,39 @@
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Creation: 14/06/2011
+cmake_minimum_required(VERSION 2.8)
+project(metapod)
+find_package(qibuild)
+enable_testing()
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/cpack.cmake)
-INCLUDE(cmake/boost.cmake)
-
-SET(PROJECT_NAME metapod)
-SET(PROJECT_DESCRIPTION "Implementation of a robot dynamics library")
-SET(PROJECT_URL "https://github.com/laas/metapod")
-
-SET(CXX_DISABLE_WERROR True)
-
-# Options
-CMAKE_POLICY(SET CMP0012 NEW)
-OPTION(BENCHMARK "Build the benchmarking tool" OFF)
-
-SETUP_PROJECT()
-
-# Search for Boost.
-# Boost.Test is used by the test suite.
-SEARCH_FOR_BOOST()
-
-# Search for Eigen.
-ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIRS})
+# generate config.hh using the same template as JRL-cmake
+set(LIBRARY_NAME "METAPOD")
+set(PROJECT_VERSION "999")
+set(EXPORT_SYMBOL "metapod_EXPORTS")
+configure_file(
+  include/metapod/config.in.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
+  @ONLY)
 
 # Set header files.
-SET(${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS
+set(${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS
   include/${PROJECT_NAME}/models/simple-humanoid/body.hh
   include/${PROJECT_NAME}/models/simple-humanoid/joint.hh
   include/${PROJECT_NAME}/models/simple-humanoid/robot.hh
   )
 
-SET(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
+set(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
   include/${PROJECT_NAME}/models/simple-arm/body.hh
   include/${PROJECT_NAME}/models/simple-arm/joint.hh
   include/${PROJECT_NAME}/models/simple-arm/robot.hh
   )
 
-SET(${PROJECT_NAME}_ALGOS_HEADERS
+set(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
   )
 
-SET(${PROJECT_NAME}_TOOLS_HEADERS
+set(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/fwd.hh
   include/${PROJECT_NAME}/tools/common.hh
   include/${PROJECT_NAME}/tools/spatial.hh
@@ -76,28 +63,37 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/bcalc.hh
   )
 
-# Set header files installation prefix.
-INSTALL(FILES ${${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/models/simple-humanoid
-  )
+# prefix all the elements of a list, in place.
+function(prefix_list a_list_name a_prefix)
+  foreach(element IN LISTS "${a_list_name}")
+    list(APPEND output "${a_prefix}${element}")
+  endforeach()
+  set("${a_list_name}" "${output}" PARENT_SCOPE)
+endfunction()
 
-INSTALL(FILES ${${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/models/simple-arm
-  )
+# prefix the sources. We could have written the prefixes directly, but it would
+# have complicated merges with the upstream CMakeLists.txt
+foreach(list_suffix
+    SIMPLE_HUMANOID_MODEL_HEADERS
+    SIMPLE_ARM_MODEL_HEADERS
+    ALGOS_HEADERS
+    TOOLS_HEADERS)
+  prefix_list("${PROJECT_NAME}_${list_suffix}" "${PROJECT_SOURCE_DIR}/")
+endforeach()
+list(APPEND
+  "${PROJECT_NAME}_TOOLS_HEADERS"
+  "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh")
 
-INSTALL(FILES ${${PROJECT_NAME}_ALGOS_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/algos
-  )
+include_directories("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
+qi_create_lib(metapod
+  ${${PROJECT_NAME}_ALGOS_HEADERS}
+  ${${PROJECT_NAME}_TOOLS_HEADERS})
+set_target_properties(metapod PROPERTIES LINKER_LANGUAGE CXX)
+qi_stage_header_only_lib(metapod)
+add_subdirectory(tests)
 
-INSTALL(FILES ${${PROJECT_NAME}_TOOLS_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/tools
-  )
+option(BENCHMARK "Build the benchmarking tool" ON)
+if(${BENCHMARK})
+  add_subdirectory(benchmark)
+endif(${BENCHMARK})
 
-ADD_SUBDIRECTORY(tests)
-
-IF(${BENCHMARK})
-  ADD_SUBDIRECTORY(benchmark)
-ENDIF(${BENCHMARK})
-
-SETUP_PROJECT_FINALIZE()
-SETUP_PROJECT_CPACK()

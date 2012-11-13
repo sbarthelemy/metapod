@@ -14,10 +14,15 @@
 # GNU General Lesser Public License for more details.
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
-
-ADD_DEFINITIONS(" -DCURRENT_MODEL_NAMESPACE=metapod::${CURRENT_MODEL}")
-ADD_DEFINITIONS(
+add_definitions(" -DCURRENT_MODEL_NAMESPACE=metapod::${CURRENT_MODEL}")
+add_definitions(
    -DTEST_DIRECTORY="${CMAKE_SOURCE_DIR}/tests/data/${CURRENT_MODEL}")
+
+# simple wrapper to make merging with upstream CMakeLists easier
+function(ADD_TESTCASE test_name source_file)
+  qi_create_test(${test_name} ${source_file}
+      DEPENDS ${CURRENT_MODEL} BOOST BOOST_TEST_EXEC_MONITOR)
+endfunction()
 
 ADD_TESTCASE(test_rnea_${CURRENT_MODEL} test_rnea.cc)
 ADD_TESTCASE(test_crba_${CURRENT_MODEL} test_crba.cc)
