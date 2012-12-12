@@ -36,11 +36,9 @@
 template struct metapod::crba< metapod::simple_arm::Robot , true >;
 template struct metapod::rnea< metapod::simple_arm::Robot , true >;
 template struct metapod::jac_point_robot< metapod::simple_arm::Robot , true >;
-template struct metapod::jac_point_chain_robot< metapod::simple_arm::Robot , true >;
 template struct metapod::crba< metapod::simple_arm::Robot , false >;
 template struct metapod::rnea< metapod::simple_arm::Robot , false >;
 template struct metapod::jac_point_robot< metapod::simple_arm::Robot , false >;
-template struct metapod::jac_point_chain_robot< metapod::simple_arm::Robot , false >;
 
 namespace metapod
 {
@@ -57,7 +55,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                    -1, 0, 0),
-      vector3d(0, 0, 1));
+      Vector3d(0, 0, 1));
 
     INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(ELBOW, 1, 0, 0);
     const std::string ELBOW::name = "ELBOW";
@@ -67,7 +65,7 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, 0, -0.45));
+      Vector3d(0, 0, -0.45));
 
     INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(WRIST, 1, 0, 0);
     const std::string WRIST::name = "WRIST";
@@ -77,14 +75,14 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, 0, -0.4));
+      Vector3d(0, 0, -0.4));
 
     INITIALIZE_BODY(ARM);
     const std::string ARM::name = "ARM";
     const int ARM::label = 0;
     const FloatType ARM::mass = 2.75;
-    const vector3d ARM::CoM = vector3d(0, 0, -0.225);
-    const matrix3d ARM::inertie = matrix3dMaker(
+    const Vector3d ARM::CoM = Vector3d(0, 0, -0.225);
+    const Matrix3d ARM::inertie = matrix3dMaker(
       4.68703125e-02, 0.0,            0.0,
       0.0,            4.68703125e-02, 0.0,
       0.0,            0.0,            9.28125000e-04);
@@ -96,8 +94,8 @@ namespace metapod
     const std::string FOREARM::name = "FOREARM";
     const int FOREARM::label = 1;
     const FloatType FOREARM::mass = 1.75;
-    const vector3d FOREARM::CoM = vector3d(0, 0, -0.2);
-    const matrix3d FOREARM::inertie = matrix3dMaker(
+    const Vector3d FOREARM::CoM = Vector3d(0, 0, -0.2);
+    const Matrix3d FOREARM::inertie = matrix3dMaker(
       2.35666667e-02, 0.0,            0.0,
       0.0,            2.35666667e-02, 0.0,
       0.0,            0.0,            4.66666667e-04);
@@ -109,8 +107,8 @@ namespace metapod
     const std::string HAND::name = "HAND";
     const int HAND::label = 2;
     const FloatType HAND::mass = 0.5;
-    const vector3d HAND::CoM = vector3d(0, 0, -0.075);
-    const matrix3d HAND::inertie = matrix3dMaker(
+    const Vector3d HAND::CoM = Vector3d(0, 0, -0.075);
+    const Matrix3d HAND::inertie = matrix3dMaker(
       9.46875000e-04, 0.0,            0.0,
       0.0,            9.46875000e-04, 0.0,
       0.0,            0.0,            1.87500000e-05);

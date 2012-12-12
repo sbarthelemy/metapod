@@ -17,6 +17,8 @@
 add_definitions(" -DCURRENT_MODEL_NAMESPACE=metapod::${CURRENT_MODEL}")
 add_definitions(
    -DTEST_DIRECTORY="${CMAKE_SOURCE_DIR}/tests/data/${CURRENT_MODEL}")
+STRING(TOUPPER "${CURRENT_MODEL}" CURRENT_MODEL_UPPER)
+ADD_DEFINITIONS(" -DCURRENT_MODEL_IS_${CURRENT_MODEL_UPPER}=1")
 
 # simple wrapper to make merging with upstream CMakeLists easier
 function(ADD_TESTCASE test_name source_file)

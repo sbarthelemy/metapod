@@ -1,9 +1,8 @@
 // Copyright 2012,
 //
-// Maxime Reis
-// Antonio El Khoury
+// Olivier STASSE
 //
-// JRL/LAAS, CNRS/AIST
+// LAAS, CNRS
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -19,17 +18,12 @@
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.(2);
 
 
-#ifndef METAPOD_SPATIAL_ALGEBRA_HH
-# define METAPOD_SPATIAL_ALGEBRA_HH
+#ifndef METAPOD_SPATIAL_ALGEBRA_CONSTRAINT_MOTION_HH
+# define METAPOD_SPATIAL_ALGEBRA_CONSTRAINT_MOTION_HH
 
 # include "metapod/tools/fwd.hh"
 
-# include "metapod/tools/spatial/motion.hh"
-# include "metapod/tools/spatial/force.hh"
-# include "metapod/tools/spatial/inertia.hh"
-# include "metapod/tools/spatial/transform.hh"
-# include "metapod/tools/spatial/constraintmotion.hh"
-
-# include "metapod/tools/backward.hh"
-
-# endif
+#include "metapod/tools/spatial/cm-oneaxis.hh"
+#include "metapod/tools/spatial/cm-freeflyer.hh"
+#include "metapod/tools/spatial/cm-anyaxis.hh"
+#endif /* METAPOD_SPATIAL_ALGEBRA_CONSTRAINT_MOTION_HH */

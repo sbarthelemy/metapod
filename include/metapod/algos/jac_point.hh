@@ -63,17 +63,14 @@ namespace metapod
     /// \param b_p Coordinates of point in Body coordinates.
     /// \retval J Computed jacobian of size 6xRobot::NBDOF.
     static void run(const typename Robot::confVector & q,
-                    const vector3d & b_p,
+                    const Vector3d & b_p,
                     jacobian_t & J)
     {
-      // Reset jacobian.
-      J.setZero ();
-
       // Update body transformations.
       bcalc< Robot >::run(q);
 
       // Compute point coordinates in world frame.
-      vector3d p = Body::iX0.applyInv(b_p);
+      Vector3d p = Body::iX0.applyInv(b_p);
 
       // Call internal jacobian routine.
       jac_point_internal< Robot, Body >::run(p, J);
@@ -91,15 +88,15 @@ namespace metapod
     /// \brief Compute the articular jacobian J.
     ///
     /// \sa jac_point< Robot, Body, true >::run().
-    static void run(const typename Robot::confVector & q,
-                    const vector3d & b_p,
+    static void run(const typename Robot::confVector & ,
+                    const Vector3d & b_p,
                     jacobian_t & J)
     {
       // Reset jacobian.
       J.setZero ();
 
       // Compute point coordinates in world frame.
-      vector3d p = Body::iX0.applyInv(b_p);
+      Vector3d p = Body::iX0.applyInv(b_p);
 
       // Call internal jacobian routine.
       jac_point_internal< Robot, Body >::run(p, J);
@@ -118,7 +115,7 @@ namespace metapod
     typedef typename jac_point< Robot, Body >::jacobian_t
     jacobian_t;
 
-    static void run(const vector3d & p,
+    static void run(const Vector3d & p,
                     jacobian_t & J) __attribute__ ((hot))
     {
       // Compute jacobian block for current node. Formula is given by:
@@ -127,8 +124,8 @@ namespace metapod
       // iX0 is the world transform in the ith body frame,
       // Si is the ith joint motion subspace matrix.
       J.template
-        block<6,Joint::NBDOF>(0,Joint::positionInConf) =
-        Joint::applyToS(Body::iX0.inverse ().toPointFrame (p));
+	block<6,Joint::NBDOF>(0,Joint::positionInConf) =
+	Body::iX0.inverse ().toPointFrame (p).apply(Joint::S);
 
       // Recurse over body parent.
       jac_point_internal< Robot, typename Body::Parent >::run(p, J);
@@ -143,7 +140,7 @@ namespace metapod
     typedef typename jac_point< Robot, NP >::jacobian_t
     jacobian_t;
 
-    static void run(const vector3d &,
+    static void run(const Vector3d &,
                     jacobian_t &) {}
   };
 
@@ -206,7 +203,7 @@ namespace metapod
       // Compute jacobian sub-block.
       bodyJacobian_t subJ = bodyJacobian_t::Zero();
       jac_point< Robot, typename Node::Body, bcalc >
-        ::run(q, vector3d(0,0,0), subJ);
+        ::run(q, Vector3d(0,0,0), subJ);
       J.template block<6,Robot::NBDOF>(6*Node::Body::label, 0) = subJ;
 
       // recursion on children

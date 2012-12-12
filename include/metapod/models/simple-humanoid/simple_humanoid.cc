@@ -27,11 +27,9 @@
 template struct metapod::crba< metapod::simple_humanoid::Robot , true >;
 template struct metapod::rnea< metapod::simple_humanoid::Robot , true >;
 template struct metapod::jac_point_robot< metapod::simple_humanoid::Robot , true >;
-template struct metapod::jac_point_chain_robot< metapod::simple_humanoid::Robot , true >;
 template struct metapod::crba< metapod::simple_humanoid::Robot , false >;
 template struct metapod::rnea< metapod::simple_humanoid::Robot , false >;
 template struct metapod::jac_point_robot< metapod::simple_humanoid::Robot , false >;
-template struct metapod::jac_point_chain_robot< metapod::simple_humanoid::Robot , false >;
 
 namespace metapod
 {
@@ -49,7 +47,7 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init WAIST_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(WAIST_P);
@@ -60,7 +58,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init WAIST_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(WAIST_R);
@@ -71,7 +69,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init CHEST
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(CHEST);
@@ -82,7 +80,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     1, 0, 0,
                     0, 1, 0),
-      vector3d(0, 0, 0.35));
+      Vector3d(0, 0, 0.35));
 
     // Init LARM_SHOULDER_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_SHOULDER_P);
@@ -93,7 +91,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0.21));
+      Vector3d(0, 0, 0.21));
 
     // Init LARM_SHOULDER_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_SHOULDER_R);
@@ -104,7 +102,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init LARM_SHOULDER_Y
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_SHOULDER_Y);
@@ -115,7 +113,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     1, 0, 0,
                     0, 1, 0),
-      vector3d(0, 0, -0.263));
+      Vector3d(0, 0, -0.263));
 
     // Init LARM_ELBOW
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_ELBOW);
@@ -126,7 +124,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init LARM_WRIST_Y
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_WRIST_Y);
@@ -137,7 +135,7 @@ namespace metapod
       matrix3dMaker(0, 0, -1,
                     0, 1, 0,
                     1, 0, 0),
-      vector3d(0, 0, 0.247));
+      Vector3d(0, 0, 0.247));
 
     // Init LARM_WRIST_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_WRIST_P);
@@ -148,7 +146,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init LARM_WRIST_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LARM_WRIST_R);
@@ -159,7 +157,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RARM_SHOULDER_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_SHOULDER_P);
@@ -170,7 +168,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, -0.21));
+      Vector3d(0, 0, -0.21));
 
     // Init RARM_SHOULDER_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_SHOULDER_R);
@@ -181,7 +179,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RARM_SHOULDER_Y
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_SHOULDER_Y);
@@ -192,7 +190,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     1, 0, 0,
                     0, 1, 0),
-      vector3d(0, 0, -0.263));
+      Vector3d(0, 0, -0.263));
 
     // Init RARM_ELBOW
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_ELBOW);
@@ -203,7 +201,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RARM_WRIST_Y
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_WRIST_Y);
@@ -214,7 +212,7 @@ namespace metapod
       matrix3dMaker(0, 0, -1,
                     0, 1, 0,
                     1, 0, 0),
-      vector3d(0, 0, 0.247));
+      Vector3d(0, 0, 0.247));
 
     // Init RARM_WRIST_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_WRIST_P);
@@ -225,7 +223,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RARM_WRIST_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RARM_WRIST_R);
@@ -236,7 +234,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init LLEG_HIP_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LLEG_HIP_R);
@@ -247,7 +245,7 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, 0.09, 0));
+      Vector3d(0, 0.09, 0));
 
     // Init LLEG_HIP_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LLEG_HIP_P);
@@ -258,7 +256,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init LLEG_HIP_Y
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LLEG_HIP_Y);
@@ -269,7 +267,7 @@ namespace metapod
       matrix3dMaker(0, 0, -1,
                     0, 1, 0,
                     1, 0, 0),
-      vector3d(0, 0, 0.3535));
+      Vector3d(0, 0, 0.3535));
 
     // Init LLEG_KNEE
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LLEG_KNEE);
@@ -280,7 +278,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init LLEG_ANKLE_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LLEG_ANKLE_P);
@@ -291,7 +289,7 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, 0, 0.3));
+      Vector3d(0, 0, 0.3));
 
     // Init LLEG_ANKLE_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(LLEG_ANKLE_R);
@@ -302,7 +300,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RLEG_HIP_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RLEG_HIP_R);
@@ -313,7 +311,7 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, -0.09, 0));
+      Vector3d(0, -0.09, 0));
 
     // Init RLEG_HIP_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RLEG_HIP_P);
@@ -324,7 +322,7 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RLEG_HIP_Y
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RLEG_HIP_Y);
@@ -335,7 +333,7 @@ namespace metapod
       matrix3dMaker(0, 0, -1,
                     0, 1, 0,
                     1, 0, 0),
-      vector3d(0, 0, 0.3535));
+      Vector3d(0, 0, 0.3535));
 
     // Init RLEG_KNEE
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RLEG_KNEE);
@@ -346,7 +344,7 @@ namespace metapod
       matrix3dMaker(0, 0, 1,
                     0, 1, 0,
                     -1, 0, 0),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     // Init RLEG_ANKLE_P
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RLEG_ANKLE_P);
@@ -357,7 +355,7 @@ namespace metapod
       matrix3dMaker(1, 0, 0,
                     0, 1, 0,
                     0, 0, 1),
-      vector3d(0, 0, 0.3));
+      Vector3d(0, 0, 0.3));
 
     // Init RLEG_ANKLE_R
     INITIALIZE_JOINT_REVOLUTE_AXIS_X(RLEG_ANKLE_R);
@@ -368,15 +366,15 @@ namespace metapod
       matrix3dMaker(0, 1, 0,
                     1, 0, 0,
                     0, 0, -1),
-      vector3d(0, 0, 0));
+      Vector3d(0, 0, 0));
 
     INITIALIZE_BODY(WAIST_LINK0);
     // Initialization of WAIST_LINK0;
     const std::string WAIST_LINK0::name = "WAIST_LINK0";
     const int WAIST_LINK0::label = 0;
     const FloatType WAIST_LINK0::mass = 27;
-    const vector3d WAIST_LINK0::CoM = vector3d(0, 0, 0.0375);
-    const matrix3d WAIST_LINK0::inertie = matrix3dMaker(
+    const Vector3d WAIST_LINK0::CoM = Vector3d(0, 0, 0.0375);
+    const Matrix3d WAIST_LINK0::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -389,8 +387,8 @@ namespace metapod
     const std::string WAIST_LINK1::name = "WAIST_LINK1";
     const int WAIST_LINK1::label = 1;
     const FloatType WAIST_LINK1::mass = 6;
-    const vector3d WAIST_LINK1::CoM = vector3d(0, 0, 0.1);
-    const matrix3d WAIST_LINK1::inertie = matrix3dMaker(
+    const Vector3d WAIST_LINK1::CoM = Vector3d(0, 0, 0.1);
+    const Matrix3d WAIST_LINK1::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -403,8 +401,8 @@ namespace metapod
     const std::string WAIST_LINK2::name = "WAIST_LINK2";
     const int WAIST_LINK2::label = 2;
     const FloatType WAIST_LINK2::mass = 30;
-    const vector3d WAIST_LINK2::CoM = vector3d(0.11, 0, 0.25);
-    const matrix3d WAIST_LINK2::inertie = matrix3dMaker(
+    const Vector3d WAIST_LINK2::CoM = Vector3d(0.11, 0, 0.25);
+    const Matrix3d WAIST_LINK2::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -417,8 +415,8 @@ namespace metapod
     const std::string WAIST_LINK3::name = "WAIST_LINK3";
     const int WAIST_LINK3::label = 3;
     const FloatType WAIST_LINK3::mass = 13;
-    const vector3d WAIST_LINK3::CoM = vector3d(0, 0, 0);
-    const matrix3d WAIST_LINK3::inertie = matrix3dMaker(
+    const Vector3d WAIST_LINK3::CoM = Vector3d(0, 0, 0);
+    const Matrix3d WAIST_LINK3::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -431,8 +429,8 @@ namespace metapod
     const std::string LARM_LINK1::name = "LARM_LINK1";
     const int LARM_LINK1::label = 4;
     const FloatType LARM_LINK1::mass = 3;
-    const vector3d LARM_LINK1::CoM = vector3d(0, 0.1, 0);
-    const matrix3d LARM_LINK1::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK1::CoM = Vector3d(0, 0.1, 0);
+    const Matrix3d LARM_LINK1::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -445,8 +443,8 @@ namespace metapod
     const std::string LARM_LINK2::name = "LARM_LINK2";
     const int LARM_LINK2::label = 5;
     const FloatType LARM_LINK2::mass = 0.6;
-    const vector3d LARM_LINK2::CoM = vector3d(0, 0, -0.1);
-    const matrix3d LARM_LINK2::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK2::CoM = Vector3d(0, 0, -0.1);
+    const Matrix3d LARM_LINK2::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -459,8 +457,8 @@ namespace metapod
     const std::string LARM_LINK3::name = "LARM_LINK3";
     const int LARM_LINK3::label = 6;
     const FloatType LARM_LINK3::mass = 1;
-    const vector3d LARM_LINK3::CoM = vector3d(0, 0, 0);
-    const matrix3d LARM_LINK3::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK3::CoM = Vector3d(0, 0, 0);
+    const Matrix3d LARM_LINK3::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -473,8 +471,8 @@ namespace metapod
     const std::string LARM_LINK4::name = "LARM_LINK4";
     const int LARM_LINK4::label = 7;
     const FloatType LARM_LINK4::mass = 0.6;
-    const vector3d LARM_LINK4::CoM = vector3d(0, 0, 0.3);
-    const matrix3d LARM_LINK4::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK4::CoM = Vector3d(0, 0, 0.3);
+    const Matrix3d LARM_LINK4::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -487,8 +485,8 @@ namespace metapod
     const std::string LARM_LINK5::name = "LARM_LINK5";
     const int LARM_LINK5::label = 8;
     const FloatType LARM_LINK5::mass = 0.4;
-    const vector3d LARM_LINK5::CoM = vector3d(0.1, 0, 0);
-    const matrix3d LARM_LINK5::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK5::CoM = Vector3d(0.1, 0, 0);
+    const Matrix3d LARM_LINK5::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -501,8 +499,8 @@ namespace metapod
     const std::string LARM_LINK6::name = "LARM_LINK6";
     const int LARM_LINK6::label = 9;
     const FloatType LARM_LINK6::mass = 0.4;
-    const vector3d LARM_LINK6::CoM = vector3d(0, -0.1, 0);
-    const matrix3d LARM_LINK6::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK6::CoM = Vector3d(0, -0.1, 0);
+    const Matrix3d LARM_LINK6::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -515,8 +513,8 @@ namespace metapod
     const std::string LARM_LINK7::name = "LARM_LINK7";
     const int LARM_LINK7::label = 10;
     const FloatType LARM_LINK7::mass = 0.4;
-    const vector3d LARM_LINK7::CoM = vector3d(0, 0, -0.1);
-    const matrix3d LARM_LINK7::inertie = matrix3dMaker(
+    const Vector3d LARM_LINK7::CoM = Vector3d(0, 0, -0.1);
+    const Matrix3d LARM_LINK7::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -529,8 +527,8 @@ namespace metapod
     const std::string RARM_LINK1::name = "RARM_LINK1";
     const int RARM_LINK1::label = 11;
     const FloatType RARM_LINK1::mass = 3;
-    const vector3d RARM_LINK1::CoM = vector3d(0, 0.1, 0);
-    const matrix3d RARM_LINK1::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK1::CoM = Vector3d(0, 0.1, 0);
+    const Matrix3d RARM_LINK1::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -543,8 +541,8 @@ namespace metapod
     const std::string RARM_LINK2::name = "RARM_LINK2";
     const int RARM_LINK2::label = 12;
     const FloatType RARM_LINK2::mass = 0.6;
-    const vector3d RARM_LINK2::CoM = vector3d(0, 0, -0.1);
-    const matrix3d RARM_LINK2::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK2::CoM = Vector3d(0, 0, -0.1);
+    const Matrix3d RARM_LINK2::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -557,8 +555,8 @@ namespace metapod
     const std::string RARM_LINK3::name = "RARM_LINK3";
     const int RARM_LINK3::label = 13;
     const FloatType RARM_LINK3::mass = 1;
-    const vector3d RARM_LINK3::CoM = vector3d(0, 0, 0);
-    const matrix3d RARM_LINK3::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK3::CoM = Vector3d(0, 0, 0);
+    const Matrix3d RARM_LINK3::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -571,8 +569,8 @@ namespace metapod
     const std::string RARM_LINK4::name = "RARM_LINK4";
     const int RARM_LINK4::label = 14;
     const FloatType RARM_LINK4::mass = 0.6;
-    const vector3d RARM_LINK4::CoM = vector3d(0, 0, 0.3);
-    const matrix3d RARM_LINK4::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK4::CoM = Vector3d(0, 0, 0.3);
+    const Matrix3d RARM_LINK4::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -585,8 +583,8 @@ namespace metapod
     const std::string RARM_LINK5::name = "RARM_LINK5";
     const int RARM_LINK5::label = 15;
     const FloatType RARM_LINK5::mass = 0.4;
-    const vector3d RARM_LINK5::CoM = vector3d(0.1, 0, 0);
-    const matrix3d RARM_LINK5::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK5::CoM = Vector3d(0.1, 0, 0);
+    const Matrix3d RARM_LINK5::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -599,8 +597,8 @@ namespace metapod
     const std::string RARM_LINK6::name = "RARM_LINK6";
     const int RARM_LINK6::label = 16;
     const FloatType RARM_LINK6::mass = 0.4;
-    const vector3d RARM_LINK6::CoM = vector3d(0, -0.1, 0);
-    const matrix3d RARM_LINK6::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK6::CoM = Vector3d(0, -0.1, 0);
+    const Matrix3d RARM_LINK6::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -613,8 +611,8 @@ namespace metapod
     const std::string RARM_LINK7::name = "RARM_LINK7";
     const int RARM_LINK7::label = 17;
     const FloatType RARM_LINK7::mass = 0.4;
-    const vector3d RARM_LINK7::CoM = vector3d(0, 0, -0.1);
-    const matrix3d RARM_LINK7::inertie = matrix3dMaker(
+    const Vector3d RARM_LINK7::CoM = Vector3d(0, 0, -0.1);
+    const Matrix3d RARM_LINK7::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -627,8 +625,8 @@ namespace metapod
     const std::string LLEG_LINK1::name = "LLEG_LINK1";
     const int LLEG_LINK1::label = 18;
     const FloatType LLEG_LINK1::mass = 2.5;
-    const vector3d LLEG_LINK1::CoM = vector3d(0, 0.1, 0);
-    const matrix3d LLEG_LINK1::inertie = matrix3dMaker(
+    const Vector3d LLEG_LINK1::CoM = Vector3d(0, 0.1, 0);
+    const Matrix3d LLEG_LINK1::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -641,8 +639,8 @@ namespace metapod
     const std::string LLEG_LINK2::name = "LLEG_LINK2";
     const int LLEG_LINK2::label = 19;
     const FloatType LLEG_LINK2::mass = 2;
-    const vector3d LLEG_LINK2::CoM = vector3d(0, 0, 0.15);
-    const matrix3d LLEG_LINK2::inertie = matrix3dMaker(
+    const Vector3d LLEG_LINK2::CoM = Vector3d(0, 0, 0.15);
+    const Matrix3d LLEG_LINK2::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -655,8 +653,8 @@ namespace metapod
     const std::string LLEG_LINK3::name = "LLEG_LINK3";
     const int LLEG_LINK3::label = 20;
     const FloatType LLEG_LINK3::mass = 5.1;
-    const vector3d LLEG_LINK3::CoM = vector3d(0, 0, 0.04);
-    const matrix3d LLEG_LINK3::inertie = matrix3dMaker(
+    const Vector3d LLEG_LINK3::CoM = Vector3d(0, 0, 0.04);
+    const Matrix3d LLEG_LINK3::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -669,8 +667,8 @@ namespace metapod
     const std::string LLEG_LINK4::name = "LLEG_LINK4";
     const int LLEG_LINK4::label = 21;
     const FloatType LLEG_LINK4::mass = 7;
-    const vector3d LLEG_LINK4::CoM = vector3d(0, 0, 0.3);
-    const matrix3d LLEG_LINK4::inertie = matrix3dMaker(
+    const Vector3d LLEG_LINK4::CoM = Vector3d(0, 0, 0.3);
+    const Matrix3d LLEG_LINK4::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -683,8 +681,8 @@ namespace metapod
     const std::string LLEG_LINK5::name = "LLEG_LINK5";
     const int LLEG_LINK5::label = 22;
     const FloatType LLEG_LINK5::mass = 2.5;
-    const vector3d LLEG_LINK5::CoM = vector3d(0, -0.15, 0);
-    const matrix3d LLEG_LINK5::inertie = matrix3dMaker(
+    const Vector3d LLEG_LINK5::CoM = Vector3d(0, -0.15, 0);
+    const Matrix3d LLEG_LINK5::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -697,8 +695,8 @@ namespace metapod
     const std::string LLEG_LINK6::name = "LLEG_LINK6";
     const int LLEG_LINK6::label = 23;
     const FloatType LLEG_LINK6::mass = 1.9;
-    const vector3d LLEG_LINK6::CoM = vector3d(0.28, 0, -0.2);
-    const matrix3d LLEG_LINK6::inertie = matrix3dMaker(
+    const Vector3d LLEG_LINK6::CoM = Vector3d(0.28, 0, -0.2);
+    const Matrix3d LLEG_LINK6::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -711,8 +709,8 @@ namespace metapod
     const std::string RLEG_LINK1::name = "RLEG_LINK1";
     const int RLEG_LINK1::label = 24;
     const FloatType RLEG_LINK1::mass = 2.5;
-    const vector3d RLEG_LINK1::CoM = vector3d(0, -0.1, 0);
-    const matrix3d RLEG_LINK1::inertie = matrix3dMaker(
+    const Vector3d RLEG_LINK1::CoM = Vector3d(0, -0.1, 0);
+    const Matrix3d RLEG_LINK1::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -725,8 +723,8 @@ namespace metapod
     const std::string RLEG_LINK2::name = "RLEG_LINK2";
     const int RLEG_LINK2::label = 25;
     const FloatType RLEG_LINK2::mass = 2;
-    const vector3d RLEG_LINK2::CoM = vector3d(0, 0, 0.15);
-    const matrix3d RLEG_LINK2::inertie = matrix3dMaker(
+    const Vector3d RLEG_LINK2::CoM = Vector3d(0, 0, 0.15);
+    const Matrix3d RLEG_LINK2::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -739,8 +737,8 @@ namespace metapod
     const std::string RLEG_LINK3::name = "RLEG_LINK3";
     const int RLEG_LINK3::label = 26;
     const FloatType RLEG_LINK3::mass = 5.1;
-    const vector3d RLEG_LINK3::CoM = vector3d(0, 0, -0.04);
-    const matrix3d RLEG_LINK3::inertie = matrix3dMaker(
+    const Vector3d RLEG_LINK3::CoM = Vector3d(0, 0, -0.04);
+    const Matrix3d RLEG_LINK3::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -753,8 +751,8 @@ namespace metapod
     const std::string RLEG_LINK4::name = "RLEG_LINK4";
     const int RLEG_LINK4::label = 27;
     const FloatType RLEG_LINK4::mass = 7;
-    const vector3d RLEG_LINK4::CoM = vector3d(0, 0, 0.3);
-    const matrix3d RLEG_LINK4::inertie = matrix3dMaker(
+    const Vector3d RLEG_LINK4::CoM = Vector3d(0, 0, 0.3);
+    const Matrix3d RLEG_LINK4::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -767,8 +765,8 @@ namespace metapod
     const std::string RLEG_LINK5::name = "RLEG_LINK5";
     const int RLEG_LINK5::label = 28;
     const FloatType RLEG_LINK5::mass = 2.5;
-    const vector3d RLEG_LINK5::CoM = vector3d(0, -0.15, 0);
-    const matrix3d RLEG_LINK5::inertie = matrix3dMaker(
+    const Vector3d RLEG_LINK5::CoM = Vector3d(0, -0.15, 0);
+    const Matrix3d RLEG_LINK5::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
@@ -781,8 +779,8 @@ namespace metapod
     const std::string RLEG_LINK6::name = "RLEG_LINK6";
     const int RLEG_LINK6::label = 29;
     const FloatType RLEG_LINK6::mass = 1.9;
-    const vector3d RLEG_LINK6::CoM = vector3d(0.28, 0, -0.2);
-    const matrix3d RLEG_LINK6::inertie = matrix3dMaker(
+    const Vector3d RLEG_LINK6::CoM = Vector3d(0.28, 0, -0.2);
+    const Matrix3d RLEG_LINK6::inertie = matrix3dMaker(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1);
