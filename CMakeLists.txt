@@ -24,6 +24,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/boost.cmake)
+INCLUDE(cmakeutils.cmake)
 
 SET(PROJECT_NAME metapod)
 SET(PROJECT_DESCRIPTION "Implementation of a robot dynamics library")
@@ -46,18 +47,6 @@ ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
 INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIRS})
 
 # Set header files.
-SET(${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS
-  include/${PROJECT_NAME}/models/simple-humanoid/body.hh
-  include/${PROJECT_NAME}/models/simple-humanoid/joint.hh
-  include/${PROJECT_NAME}/models/simple-humanoid/robot.hh
-  )
-
-SET(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
-  include/${PROJECT_NAME}/models/simple-arm/body.hh
-  include/${PROJECT_NAME}/models/simple-arm/joint.hh
-  include/${PROJECT_NAME}/models/simple-arm/robot.hh
-  )
-
 SET(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
@@ -86,14 +75,6 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   )
 
 # Set header files installation prefix.
-INSTALL(FILES ${${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/models/simple-humanoid
-  )
-
-INSTALL(FILES ${${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/models/simple-arm
-  )
-
 INSTALL(FILES ${${PROJECT_NAME}_ALGOS_HEADERS}
   DESTINATION include/${PROJECT_NAME}/algos
   )
@@ -101,6 +82,9 @@ INSTALL(FILES ${${PROJECT_NAME}_ALGOS_HEADERS}
 INSTALL(FILES ${${PROJECT_NAME}_TOOLS_HEADERS}
   DESTINATION include/${PROJECT_NAME}/tools
   )
+
+ADD_SUBDIRECTORY(include/metapod/models/simple-humanoid)
+ADD_SUBDIRECTORY(include/metapod/models/simple-arm)
 
 ADD_SUBDIRECTORY(tests)
 
