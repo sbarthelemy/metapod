@@ -26,9 +26,6 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/)
 # Make Boost.Test generates the main function in test cases.
 ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
 
-ADD_LIBRARY(simple_humanoid SHARED ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-humanoid/simple_humanoid.cc)
-ADD_LIBRARY(simple_arm SHARED ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-arm/simple_arm.cc)
-
 # ADD_TESTCASE(NAME)
 # ------------------------
 #
