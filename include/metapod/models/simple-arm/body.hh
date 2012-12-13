@@ -31,9 +31,9 @@ namespace metapod
 {
   namespace simple_arm
   {
-    CREATE_BODY(ARM, NP, SHOULDER);
-    CREATE_BODY(FOREARM, ARM, ELBOW);
-    CREATE_BODY(HAND, FOREARM, WRIST);
+    CREATE_BODY(SIMPLE_ARM, ARM, NP, SHOULDER);
+    CREATE_BODY(SIMPLE_ARM, FOREARM, ARM, ELBOW);
+    CREATE_BODY(SIMPLE_ARM, HAND, FOREARM, WRIST);
   } // end of namespace simple_arm
 } // end of namespace metapod
 
