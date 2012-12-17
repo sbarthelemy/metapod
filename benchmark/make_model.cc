@@ -96,29 +96,23 @@ void metapod::benchmark::generate_model(const std::string & name, int depth)
   lib_cc
     << "# include \"sample_" << NBDOF << "_dof.hh\"\n"
     << "\n"
-    << "template struct metapod::crba< metapod::sample_" << NBDOF << "_dof::Robot , true >;\n"
-    << "template struct metapod::rnea< metapod::sample_" << NBDOF << "_dof::Robot , true >;\n"
-    << "template struct metapod::crba< metapod::sample_" << NBDOF << "_dof::Robot , false >;\n"
-    << "template struct metapod::rnea< metapod::sample_" << NBDOF << "_dof::Robot , false >;\n"
-    << "\n"
     << "namespace metapod\n"
     << "{\n"
     << "  namespace sample_" << NBDOF << "_dof\n"
     << "  {\n"
     << "    Eigen::Matrix< FloatType, Robot::NBDOF, Robot::NBDOF > Robot::H;\n\n";
-      
+
   std::string tab = "    ";
   // Create Root Joint
   createJoint(joint_hh, lib_cc, REVOLUTE_AXIS_X, "J0", 0, 0,
-              Matrix3d::Random(), 
+              Matrix3d::Random(),
               Vector3d::Random(), tab);
 
   // Create Root Body
   createBody(body_hh, lib_cc, "B0", "NP", "J0", 0, 1.,
              Vector3d::Random(),
              Matrix3d::Random(),
-             tab,
-             false);
+             tab);
 
   robot_hh << "        typedef Node< B0,\n"
            << "                      J0,\n";
@@ -178,7 +172,7 @@ void metapod::benchmark::buildTree(std::ofstream & robot_hh,
     *label = *label+1;
     addNode(body_hh, joint_hh, lib_cc, *label, parent_label);
     robot_hh << tab.str() << "Node< B" << *label << ", J" << *label << ">\n";
-  }  
+  }
 }
 
 void metapod::benchmark::addNode(std::ofstream & body_hh,
@@ -192,7 +186,7 @@ void metapod::benchmark::addNode(std::ofstream & body_hh,
   joint_name << "J" << label;
   std::string tab = "    ";
   createBody(body_hh, lib_cc, name.str(), parent_name.str(), joint_name.str(),
-             label, 1., Vector3d::Random(), Matrix3d::Random(), tab, true);
+             label, 1., Vector3d::Random(), Matrix3d::Random(), tab);
   createJoint(joint_hh, lib_cc, REVOLUTE_AXIS_X, joint_name.str(), label, label,
               Matrix3d::Random(), Vector3d::Random(), tab);
 }
@@ -210,20 +204,7 @@ void metapod::benchmark::makeLibraryHeader(std::ofstream & lib_hh, int nbdof)
     << "#ifndef METAPOD_SAMPLE_" << nbdof << "_DOF_HH\n"
     << "# define METAPOD_SAMPLE_" << nbdof << "_DOF_HH\n"
     << std::endl
-    << "# include \"metapod/tools/common.hh\"\n"
-    << "# include \"metapod/algos/rnea.hh\"\n"
-    << "# include \"metapod/algos/crba.hh\"\n"
-    << std::endl
     << "# include \"robot.hh\"\n"
-    << std::endl
-    << "extern template struct metapod::crba< metapod::sample_" << nbdof
-      << "_dof::Robot , true >;\n"
-    << "extern template struct metapod::rnea< metapod::sample_" << nbdof
-      << "_dof::Robot , true >;\n"
-    << "extern template struct metapod::crba< metapod::sample_" << nbdof
-      << "_dof::Robot , false >;\n"
-    << "extern template struct metapod::rnea< metapod::sample_" << nbdof
-      << "_dof::Robot , false >;\n"
     << std::endl
     << "#endif";
 }
