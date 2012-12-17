@@ -18,19 +18,6 @@
 #
 # Creation: 14/06/2011
 
-qi_create_lib(simple_humanoid SHARED
-    ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-humanoid/simple_humanoid.cc
-    ${${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS})
-qi_use_lib(simple_humanoid metapod EIGEN3)
-qi_stage_lib(simple_humanoid)
-
-qi_create_lib(simple_arm SHARED
-    ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-arm/simple_arm.cc
-    ${${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS})
-qi_use_lib(simple_arm metapod EIGEN3)
-qi_stage_lib(simple_arm)
-
-
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 

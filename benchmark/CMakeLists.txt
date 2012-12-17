@@ -21,12 +21,20 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/benchmark)
 
 # Returns the list of source files for sample_${dof}_dof model
 FUNCTION(GET_SAMPLE_SOURCE_FILES output dof)
+    SET(LIBRARY_NAME "SAMPLE_${dof}_DOF")
+    SET(EXPORT_SYMBOL "sample_${dof}_dof")
+    CONFIGURE_FILE(
+        ${PROJECT_SOURCE_DIR}/cmake/config.hh.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/config.hh
+        @ONLY
+        )
     SET("${output}"
         ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/sample_${dof}_dof.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/sample_${dof}_dof.cc
         ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/body.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/joint.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/robot.hh
+        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/config.hh
         PARENT_SCOPE)
 ENDFUNCTION()
 

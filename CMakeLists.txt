@@ -33,18 +33,6 @@ configure_file(
   @ONLY)
 
 # Set header files.
-set(${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS
-  include/${PROJECT_NAME}/models/simple-humanoid/body.hh
-  include/${PROJECT_NAME}/models/simple-humanoid/joint.hh
-  include/${PROJECT_NAME}/models/simple-humanoid/robot.hh
-  )
-
-set(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
-  include/${PROJECT_NAME}/models/simple-arm/body.hh
-  include/${PROJECT_NAME}/models/simple-arm/joint.hh
-  include/${PROJECT_NAME}/models/simple-arm/robot.hh
-  )
-
 set(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
@@ -70,28 +58,8 @@ set(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/jcalc.hh
   include/${PROJECT_NAME}/tools/bcalc.hh
   include/${PROJECT_NAME}/tools/jac_point_robot.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh"
   )
-
-# prefix all the elements of a list, in place.
-function(prefix_list a_list_name a_prefix)
-  foreach(element IN LISTS "${a_list_name}")
-    list(APPEND output "${a_prefix}${element}")
-  endforeach()
-  set("${a_list_name}" "${output}" PARENT_SCOPE)
-endfunction()
-
-# prefix the sources. We could have written the prefixes directly, but it would
-# have complicated merges with the upstream CMakeLists.txt
-foreach(list_suffix
-    SIMPLE_HUMANOID_MODEL_HEADERS
-    SIMPLE_ARM_MODEL_HEADERS
-    ALGOS_HEADERS
-    TOOLS_HEADERS)
-  prefix_list("${PROJECT_NAME}_${list_suffix}" "${PROJECT_SOURCE_DIR}/")
-endforeach()
-list(APPEND
-  "${PROJECT_NAME}_TOOLS_HEADERS"
-  "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh")
 
 include_directories("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
 qi_create_lib(metapod
@@ -99,6 +67,8 @@ qi_create_lib(metapod
   ${${PROJECT_NAME}_TOOLS_HEADERS})
 set_target_properties(metapod PROPERTIES LINKER_LANGUAGE CXX)
 qi_stage_header_only_lib(metapod)
+add_subdirectory(include/metapod/models/simple-humanoid)
+add_subdirectory(include/metapod/models/simple-arm)
 add_subdirectory(tests)
 
 option(BENCHMARK "Build the benchmarking tool" OFF)
@@ -108,4 +78,3 @@ endif()
 if(${BENCHMARK})
   add_subdirectory(benchmark)
 endif(${BENCHMARK})
-
