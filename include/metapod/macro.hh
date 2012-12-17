@@ -1,8 +1,6 @@
-// Copyright 2011, 2012,
+// Copyright 2012,
 //
-// Maxime Reis
-//
-// JRL/LAAS, CNRS/AIST
+// Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -17,24 +15,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * Header of the simple humanoid robot model, used for test purpose.
- */
+#ifndef METAPOD_MACRO_CONFIG_HH
+# define METAPOD_MACRO_CONFIG_HH
 
-#ifndef METAPOD_SIMPLE_HUMANOID_HH
-# define METAPOD_SIMPLE_HUMANOID_HH
-
-# ifdef _MSC_VER
-#  pragma warning( push )
-// disable warning C4251: need to have DLL interface
-// disable warning C4099: struct/class discrepancies
-#  pragma warning( disable: 4251 4099 )
-# endif
-
-# include "robot.hh"
-
-# ifdef _MSC_VER
-#  pragma warning( pop )
-# endif
+# if __GNUC__ >= 4 && __GNUC_MINOR__ >= 3
+// hot is supported on functions since GCC 4.3.
+// It is also supported on labels since GCC 4.8
+#  define METAPOD_HOT __attribute__ ((hot))
+# else
+#  define METAPOD_HOT
+#endif
 
 #endif

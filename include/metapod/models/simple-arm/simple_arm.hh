@@ -24,6 +24,17 @@
 #ifndef METAPOD_SIMPLE_ARM_HH
 # define METAPOD_SIMPLE_ARM_HH
 
+# ifdef _MSC_VER
+#  pragma warning( push )
+// disable warning C4251: need to have DLL interface
+// disable warning C4099: struct/class discrepancies
+#  pragma warning( disable: 4251 4099 )
+# endif
+
 # include "robot.hh"
+
+# ifdef _MSC_VER
+#  pragma warning( pop )
+# endif
 
 #endif
