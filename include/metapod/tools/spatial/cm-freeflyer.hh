@@ -48,7 +48,7 @@ namespace metapod
         Matrix6d m_S;
 
       public:
-      void setlocalR(const Matrix3d &localR)  
+      void setlocalR(const Matrix3d &localR)
       {       m_S.block<3,3>(0,3) = m_S.block<3,3>(3,0) = localR; }
       const Matrix6d & S() const {return m_S;}
       Matrix6d transpose() const {return m_S.transpose();}
@@ -58,8 +58,8 @@ namespace metapod
     (double x) const
     {
       Matrix6d tmp = Matrix6d::Zero();
-      tmp = x*m_S;                    
-      return tmp;                                                   
+      tmp = x*m_S;
+      return tmp;
     }
 
     template<>
@@ -75,9 +75,9 @@ namespace metapod
       r.block<3,3>(3,3)=-skew(m.h())*a.S().block<3,3>(0,3);
       return r;
     }
-    
+
     Matrix6d operator*(const Inertia & m,
-		       const ConstraintMotionFreeFlyer &a) 
+		       const ConstraintMotionFreeFlyer &a)
     {
       OperatorMul<Matrix6d,Inertia, ConstraintMotionFreeFlyer > om;
       return om.mul(m,a);
