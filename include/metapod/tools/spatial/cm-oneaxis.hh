@@ -25,7 +25,7 @@ namespace metapod
   namespace Spatial
   {
     // Constraint motion for one specific axis.
-    enum AxisType:int  { AxisX=0,AxisY,AxisZ };
+    enum AxisType { AxisX=0,AxisY,AxisZ };
 
     template <int axis>
     struct Vector6dMakerOneAxis
