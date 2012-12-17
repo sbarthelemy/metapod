@@ -2,7 +2,7 @@
 SET(LIBRARY_NAME "SIMPLE_ARM")
 SET(EXPORT_SYMBOL "simple_arm_EXPORTS")
 CONFIGURE_FILE(
-  ${PROJECT_SOURCE_DIR}/cmake/config.hh.cmake
+  ${PROJECT_SOURCE_DIR}/include/metapod/config.in.hh
   ${CMAKE_CURRENT_BINARY_DIR}/config.hh
   @ONLY
   )

@@ -24,7 +24,7 @@ FUNCTION(GET_SAMPLE_SOURCE_FILES output dof)
     SET(LIBRARY_NAME "SAMPLE_${dof}_DOF")
     SET(EXPORT_SYMBOL "sample_${dof}_dof")
     CONFIGURE_FILE(
-        ${PROJECT_SOURCE_DIR}/cmake/config.hh.cmake
+        ${PROJECT_SOURCE_DIR}/include/metapod/config.in.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/config.hh
         @ONLY
         )
