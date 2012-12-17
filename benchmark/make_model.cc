@@ -79,7 +79,7 @@ void metapod::benchmark::generate_model(const std::string & name, int depth)
     << "#ifndef METAPOD_SAMPLE_" << NBDOF << "_DOF_ROBOT_HH\n"
     << "# define METAPOD_SAMPLE_" << NBDOF << "_DOF_ROBOT_HH\n\n"
     << "# include \"config.hh\"\n"
-    << "# ifdef " << name << " _EXPORTS\n"
+    << "# ifdef " << name << "_EXPORTS\n"
     << "#   define metapod_EXPORTS\n"
     << "# endif\n"
     << "# include \"metapod/tools/common.hh\"\n"
