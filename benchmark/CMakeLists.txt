@@ -51,7 +51,7 @@ FOREACH(dof IN LISTS dof_list)
 ENDFOREACH()
 
 # build the generator
-ADD_EXECUTABLE(make_model make_model.cc) #TODO: add missing sources
+ADD_EXECUTABLE(make_model make_model.cc make_model.hh) #TODO: add missing sources
 TARGET_LINK_LIBRARIES(make_model ${Boost_LIBRARIES})
 
 # declare the generated files
@@ -70,7 +70,28 @@ FOREACH(dof IN LISTS dof_list)
     LIST(APPEND _generated_libs "${_target}")
 ENDFOREACH()
 
-# and finally, the benchmark
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-ADD_EXECUTABLE(benchmark benchmark.cc)
-TARGET_LINK_LIBRARIES(benchmark ${_generated_libs} simple_humanoid)
+
+# build the timer library
+# Generate config.hh using the same template as JRL-cmake
+SET(LIBRARY_NAME "METAPODTIMER")
+SET(EXPORT_SYMBOL "metapodtimer_EXPORTS")
+CONFIGURE_FILE(
+    ${PROJECT_SOURCE_DIR}/cmake/config.hh.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/config.hh
+    @ONLY
+    )
+ADD_LIBRARY(metapodtimer
+    timer.cc
+    timer.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/config.hh)
+# BOOST_TIMER was introduced in boost 1.48
+IF(NOT Boost_VERSION LESS 104800 )
+  TARGET_LINK_LIBRARIES(metapodtimer ${Boost_LIBRARIES})
+ENDIF()
+
+# and finally, the benchmark
+ADD_EXECUTABLE(benchmark benchmark.cc benchmark.hh timer.hh)
+TARGET_LINK_LIBRARIES(benchmark
+    metapodtimer simple_humanoid ${_generated_libs})

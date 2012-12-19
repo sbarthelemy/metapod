@@ -22,12 +22,12 @@
  * models.
  */
 
-#include "models/sample_3_dof/sample_3_dof.hh"
-#include "models/sample_7_dof/sample_7_dof.hh"
-#include "models/sample_15_dof/sample_15_dof.hh"
-#include "models/sample_31_dof/sample_31_dof.hh"
-#include "models/sample_63_dof/sample_63_dof.hh"
-#include "metapod/models/simple-humanoid/simple_humanoid.hh"
+# include "metapod/models/simple-humanoid/simple_humanoid.hh"
+# include "models/sample_3_dof/sample_3_dof.hh"
+# include "models/sample_7_dof/sample_7_dof.hh"
+# include "models/sample_15_dof/sample_15_dof.hh"
+# include "models/sample_31_dof/sample_31_dof.hh"
+# include "models/sample_63_dof/sample_63_dof.hh"
 
 #include "benchmark.hh"
 using namespace metapod::benchmark;
