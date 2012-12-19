@@ -93,6 +93,7 @@ ADD_SUBDIRECTORY(include/metapod/models/simple-arm)
 ADD_SUBDIRECTORY(tests)
 
 IF(${BENCHMARK})
+  ADD_SUBDIRECTORY(timer)
   ADD_SUBDIRECTORY(benchmark)
 ENDIF(${BENCHMARK})
 
