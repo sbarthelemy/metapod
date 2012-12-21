@@ -22,6 +22,7 @@ cmake_minimum_required(VERSION 2.8)
 project(metapod)
 find_package(qibuild)
 enable_testing()
+qi_sanitize_compile_flags(HIDDEN_SYMBOLS)
 
 # generate config.hh using the same template as JRL-cmake
 set(LIBRARY_NAME "METAPOD")
