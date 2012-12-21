@@ -72,7 +72,19 @@ FOREACH(dof IN LISTS dof_list)
     LIST(APPEND _generated_libs "${_target}")
 ENDFOREACH()
 
-# and finally, the benchmark
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-qi_create_bin(benchmark benchmark.cc)
-qi_use_lib(benchmark metapod ${_generated_libs} simple_humanoid)
+
+# build the timer library
+QI_CREATE_LIB(metapodtimer STATIC timer.cc timer.hh)
+# BOOST_TIMER was introduced in boost 1.48
+QI_ADD_OPTIONAL_PACKAGE(BOOST_TIMER
+    "Use the new boost timer library (requires boost >= 1.48)")
+IF(WITH_BOOST_TIMER)
+    QI_USE_LIB(metapodtimer BOOST_TIMER)
+ENDIF()
+QI_STAGE_LIB(metapodtimer)
+
+# and finally, the benchmark
+qi_create_bin(benchmark benchmark.cc benchmark.hh timer.hh)
+qi_use_lib(benchmark metapod metapodtimer ${_generated_libs} simple_humanoid)
