@@ -76,12 +76,23 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # build the timer library
-QI_CREATE_LIB(metapodtimer STATIC timer.cc timer.hh)
+# Generate config.hh using the same template as JRL-cmake
+SET(LIBRARY_NAME "METAPODTIMER")
+SET(EXPORT_SYMBOL "metapodtimer_EXPORTS")
+CONFIGURE_FILE(
+    ${PROJECT_SOURCE_DIR}/include/metapod/config.in.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/config.hh
+    @ONLY
+    )
+QI_CREATE_LIB(metapodtimer
+    timer.cc
+    timer.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/config.hh)
 # BOOST_TIMER was introduced in boost 1.48
 QI_ADD_OPTIONAL_PACKAGE(BOOST_TIMER
     "Use the new boost timer library (requires boost >= 1.48)")
 IF(WITH_BOOST_TIMER)
-    QI_USE_LIB(metapodtimer BOOST_TIMER)
+    QI_USE_LIB(metapodtimer BOOST_TIMER BOOST_CHRONO BOOST_SYSTEM)
 ENDIF()
 QI_STAGE_LIB(metapodtimer)
 
