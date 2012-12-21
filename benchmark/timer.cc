@@ -20,16 +20,19 @@
  * 3 implementations are provided:
  *  * one relies on boost::timer from boost >= 1.48, it is used preferentially
  *  * another relies on boost legacy timer, it is to be used with Visual Studio
- *  * another one relies on gettimeofday, for unix systems.
+ *    when the new boost timer is not available (they confict)
+ *  * another one relies on gettimeofday, for unix systems, when the new boost
+ *    timer is not available. The legacy would "work" but it does not measure
+ *    wall-clock time.
  */
 #include "timer.hh"
 #include <cassert>
+# include <boost/version.hpp>
 #if BOOST_VERSION >= 104800
-// new boost timer:
-# include <boost/timer/timer.hpp>
+# include <boost/timer/timer.hpp> // new boost timer
+# else
+# include <boost/timer.hpp> // old boost timer
 #endif
-// old boost timer:
-# include <boost/timer.hpp>
 #ifdef __GNUC__
 # include <sys/time.h>
 # include <cstddef>
@@ -37,7 +40,7 @@
 
 namespace metapod
 {
-  namespace benchmark
+  namespace
   {
 #if BOOST_VERSION >= 104800
     // simple wrapper
@@ -62,16 +65,15 @@ namespace metapod
         timer_.resume();
       }
 
-      double void elapsed_wall_time_in_us()
+      double elapsed_wall_clock_time_in_us()
       {
-        return timer_.elapsed().wall * 1e3;
+        return timer_.elapsed().wall * 1e-3;
       }
 
     private:
       boost::timer::cpu_timer timer_;
     };
-#endif
-
+#else
     // the old boost timer also works on posix systems but on these systems it
     // measures CPU time instead of wall clock time. So let build it,
     // but avoid using it.
@@ -87,7 +89,7 @@ namespace metapod
       {
         if (is_running_)
         {
-          time_ += elapsed_wall_time_in_us_();
+          time_ += elapsed_wall_clock_time_in_us_();
           is_running_ = false;
         }
       }
@@ -107,16 +109,16 @@ namespace metapod
         resume();
       }
 
-      double elapsed_wall_time_in_us()
+      double elapsed_wall_clock_time_in_us()
       {
         if (is_running_)
-          return time_ + elapsed_wall_time_in_us_();
+          return time_ + elapsed_wall_clock_time_in_us_();
         else
           return time_;
       }
 
     private:
-      double elapsed_wall_time_in_us_()
+      double elapsed_wall_clock_time_in_us_()
       {
         assert(is_running_);
         return timer_.elapsed() * 1e6;
@@ -125,6 +127,7 @@ namespace metapod
       double time_;
       boost::timer timer_;
     };
+#endif
 
 #ifdef __GNUC__
     class TimerGetTimeOfDay : public Timer
@@ -141,7 +144,7 @@ namespace metapod
       void stop()
       {
         if (is_running_)
-          time_ += elapsed_wall_time_in_us_();
+          time_ += elapsed_wall_clock_time_in_us_();
         is_running_ = false;
       }
 
@@ -160,16 +163,16 @@ namespace metapod
         resume();
       }
 
-      double elapsed_wall_time_in_us()
+      double elapsed_wall_clock_time_in_us()
       {
         if (is_running_)
-          return static_cast<double>(time_ + elapsed_wall_time_in_us_());
+          return static_cast<double>(time_ + elapsed_wall_clock_time_in_us_());
         else
           return static_cast<double>(time_);
       }
 
     private:
-      long elapsed_wall_time_in_us_()
+      long elapsed_wall_clock_time_in_us_()
       {
         assert(is_running_);
         struct timeval stop;
@@ -182,19 +185,19 @@ namespace metapod
       long time_;
     };
 #endif
+  }
 
-    // factory function
-    Timer* make_timer(void)
-    {
+  // factory function
+  Timer* make_timer(void)
+  {
 #if BOOST_VERSION >= 104800
-      return new TimerBoostNew();
+    return new TimerBoostNew();
 #elif defined _MSC_VER
-      return new TimerBoostLegacy();
+    return new TimerBoostLegacy();
 #elif defined __GNUC__
-      return new TimerGetTimeOfDay();
+    return new TimerGetTimeOfDay();
 #else
 # pragma error()
 #endif
-    }
   }
 }

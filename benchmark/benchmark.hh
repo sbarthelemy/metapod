@@ -107,7 +107,7 @@ namespace metapod
 
       void print()
       {
-        double total_time_us = timer_->elapsed_wall_time_in_us();
+        double total_time_us = timer_->elapsed_wall_clock_time_in_us();
         std::cout << msg_ << ": "
                   << total_time_us/double(inner_loop_max_ * outer_loop_count_)
                   << "µs\n";

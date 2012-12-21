@@ -21,25 +21,23 @@
  */
 #ifndef METAPOD_BENCHMARK_TIMER_HH
 # define METAPOD_BENCHMARK_TIMER_HH
+#include "config.hh"
 
 namespace metapod
 {
-  namespace benchmark
+  // interface of the class, modelled after boost new times (boost 1.48)
+  class METAPODTIMER_DLLAPI Timer
   {
-    // interface of the class, modelled after boost new times (boost 1.48)
-    class Timer
-    {
-    public:
-      Timer() {}; // timer is started automatically after construction
-      virtual void stop() = 0;
-      virtual void resume() = 0;
-      virtual void start() = 0;
-      virtual double elapsed_wall_time_in_us() = 0;
-      virtual ~Timer() {};
-    };
+  public:
+    Timer() {}; // timer is started automatically after construction
+    virtual void stop() = 0;
+    virtual void resume() = 0;
+    virtual void start() = 0;
+    virtual double elapsed_wall_clock_time_in_us() = 0;
+    virtual ~Timer() {};
+  };
 
-    // factory function
-    Timer* make_timer(void);
-  }
+  // factory function
+  METAPODTIMER_DLLAPI Timer* make_timer(void);
 }
 #endif
