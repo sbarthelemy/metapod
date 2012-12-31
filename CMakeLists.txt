@@ -23,6 +23,7 @@ project(metapod)
 find_package(qibuild)
 include(cmakeutils.cmake)
 enable_testing()
+qi_sanitize_compile_flags(HIDDEN_SYMBOLS)
 
 # generate config.hh using the same template as JRL-cmake
 set(PROJECT_VERSION "999")
