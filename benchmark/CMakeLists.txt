@@ -19,7 +19,8 @@
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/robotbuilder/include)
+INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/robotbuilder)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/timer/include)
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/timer)
 
@@ -51,8 +52,8 @@ FOREACH(dof IN LISTS dof_list)
 ENDFOREACH()
 
 # build the generator
-ADD_EXECUTABLE(make_model make_model.cc make_model.hh) #TODO: add missing sources
-TARGET_LINK_LIBRARIES(make_model ${Boost_LIBRARIES})
+ADD_EXECUTABLE(make_model make_model.cc)
+TARGET_LINK_LIBRARIES(make_model metapod_robotbuilder)
 
 # declare the generated files
 IF(dof_list)

@@ -92,6 +92,7 @@ ADD_SUBDIRECTORY(include/metapod/models/simple-arm)
 
 ADD_SUBDIRECTORY(tests)
 
+ADD_SUBDIRECTORY(robotbuilder)
 IF(${BENCHMARK})
   ADD_SUBDIRECTORY(timer)
   ADD_SUBDIRECTORY(benchmark)
