@@ -28,11 +28,16 @@ SET(METAPOD_ROBOTBUILDER_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/metapod/robotbuilder/config.hh
   include/metapod/robotbuilder/robotbuilder.hh
   )
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/config_hh.c
+  COMMAND embedfile ${CMAKE_CURRENT_BINARY_DIR}/config_hh.c ${CMAKE_CURRENT_SOURCE_DIR}/tpl/config.in.hh config_hh
+  )
 INSTALL(FILES ${METAPOD_ROBOTBUILDER_MODEL_HEADERS}
   DESTINATION include/metapod/robotbuilder
   )
 ADD_LIBRARY(metapod_robotbuilder SHARED
   src/robotbuilder.cc
+  ${CMAKE_CURRENT_BINARY_DIR}/config_hh.c
   ${METAPOD_ROBOTBUILDER_HEADERS}
   )
 TARGET_LINK_LIBRARIES(metapod_robotbuilder ${Boost_LIBRARIES})

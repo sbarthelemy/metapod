@@ -25,20 +25,15 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/timer/include)
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/timer)
 
 # Returns the list of source files for sample_${dof}_dof model
-FUNCTION(GET_SAMPLE_SOURCE_FILES output dof include_config_hh)
+FUNCTION(GET_SAMPLE_SOURCE_FILES output dof)
     SET(_libname "sample_${dof}_dof")
     SET(_output
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.cc
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/body.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/joint.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/robot.hh)
-    IF (include_config_hh)
-        SET(_config_hh_path
-            ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/config.hh)
-        GENERATE_CONFIG_HEADER(${_config_hh_path} ${_libname})
-        LIST(APPEND _output ${_config_hh_path})
-    ENDIF()
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/robot.hh
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/config.hh)
     SET("${output}" ${_output} PARENT_SCOPE)
 ENDFUNCTION()
 
@@ -47,7 +42,7 @@ SET(dof_list 3 7 15 31 63)
 
 # put together a list of all the generated files
 FOREACH(dof IN LISTS dof_list)
-    GET_SAMPLE_SOURCE_FILES(_sources ${dof} False)
+    GET_SAMPLE_SOURCE_FILES(_sources ${dof})
     LIST(APPEND _generated_files "${_sources}")
 ENDFOREACH()
 
@@ -65,7 +60,7 @@ ENDIF()
 
 # build the sample models libraries
 FOREACH(dof IN LISTS dof_list)
-    GET_SAMPLE_SOURCE_FILES(_sources ${dof} True)
+    GET_SAMPLE_SOURCE_FILES(_sources ${dof})
     SET(_target sample_${dof}_dof)
     ADD_LIBRARY(sample_${dof}_dof SHARED ${_sources})
     LIST(APPEND _generated_libs "${_target}")

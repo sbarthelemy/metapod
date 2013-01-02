@@ -44,6 +44,8 @@ SETUP_PROJECT()
 
 # Search for Boost.
 # Boost.Test is used by the test suite.
+SET(BOOST_COMPONENTS
+    filesystem system program_options unit_test_framework regex)
 SEARCH_FOR_BOOST()
 
 # Search for Eigen.

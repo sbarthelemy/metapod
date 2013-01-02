@@ -1,7 +1,9 @@
 #include <metapod/robotbuilder/robotbuilder.hh>
 #include <iostream>
+#include <cassert>
 #include <algorithm>
 #include <cctype>
+#include <boost/regex.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <metapod/tools/spatial.hh>
@@ -97,7 +99,62 @@ void createBody(std::ofstream & body_hh,
       << name << "::inertie);\n"
     << std::endl;
 }
+
+// text of the template source files
+extern "C" const char config_hh[];
+extern "C" const size_t config_hh_len;
+
+// Functor that provides the replacement text given a match for use with
+// boost::regex_replace.
+// Match/replacement pairs are stored in a map.
+// Boost.regex passes the functor by copy. To avoid copying map, we only store
+// a reference.
+class ReplFunctor
+{
+private:
+  std::map<std::string, std::string> & map_;
+public:
+  ReplFunctor(std::map<std::string, std::string> & map):
+      map_(map)
+  {}
+  std::string operator()(boost::smatch m)
+  {
+    std::string key = m[1].str();
+    assert(map_.count(key) > 0);
+    return map_[key];
+  }
+};
+
+// helper function which write config.hh. It loads the template text, and
+// format it using regular expressions.
+void write_config_hh(std::ostream& stream,
+                      const std::string & libname)
+{
+  std::map<std::string, std::string> map;
+  std::string libname_uc(libname);
+  std::transform(libname.begin(), libname.end(), libname_uc.begin(),
+      ::toupper);
+  map[std::string("LIBRARY_NAME")] = libname_uc;
+  std::stringstream export_symbol;
+  export_symbol << libname << "_EXPORTS";
+  map[std::string("EXPORT_SYMBOL")] = export_symbol.str();
+
+  const char* expr =
+      "@((?:LIBRARY_NAME)|(?:EXPORT_SYMBOL))@";
+  ReplFunctor repl_functor(map);
+  const std::string in(config_hh, config_hh_len);
+  boost::regex e;
+  e.assign(expr);
+  std::string out = boost::regex_replace(
+          in,
+          e,
+          repl_functor,
+          boost::regex_constants::format_literal);
+  stream << out;
 }
+
+}
+
 namespace metapod {
 
 RobotBuilder::RobotBuilder()
@@ -319,6 +376,10 @@ RobotBuilder::Status RobotBuilder::init()
     << "# include \"body.hh\"\n\n"
     << namespaces_opening_;
 
+  std::ofstream config_hh;
+  config_hh.open(std::string(directory_ + "/config.hh").c_str());
+  ::write_config_hh(config_hh, libname_);
+  config_hh.close();
   is_initialized_ = true;
   return STATUS_SUCCESS;
 }
