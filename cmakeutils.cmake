@@ -29,12 +29,16 @@ FUNCTION(GENERATE_CONFIG_HEADER OUTPUT LIBRARY_NAME)
   STRING(TOLOWER "${LIBRARY_NAME}" "LIBRARY_NAME_LOWER")
   SET(EXPORT_SYMBOL "${LIBRARY_NAME_LOWER}_EXPORTS")
   STRING(TOUPPER "${LIBRARY_NAME}" "LIBRARY_NAME")
-  # Generate the header.
+  # create the directory (and its parents)
+  GET_FILENAME_COMPONENT(OUTPUT_DIR "${OUTPUT}" PATH)
+  FILE(MAKE_DIRECTORY "${OUTPUT_DIR}")
+  # Generate the header. The following variables are used in the template
   # LIBRARY_NAME: CPP symbol prefix, should match the compiled library name,
   #               usually in upper case
-  # EXPORT_SYMBOl: what symbol controls the switch between symbol
+  # EXPORT_SYMBOL: what symbol controls the switch between symbol
   #                import/export, usually libname_EXPORTS, with libname in
   #                lower case.
+  # PROJECT_VERSION: the project version
   CONFIGURE_FILE(
     ${PROJECT_SOURCE_DIR}/include/metapod/config.in.hh
     ${OUTPUT}
