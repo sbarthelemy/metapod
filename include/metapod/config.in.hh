@@ -16,9 +16,6 @@
 #ifndef @LIBRARY_NAME@_CONFIG_HH
 # define @LIBRARY_NAME@_CONFIG_HH
 
-// Package version (header).
-# define @LIBRARY_NAME@_VERSION "@PROJECT_VERSION@"
-
 // Handle portable symbol export.
 // Defining manually which symbol should be exported is required
 // under Windows whether MinGW or MSVC is used.

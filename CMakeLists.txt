@@ -26,7 +26,6 @@ enable_testing()
 qi_sanitize_compile_flags(HIDDEN_SYMBOLS)
 
 # generate config.hh using the same template as JRL-cmake
-set(PROJECT_VERSION "999")
 generate_config_header(
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
   metapod)
