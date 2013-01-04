@@ -340,6 +340,8 @@ RobotBuilder::Status RobotBuilder::init()
   joint_hh_.open(std::string(directory_ + "/joint.hh").c_str());
   robot_hh_.open(std::string(directory_ + "/robot.hh").c_str());
 
+  body_hh_
+    << license_ << warning_;
   openInclusionGuard(body_hh_, "BODY_HH");
   body_hh_ << "# include \"metapod/tools/bodymacros.hh\"\n\n" // TODO: use "" or <> ?
            << namespaces_opening_;
