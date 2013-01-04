@@ -1,15 +1,9 @@
-# Generate config.hh header.
-GENERATE_CONFIG_HEADER(
-  ${CMAKE_CURRENT_BINARY_DIR}/config.hh
-  simple_arm
-  )
-
 # Set header files.
 SET(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
   body.hh
   joint.hh
   robot.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/config.hh
+  config.hh
   )
 
 # Set header files installation prefix.
