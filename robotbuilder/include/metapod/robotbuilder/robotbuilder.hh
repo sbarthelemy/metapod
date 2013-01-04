@@ -48,6 +48,7 @@ public:
   Status set_directory(const std::string& directory);
   Status set_namespace(const std::string& combined_namespace);
   Status set_reinclusion_guard_prefix(const std::string& text);
+  Status set_use_dof_index(bool);
   Status set_license(const std::string& text);
   Status init();
 
@@ -60,6 +61,10 @@ public:
   // frame, then p_joint is given by
   //
   //   p_joint = R_joint_parent * (p_parent - r_parent_joint)
+  //
+  // dof_index will only be taken into account if set_use_dof_index(true)
+  // has been called. In such a case, consistent dof indexes should be provided
+  // for each link.
   Status addLink(
       const std::string& parent_body_name,
       const std::string& joint_name,
@@ -70,7 +75,8 @@ public:
       double body_mass,
       const Eigen::Vector3d & body_center_of_mass,
       const Eigen::Matrix3d & body_rotational_inertia,
-      const Eigen::Vector3d & joint_axis=defaultAxis());
+      const Eigen::Vector3d & joint_axis=defaultAxis(),
+      int dof_index=-1);
 private:
   static Eigen::Vector3d defaultAxis();
   void openInclusionGuard(std::ostream& stream, const char* name);
@@ -83,6 +89,7 @@ private:
   unsigned int nb_bodies_;
   unsigned int node_depth_;
   bool is_initialized_;
+  bool use_dof_index_;
   const size_t tab_size_;
   const size_t node_tab_size_;
   const std::string tab_;

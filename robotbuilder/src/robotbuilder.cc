@@ -162,6 +162,7 @@ RobotBuilder::RobotBuilder()
     nb_bodies_(0),
     node_depth_(0),
     is_initialized_(false),
+    use_dof_index_(false),
     tab_size_(2),
     node_tab_size_(std::string("Node< ").length()),
     tab_(tab_size_, ' '),
@@ -298,6 +299,19 @@ RobotBuilder::Status RobotBuilder::set_reinclusion_guard_prefix(const std::strin
   return STATUS_SUCCESS;
 }
 
+RobotBuilder::Status RobotBuilder::set_use_dof_index(bool flag)
+{
+  if (is_initialized_)
+  {
+    std::cerr
+        << "ERROR: one cannot call set_use_dof_index() after having called init()"
+        << std::endl;
+    return STATUS_FAILURE;
+  }
+  use_dof_index_ = flag;
+  return STATUS_SUCCESS;
+}
+
 RobotBuilder::Status RobotBuilder::set_license(const std::string& text)
 {
   if (is_initialized_)
@@ -425,7 +439,8 @@ RobotBuilder::Status RobotBuilder::addLink(
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
     const Eigen::Matrix3d & body_rotational_inertia,
-    const Eigen::Vector3d & joint_axis)
+    const Eigen::Vector3d & joint_axis,
+    int dof_index)
 {
 
   if (not is_initialized_)
@@ -498,7 +513,22 @@ RobotBuilder::Status RobotBuilder::addLink(
   }
   int joint_label = nb_bodies_;
   int body_label = nb_bodies_; // TODO: understand why body labels start at 0 in simple-humanoid
-  int joint_position_in_conf = nb_dof_;
+  int joint_position_in_conf = -1;
+  if (use_dof_index_)
+  {
+    if (dof_index < 0)
+    {
+      std::cerr
+        << "ERROR: dof_index for joint '" << joint_name << "' is inconsitent"
+        << std::endl;
+      return STATUS_FAILURE;
+    }
+    joint_position_in_conf = dof_index;
+  }
+  else
+  {
+    joint_position_in_conf = nb_dof_;
+  }
   ::createJoint(
       joint_hh_,
       init_cc_,
