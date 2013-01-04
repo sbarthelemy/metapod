@@ -50,26 +50,6 @@ namespace metapod
                    -1, 0, 0),
       Vector3d(0, 0, 1));
 
-    INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(ELBOW, 1, 0, 0);
-    const std::string ELBOW::name = "ELBOW";
-    const int ELBOW::label = 2;
-    const int ELBOW::positionInConf = 1;
-    const Spatial::Transform ELBOW::Xt = Spatial::Transform(
-      matrix3dMaker(1, 0, 0,
-                    0, 1, 0,
-                    0, 0, 1),
-      Vector3d(0, 0, -0.45));
-
-    INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(WRIST, 1, 0, 0);
-    const std::string WRIST::name = "WRIST";
-    const int WRIST::label = 3;
-    const int WRIST::positionInConf = 2;
-    const Spatial::Transform WRIST::Xt = Spatial::Transform(
-      matrix3dMaker(1, 0, 0,
-                    0, 1, 0,
-                    0, 0, 1),
-      Vector3d(0, 0, -0.4));
-
     INITIALIZE_BODY(ARM);
     const std::string ARM::name = "ARM";
     const int ARM::label = 0;
@@ -83,6 +63,16 @@ namespace metapod
                                                   ARM::CoM,
                                                   ARM::inertie);
 
+    INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(ELBOW, 1, 0, 0);
+    const std::string ELBOW::name = "ELBOW";
+    const int ELBOW::label = 2;
+    const int ELBOW::positionInConf = 1;
+    const Spatial::Transform ELBOW::Xt = Spatial::Transform(
+      matrix3dMaker(1, 0, 0,
+                    0, 1, 0,
+                    0, 0, 1),
+      Vector3d(0, 0, -0.45));
+
     INITIALIZE_BODY(FOREARM);
     const std::string FOREARM::name = "FOREARM";
     const int FOREARM::label = 1;
@@ -95,6 +85,16 @@ namespace metapod
     Spatial::Inertia FOREARM::I = spatialInertiaMaker(FOREARM::mass,
                                                       FOREARM::CoM,
                                                       FOREARM::inertie);
+
+    INITIALIZE_JOINT_REVOLUTE_AXIS_ANY(WRIST, 1, 0, 0);
+    const std::string WRIST::name = "WRIST";
+    const int WRIST::label = 3;
+    const int WRIST::positionInConf = 2;
+    const Spatial::Transform WRIST::Xt = Spatial::Transform(
+      matrix3dMaker(1, 0, 0,
+                    0, 1, 0,
+                    0, 0, 1),
+      Vector3d(0, 0, -0.4));
 
     INITIALIZE_BODY(HAND);
     const std::string HAND::name = "HAND";
