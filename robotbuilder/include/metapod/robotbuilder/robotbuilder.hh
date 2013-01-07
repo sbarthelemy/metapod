@@ -28,6 +28,7 @@
 # include <fstream>
 # include <sstream>
 # include <vector>
+# include <map>
 # include <Eigen/Eigen>
 
 namespace metapod {
@@ -46,8 +47,6 @@ public:
   Status set_name(const std::string& name);
   Status set_libname(const std::string& libname);
   Status set_directory(const std::string& directory);
-  Status set_namespace(const std::string& combined_namespace);
-  Status set_reinclusion_guard_prefix(const std::string& text);
   Status set_use_dof_index(bool);
   Status set_license(const std::string& text);
   Status init();
@@ -79,10 +78,9 @@ public:
       int dof_index=-1);
 private:
   static Eigen::Vector3d defaultAxis();
-  void openInclusionGuard(std::ostream& stream, const char* name);
-  void closeInclusionGuard(std::ostream& stream, const char* name);
-  void openNamespace(std::ostream& stream);
-  void closeNamespace(std::ostream& stream);
+  void writeTemplate(
+      const std::string& output_filename,
+      const std::string &input_template);
   void closeNode();
   RobotBuilder(const RobotBuilder&); // forbid copy-constuction
   unsigned int nb_dof_;
@@ -94,21 +92,15 @@ private:
   const size_t node_tab_size_;
   const std::string tab_;
   const std::string warning_;
+  std::map<std::string, std::string> replacements_;
   std::vector< std::pair<std::string, int> > bodies_stack_;
   std::string name_;
   std::string libname_;
   std::string directory_;
-  std::string reinclusion_guard_prefix_;
-  std::string namespace_;
   std::string license_;
-  std::vector<std::string> namespaces_;
-  std::string namespaces_opening_;
-  std::string namespaces_closing_;
-  std::ofstream body_hh_;
-  std::ofstream init_cc_;
-  std::ofstream init_hh_;
-  std::ofstream joint_hh_;
-  std::ofstream robot_hh_;
+  std::ostringstream init_ss_;
+  std::ostringstream body_ss_;
+  std::ostringstream joint_ss_;
   std::ostringstream tree_;
 };
 }
