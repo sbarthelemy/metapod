@@ -55,6 +55,8 @@ INSTALL(FILES ${METAPOD_ROBOTBUILDER_MODEL_HEADERS}
   )
 ADD_LIBRARY(metapod_robotbuilder SHARED
   src/robotbuilder.cc
+  src/robotbuilder_p.hh
+  src/robotbuilder_p.cc
   ${EMBEDDED_FILES}
   ${METAPOD_ROBOTBUILDER_HEADERS}
   )

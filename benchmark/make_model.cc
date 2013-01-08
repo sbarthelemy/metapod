@@ -68,7 +68,6 @@ void generate_model(const std::string & name, int depth)
   ss_path << "models/" << name;
   builder.set_directory(ss_path.str());
   ss_namespace << "metapod::" << name;
-  builder.init();
   // add root joint and body
   int label = 0;
   addNode(builder, label, 0);
