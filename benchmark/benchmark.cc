@@ -22,12 +22,12 @@
  * models.
  */
 
-#include "models/sample_3_dof/sample_3_dof.hh"
-#include "models/sample_7_dof/sample_7_dof.hh"
-#include "models/sample_15_dof/sample_15_dof.hh"
-#include "models/sample_31_dof/sample_31_dof.hh"
-#include "models/sample_63_dof/sample_63_dof.hh"
-#include "metapod/models/simple-humanoid/simple_humanoid.hh"
+# include "metapod/models/simple-humanoid/simple_humanoid.hh"
+# include "models/sample_1/sample_1.hh"
+# include "models/sample_2/sample_2.hh"
+# include "models/sample_3/sample_3.hh"
+# include "models/sample_4/sample_4.hh"
+# include "models/sample_5/sample_5.hh"
 
 #include "benchmark.hh"
 using namespace metapod::benchmark;
@@ -35,9 +35,9 @@ using namespace metapod::benchmark;
 int main()
 {
   BENCHMARK(metapod::simple_humanoid);
-  BENCHMARK(metapod::sample_3_dof);
-  BENCHMARK(metapod::sample_7_dof);
-  BENCHMARK(metapod::sample_15_dof);
-  BENCHMARK(metapod::sample_31_dof);
-  BENCHMARK(metapod::sample_63_dof);
+  BENCHMARK(metapod::sample_1);
+  BENCHMARK(metapod::sample_2);
+  BENCHMARK(metapod::sample_3);
+  BENCHMARK(metapod::sample_4);
+  BENCHMARK(metapod::sample_5);
 }

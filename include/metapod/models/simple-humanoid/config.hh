@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef @LIBRARY_NAME@_CONFIG_HH
-# define @LIBRARY_NAME@_CONFIG_HH
+#ifndef SIMPLE_HUMANOID_CONFIG_HH
+# define SIMPLE_HUMANOID_CONFIG_HH
 
 // Handle portable symbol export.
 // Defining manually which symbol should be exported is required
@@ -28,36 +28,37 @@
 // is handled by the compiler, see: http://gcc.gnu.org/wiki/Visibility
 # if defined _WIN32 || defined __CYGWIN__
 // On Microsoft Windows, use dllimport and dllexport to tag symbols.
-#  define @LIBRARY_NAME@_DLLIMPORT __declspec(dllimport)
-#  define @LIBRARY_NAME@_DLLEXPORT __declspec(dllexport)
-#  define @LIBRARY_NAME@_DLLLOCAL
+#  define SIMPLE_HUMANOID_DLLIMPORT __declspec(dllimport)
+#  define SIMPLE_HUMANOID_DLLEXPORT __declspec(dllexport)
+#  define SIMPLE_HUMANOID_DLLLOCAL
 # else
 // On Linux, for GCC >= 4, tag symbols using GCC extension.
 #  if __GNUC__ >= 4
-#   define @LIBRARY_NAME@_DLLIMPORT __attribute__ ((visibility("default")))
-#   define @LIBRARY_NAME@_DLLEXPORT __attribute__ ((visibility("default")))
-#   define @LIBRARY_NAME@_DLLLOCAL  __attribute__ ((visibility("hidden")))
+#   define SIMPLE_HUMANOID_DLLIMPORT __attribute__ ((visibility("default")))
+#   define SIMPLE_HUMANOID_DLLEXPORT __attribute__ ((visibility("default")))
+#   define SIMPLE_HUMANOID_DLLLOCAL  __attribute__ ((visibility("hidden")))
 #  else
 // Otherwise (GCC < 4 or another compiler is used), export everything.
-#   define @LIBRARY_NAME@_DLLIMPORT
-#   define @LIBRARY_NAME@_DLLEXPORT
-#   define @LIBRARY_NAME@_DLLLOCAL
+#   define SIMPLE_HUMANOID_DLLIMPORT
+#   define SIMPLE_HUMANOID_DLLEXPORT
+#   define SIMPLE_HUMANOID_DLLLOCAL
 #  endif // __GNUC__ >= 4
 # endif // defined _WIN32 || defined __CYGWIN__
 
-# ifdef @LIBRARY_NAME@_STATIC
+# ifdef SIMPLE_HUMANOID_STATIC
 // If one is using the library statically, get rid of
 // extra information.
-#  define @LIBRARY_NAME@_DLLAPI
-#  define @LIBRARY_NAME@_LOCAL
+#  define SIMPLE_HUMANOID_DLLAPI
+#  define SIMPLE_HUMANOID_LOCAL
 # else
 // Depending on whether one is building or using the
 // library define DLLAPI to import or export.
-#  ifdef @EXPORT_SYMBOL@
-#   define @LIBRARY_NAME@_DLLAPI @LIBRARY_NAME@_DLLEXPORT
+#  ifdef simple_humanoid_EXPORTS
+#   define SIMPLE_HUMANOID_DLLAPI SIMPLE_HUMANOID_DLLEXPORT
 #  else
-#   define @LIBRARY_NAME@_DLLAPI @LIBRARY_NAME@_DLLIMPORT
-#  endif // @LIBRARY_NAME@_EXPORTS
-#  define @LIBRARY_NAME@_LOCAL @LIBRARY_NAME@_DLLLOCAL
-# endif // @LIBRARY_NAME@_STATIC
-#endif //! @LIBRARY_NAME@_CONFIG_HH
+#   define SIMPLE_HUMANOID_DLLAPI SIMPLE_HUMANOID_DLLIMPORT
+#  endif // SIMPLE_HUMANOID_EXPORTS
+#  define SIMPLE_HUMANOID_LOCAL SIMPLE_HUMANOID_DLLLOCAL
+# endif // SIMPLE_HUMANOID_STATIC
+#endif //! SIMPLE_HUMANOID_CONFIG_HH
+

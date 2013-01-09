@@ -67,14 +67,20 @@ qi_create_lib(metapod
 set_target_properties(metapod PROPERTIES LINKER_LANGUAGE CXX)
 qi_stage_header_only_lib(metapod)
 
-add_subdirectory(include/metapod/models/simple-humanoid)
-add_subdirectory(include/metapod/models/simple-arm)
-add_subdirectory(tests)
+ADD_SUBDIRECTORY(include/metapod/models/simple-humanoid)
+ADD_SUBDIRECTORY(include/metapod/models/simple-arm)
+ADD_SUBDIRECTORY(tests)
 
-option(BENCHMARK "Build the benchmarking tool" OFF)
-if (NOT CMAKE_CROSSCOMPILING)
-  set(BENCHMARK ON)
-endif()
-if(${BENCHMARK})
-  add_subdirectory(benchmark)
-endif(${BENCHMARK})
+ADD_SUBDIRECTORY(embedfile)
+ADD_SUBDIRECTORY(robotbuilder)
+
+OPTION(BENCHMARK "Build the benchmarking tool" OFF)
+IF (NOT CMAKE_CROSSCOMPILING)
+  SET(BENCHMARK ON)
+ENDIF()
+IF(${BENCHMARK})
+  ADD_SUBDIRECTORY(timer)
+  ADD_SUBDIRECTORY(benchmark)
+ENDIF(${BENCHMARK})
+
+
