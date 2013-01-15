@@ -1,8 +1,6 @@
 // Copyright 2012,
 //
-// Sébastien Barthélémy
-//
-// Aldebaran Robotics
+// Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -17,13 +15,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * Header of the simple arm robot model, used for test purpose.
- */
+#ifndef METAPOD_MACRO_CONFIG_HH
+# define METAPOD_MACRO_CONFIG_HH
 
-#ifndef METAPOD_SIMPLE_ARM_HH
-# define METAPOD_SIMPLE_ARM_HH
-
-# include "robot.hh"
+# if __GNUC__ >= 4 && __GNUC_MINOR__ >= 3
+// hot is supported on functions since GCC 4.3.
+// It is also supported on labels since GCC 4.8
+#  define METAPOD_HOT __attribute__ ((hot))
+# else
+#  define METAPOD_HOT
+#endif
 
 #endif

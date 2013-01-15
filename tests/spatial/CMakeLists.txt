@@ -1,6 +1,7 @@
-# Copyright 2012,
+# Copyright 2012, 2013
 #
-# Olivier STASSE, LAAS/CNRS
+# Olivier STASSE (LAAS/CNRS)
+# Sébastien Barthélémy (Aldebaran Robotics)
 #
 # This file is part of metapod.
 # metapod is free software: you can redistribute it and/or modify
@@ -16,5 +17,4 @@
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Creation: 17/12/2012
-
 ADD_TESTCASE(test_rotation test_rotation.cc)

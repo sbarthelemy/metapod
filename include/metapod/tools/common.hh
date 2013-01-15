@@ -28,6 +28,7 @@
 # include "metapod/tools/fwd.hh"
 # include "metapod/config.hh"
 # include "metapod/tools/static_assert.hh"
+# include "metapod/macro.hh"
 # include "metapod/tools/jointmacros.hh"
 # include "metapod/tools/spatial.hh"
 # include "metapod/tools/bcalc.hh"
@@ -63,10 +64,7 @@ namespace metapod
   // Class No-Parent. Used to set the parent body of the freeflyer.
   class NP
   {
-    public:
-      static Spatial::Inertia Iic;
   };
-//  Inertia NP::Iic;
 
   // Class Node. Contains a Body, a Joint, and up to 3 Node children.
   // Non-existant children make use of the NC class (No-Child).

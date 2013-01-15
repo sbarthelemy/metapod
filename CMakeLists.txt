@@ -21,39 +21,34 @@
 cmake_minimum_required(VERSION 2.8)
 project(metapod)
 find_package(qibuild)
+include(cmakeutils.cmake)
 enable_testing()
+qi_sanitize_compile_flags(HIDDEN_SYMBOLS)
 
 # generate config.hh using the same template as JRL-cmake
-set(LIBRARY_NAME "METAPOD")
-set(PROJECT_VERSION "999")
-set(EXPORT_SYMBOL "metapod_EXPORTS")
-configure_file(
-  include/metapod/config.in.hh
+generate_config_header(
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
-  @ONLY)
+  metapod)
+
+OPTION(WITH_SIMPLE_HUMANOID "Build the simple humanoid example model" ON)
+OPTION(WITH_SIMPLE_ARM "Build the simple arm example model" ON)
+OPTION(BENCHMARK "Build the benchmarking tool" OFF)
+IF (NOT CMAKE_CROSSCOMPILING)
+  SET(BENCHMARK ON)
+ENDIF()
 
 # Set header files.
-set(${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS
-  include/${PROJECT_NAME}/models/simple-humanoid/body.hh
-  include/${PROJECT_NAME}/models/simple-humanoid/joint.hh
-  include/${PROJECT_NAME}/models/simple-humanoid/robot.hh
-  )
-
-set(${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS
-  include/${PROJECT_NAME}/models/simple-arm/body.hh
-  include/${PROJECT_NAME}/models/simple-arm/joint.hh
-  include/${PROJECT_NAME}/models/simple-arm/robot.hh
-  )
-
-set(${PROJECT_NAME}_ALGOS_HEADERS
+SET(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
   include/${PROJECT_NAME}/algos/jac_point_relative.hh
   include/${PROJECT_NAME}/algos/jac_point_chain.hh
   )
 
-set(${PROJECT_NAME}_TOOLS_HEADERS
+SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/fwd.hh
+  include/${PROJECT_NAME}/macro.hh
+  include/${PROJECT_NAME}/tools/static_assert.hh
   include/${PROJECT_NAME}/tools/common.hh
   include/${PROJECT_NAME}/tools/spatial.hh
   include/${PROJECT_NAME}/tools/jointmacros.hh
@@ -69,42 +64,28 @@ set(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/jcalc.hh
   include/${PROJECT_NAME}/tools/bcalc.hh
   include/${PROJECT_NAME}/tools/jac_point_robot.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
   )
 
-# prefix all the elements of a list, in place.
-function(prefix_list a_list_name a_prefix)
-  foreach(element IN LISTS "${a_list_name}")
-    list(APPEND output "${a_prefix}${element}")
-  endforeach()
-  set("${a_list_name}" "${output}" PARENT_SCOPE)
-endfunction()
+INCLUDE_DIRECTORIES("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
 
-# prefix the sources. We could have written the prefixes directly, but it would
-# have complicated merges with the upstream CMakeLists.txt
-foreach(list_suffix
-    SIMPLE_HUMANOID_MODEL_HEADERS
-    SIMPLE_ARM_MODEL_HEADERS
-    ALGOS_HEADERS
-    TOOLS_HEADERS)
-  prefix_list("${PROJECT_NAME}_${list_suffix}" "${PROJECT_SOURCE_DIR}/")
-endforeach()
-list(APPEND
-  "${PROJECT_NAME}_TOOLS_HEADERS"
-  "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh")
-
-include_directories("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
-qi_create_lib(metapod
+QI_CREATE_LIB(metapod
   ${${PROJECT_NAME}_ALGOS_HEADERS}
   ${${PROJECT_NAME}_TOOLS_HEADERS})
-set_target_properties(metapod PROPERTIES LINKER_LANGUAGE CXX)
-qi_stage_header_only_lib(metapod)
-add_subdirectory(tests)
+SET_TARGET_PROPERTIES(metapod PROPERTIES LINKER_LANGUAGE CXX)
+QI_USE_LIB(metapod EIGEN3 BOOST)
+QI_STAGE_HEADER_ONLY_LIB(metapod)
 
-option(BENCHMARK "Build the benchmarking tool" OFF)
-if (NOT CMAKE_CROSSCOMPILING)
-  set(BENCHMARK ON)
-endif()
-if(${BENCHMARK})
-  add_subdirectory(benchmark)
-endif(${BENCHMARK})
 
+IF(${WITH_SIMPLE_HUMANOID})
+  ADD_SUBDIRECTORY(simple_humanoid)
+ENDIF()
+IF(${WITH_SIMPLE_ARM})
+  ADD_SUBDIRECTORY(simple_arm)
+ENDIF()
+ADD_SUBDIRECTORY(tests)
+
+IF(${BENCHMARK})
+  ADD_SUBDIRECTORY(timer)
+  ADD_SUBDIRECTORY(benchmark)
+ENDIF(${BENCHMARK})

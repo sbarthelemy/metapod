@@ -1,4 +1,4 @@
-# Copyright 2011, 2012,
+# Copyright 2011, 2012, 2013
 #
 # Maxime Reis (JRL/LAAS, CNRS/AIST)
 # Antonio El Khoury (JRL/LAAS, CNRS/AIST)
@@ -17,17 +17,24 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/benchmark)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Returns the list of source files for sample_${dof}_dof model
-FUNCTION(GET_SAMPLE_SOURCE_FILES output dof)
-    SET("${output}"
-        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/sample_${dof}_dof.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/sample_${dof}_dof.cc
-        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/body.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/joint.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/sample_${dof}_dof/robot.hh
-        PARENT_SCOPE)
+FUNCTION(GET_SAMPLE_SOURCE_FILES output dof include_config_hh)
+    SET(_libname "sample_${dof}_dof")
+    SET(_output
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.hh
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.cc
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/body.hh
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/joint.hh
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/robot.hh)
+    IF (include_config_hh)
+        SET(_config_hh_path
+            ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/config.hh)
+        GENERATE_CONFIG_HEADER(${_config_hh_path} ${_libname})
+        LIST(APPEND _output ${_config_hh_path})
+    ENDIF()
+    SET("${output}" ${_output} PARENT_SCOPE)
 ENDFUNCTION()
 
 # list of the sample models
@@ -35,31 +42,40 @@ SET(dof_list 3 7 15 31 63)
 
 # put together a list of all the generated files
 FOREACH(dof IN LISTS dof_list)
-    GET_SAMPLE_SOURCE_FILES(_sources ${dof})
+    GET_SAMPLE_SOURCE_FILES(_sources ${dof} False)
     LIST(APPEND _generated_files "${_sources}")
 ENDFOREACH()
 
 # build the generator
-qi_create_bin(make_model make_model.cc make_model.hh)
-qi_use_lib(make_model boost_filesystem)
+QI_CREATE_BIN(make_model make_model.cc make_model.hh)
+QI_USE_LIB(make_model boost_filesystem)
 
 # declare the generated files
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${_generated_files}
-  COMMAND make_model
-  DEPENDS make_model
-)
+IF(dof_list)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_generated_files}
+      COMMAND make_model
+    )
+ENDIF()
 
 # build the sample models libraries
 FOREACH(dof IN LISTS dof_list)
-    GET_SAMPLE_SOURCE_FILES(_sources ${dof})
+    GET_SAMPLE_SOURCE_FILES(_sources ${dof} True)
     SET(_target sample_${dof}_dof)
-    qi_create_lib(${_target} SHARED ${_sources})
-    qi_stage_lib(${_target})
-    LIST(APPEND _generated_libs "${_target}")
+    QI_CREATE_LIB(${_target} SHARED ${_sources})
+    QI_STAGE_LIB(${_target})
+    LIST(APPEND _model_libs "${_target}")
 ENDFOREACH()
 
+# add simple humanoid model
+IF(WITH_SIMPLE_HUMANOID)
+    SET_SOURCE_FILES_PROPERTIES("benchmark.cc" PROPERTIES
+        COMPILE_FLAGS " -DWITH_SIMPLE_HUMANOID")
+    LIST(APPEND _model_libs "metapod_simple_humanoid")
+    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/simple_humanoid/include)
+    INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/simple_humanoid)
+ENDIF()
 # and finally, the benchmark
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-qi_create_bin(benchmark benchmark.cc)
-qi_use_lib(benchmark metapod ${_generated_libs} simple_humanoid)
+QI_CREATE_BIN(benchmark benchmark.cc benchmark.hh)
+QI_USE_LIB(benchmark metapod_timer ${_model_libs})

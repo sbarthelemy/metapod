@@ -1,7 +1,8 @@
-# Copyright 2011, 2012,
+# Copyright 2011, 2012, 2013
 #
 # Maxime Reis (JRL/LAAS, CNRS/AIST)
 # Sébastien Barthélémy (Aldebaran Robotics)
+# Olivier Stasse (JRL/LAAS, CNRS/AIST)
 #
 # This file is part of metapod.
 # metapod is free software: you can redistribute it and/or modify
@@ -18,32 +19,24 @@
 #
 # Creation: 14/06/2011
 
-qi_create_lib(simple_humanoid SHARED
-    ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-humanoid/simple_humanoid.cc
-    ${${PROJECT_NAME}_SIMPLE_HUMANOID_MODEL_HEADERS})
-qi_use_lib(simple_humanoid metapod EIGEN3)
-qi_stage_lib(simple_humanoid)
-
-qi_create_lib(simple_arm SHARED
-    ${PROJECT_SOURCE_DIR}/include/metapod/models/simple-arm/simple_arm.cc
-    ${${PROJECT_NAME}_SIMPLE_ARM_MODEL_HEADERS})
-qi_use_lib(simple_arm metapod EIGEN3)
-qi_stage_lib(simple_arm)
-
-# simple wrapper to make merging with upstream CMakeLists easier
-FUNCTION(ADD_TESTCASE test_name source_file)
-  QI_CREATE_TEST(${test_name} ${source_file}
-      DEPENDS simple_arm simple_humanoid BOOST BOOST_TEST_EXEC_MONITOR)
-ENDFUNCTION()
 
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
 # Make Boost.Test generates the main function in test cases.
-add_definitions(-DBOOST_TEST_MAIN)
+ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
 # note: the following line is needed if we link with the dynamic version
 #       of libboost_test_exec_monitor
-#add_definitions(-DBOOST_TEST_DYN_LINK)
+#ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
+
+# ADD_TESTCASE(NAME)
+# ------------------------
+#
+# simple wrapper to make merging with upstream CMakeLists easier
+FUNCTION(ADD_TESTCASE test_name source_file)
+  QI_CREATE_TEST(${test_name} ${source_file}
+      DEPENDS BOOST BOOST_TEST_EXEC_MONITOR)
+ENDFUNCTION()
 
 # the "use_model" subfolder is included once per tested model. The tests
 # defined within it should use the "CURRENT_MODEL" macro to use the
@@ -51,8 +44,12 @@ add_definitions(-DBOOST_TEST_MAIN)
 # For each inclusion of the folder, a different binary folder is used. It acts
 # as a namespace for CMake. This makes it possible to use different values
 # for "CURRENT_MODEL" when calling add_definitions(), without conflicts.
-set(CURRENT_MODEL "simple_humanoid")
-add_subdirectory(use_model use_simple_humanoid)
-set(CURRENT_MODEL "simple_arm")
-add_subdirectory(use_model use_simple_arm)
-add_subdirectory(spatial)
+IF(${WITH_SIMPLE_HUMANOID})
+  SET(CURRENT_MODEL "simple_humanoid")
+  ADD_SUBDIRECTORY(use_model use_simple_humanoid)
+ENDIF()
+IF(${WITH_SIMPLE_ARM})
+  SET(CURRENT_MODEL "simple_arm")
+  ADD_SUBDIRECTORY(use_model use_simple_arm)
+ENDIF()
+ADD_SUBDIRECTORY(spatial)

@@ -1,8 +1,8 @@
-// Copyright 2011, 2012,
+// Copyright 2012,
 //
-// Maxime Reis
+// Sébastien Barthélémy
 //
-// JRL/LAAS, CNRS/AIST
+// Aldebaran Robotics
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -18,12 +18,22 @@
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
- * Header of the simple humanoid robot model, used for test purpose.
+ * Header of the simple arm robot model, used for test purpose.
  */
 
-#ifndef METAPOD_SIMPLE_HUMANOID_HH
-# define METAPOD_SIMPLE_HUMANOID_HH
+#ifndef METAPOD_SIMPLE_ARM_HH
+# define METAPOD_SIMPLE_ARM_HH
+
+# ifdef _MSC_VER
+#  pragma warning( push )
+// disable warning C4251: need to have DLL interface
+#  pragma warning( disable: 4251 )
+# endif
 
 # include "robot.hh"
+
+# ifdef _MSC_VER
+#  pragma warning( pop )
+# endif
 
 #endif

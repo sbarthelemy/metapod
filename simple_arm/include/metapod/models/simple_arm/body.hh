@@ -19,21 +19,21 @@
 
 /*
  * This file is part of a simple arm robot model, used for test purpose.
- * It contains the definition of all the robot joints.
+ * It contains the definition of all the robot bodies.
  */
 
-#ifndef METAPOD_SIMPLE_ARM_JOINT_HH
-# define METAPOD_SIMPLE_ARM_JOINT_HH
+#ifndef METAPOD_SIMPLE_ARM_BODY_HH
+# define METAPOD_SIMPLE_ARM_BODY_HH
 
-# include "metapod/tools/jointmacros.hh"
+# include <metapod/tools/bodymacros.hh>
 
 namespace metapod
 {
   namespace simple_arm
   {
-    JOINT_REVOLUTE_AXIS_ANY(SHOULDER, 1, 0, 0);
-    JOINT_REVOLUTE_AXIS_ANY(ELBOW, 1, 0, 0);
-    JOINT_REVOLUTE_AXIS_ANY(WRIST, 1, 0, 0);
+    CREATE_BODY(METAPOD_SIMPLE_ARM, ARM, NP, SHOULDER);
+    CREATE_BODY(METAPOD_SIMPLE_ARM, FOREARM, ARM, ELBOW);
+    CREATE_BODY(METAPOD_SIMPLE_ARM, HAND, FOREARM, WRIST);
   } // end of namespace simple_arm
 } // end of namespace metapod
 
