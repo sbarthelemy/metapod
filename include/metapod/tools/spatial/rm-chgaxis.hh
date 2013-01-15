@@ -290,15 +290,15 @@ namespace metapod
                         traits::value_Z*ar[traits::ind_Z]);
       }
 
-      friend std::ostream * operator<<(std::ostream &os,
+      friend std::ostream & operator<<(std::ostream &os,
                                        const struct RotationMatrixChangeAxis & aRMCA)
       {
         static const int lind[3] = { traits::ind_X, traits::ind_Y, traits::ind_Z };
         static const int lvalue[3] = { traits::value_X, traits::ind_Y, traits::ind_Z };
 
-        for(unsigned int li=0;li<3;li++)
+        for(unsigned int li=0;li<3;++li)
         {
-          for(unsigned int lj=0;lj<3;lj++)
+          for(unsigned int lj=0;lj<3;++lj)
             if (lj==lind[li])
               cout << " " << lvalue[li] ;
             else
@@ -308,7 +308,7 @@ namespace metapod
         return os;
       }
     };
-    
+
     template < typename RotationMatrixT,
                typename RotMatChgAxis>
     struct RotationBinaryOp
