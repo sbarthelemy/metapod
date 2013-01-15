@@ -16,14 +16,14 @@
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 
 GENERATE_CONFIG_HEADER(
-  ${CMAKE_CURRENT_BINARY_DIR}/metapod/timer/config.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/timer/config.hh
   metapod_timer
   )
 SET(METAPOD_TIMER_HEADERS
-  ${CMAKE_CURRENT_BINARY_DIR}/metapod/timer/config.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/timer/config.hh
   include/metapod/timer/timer.hh
   )
 QI_CREATE_LIB(metapod_timer SHARED

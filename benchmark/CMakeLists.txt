@@ -18,53 +18,33 @@
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-# Returns the list of source files for sample_${dof}_dof model
-FUNCTION(GET_SAMPLE_SOURCE_FILES output dof include_config_hh)
-    SET(_libname "sample_${dof}_dof")
-    SET(_output
+# list of the sample models
+SET(depth_list 1 2 3 4 5)
+
+# build the generator
+QI_CREATE_BIN(make_model make_model.cc)
+QI_USE_LIB(make_model metapod_robotbuilder)
+
+# build the sample models libraries
+FOREACH(depth IN LISTS depth_list)
+    SET(_libname "sample_${depth}")
+    SET(_sources
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.cc
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/body.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/joint.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/robot.hh)
-    IF (include_config_hh)
-        SET(_config_hh_path
-            ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/config.hh)
-        GENERATE_CONFIG_HEADER(${_config_hh_path} ${_libname})
-        LIST(APPEND _output ${_config_hh_path})
-    ENDIF()
-    SET("${output}" ${_output} PARENT_SCOPE)
-ENDFUNCTION()
-
-# list of the sample models
-SET(dof_list 3 7 15 31 63)
-
-# put together a list of all the generated files
-FOREACH(dof IN LISTS dof_list)
-    GET_SAMPLE_SOURCE_FILES(_sources ${dof} False)
-    LIST(APPEND _generated_files "${_sources}")
-ENDFOREACH()
-
-# build the generator
-QI_CREATE_BIN(make_model make_model.cc make_model.hh)
-QI_USE_LIB(make_model boost_filesystem)
-
-# declare the generated files
-IF(dof_list)
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/robot.hh
+        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/config.hh)
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${_generated_files}
-      COMMAND make_model
+      OUTPUT ${_sources}
+      COMMAND make_model ${depth}
     )
-ENDIF()
-
-# build the sample models libraries
-FOREACH(dof IN LISTS dof_list)
-    GET_SAMPLE_SOURCE_FILES(_sources ${dof} True)
-    SET(_target sample_${dof}_dof)
-    QI_CREATE_LIB(${_target} SHARED ${_sources})
-    QI_STAGE_LIB(${_target})
-    LIST(APPEND _model_libs "${_target}")
+    QI_CREATE_LIB(${_libname} SHARED ${_sources})
+    QI_USE_LIB(${_libname} metapod EIGEN3)
+    QI_STAGE_LIB(${_libname})
+    LIST(APPEND _model_libs "${_libname}")
 ENDFOREACH()
 
 # add simple humanoid model
@@ -73,9 +53,9 @@ IF(WITH_SIMPLE_HUMANOID)
         COMPILE_FLAGS " -DWITH_SIMPLE_HUMANOID")
     LIST(APPEND _model_libs "metapod_simple_humanoid")
     INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/simple_humanoid/include)
-    INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/simple_humanoid)
+    INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/simple_humanoid/include)
 ENDIF()
+
 # and finally, the benchmark
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 QI_CREATE_BIN(benchmark benchmark.cc benchmark.hh)
 QI_USE_LIB(benchmark metapod_timer ${_model_libs})

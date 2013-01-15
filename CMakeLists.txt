@@ -54,7 +54,6 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/backward_traversal_prev.hh
   include/${PROJECT_NAME}/tools/bcalc.hh
   include/${PROJECT_NAME}/tools/bodymacros.hh
-  include/${PROJECT_NAME}/tools/buildrobot.hh
   include/${PROJECT_NAME}/tools/common.hh
   include/${PROJECT_NAME}/tools/deepest_common_ancestor.hh
   include/${PROJECT_NAME}/tools/depth_first_traversal.hh
@@ -107,6 +106,8 @@ IF(${WITH_SIMPLE_ARM})
 ENDIF()
 ADD_SUBDIRECTORY(tests)
 
+ADD_SUBDIRECTORY(embedfile)
+ADD_SUBDIRECTORY(robotbuilder)
 IF(${BENCHMARK})
   ADD_SUBDIRECTORY(timer)
   ADD_SUBDIRECTORY(benchmark)
