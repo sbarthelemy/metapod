@@ -38,9 +38,9 @@ FUNCTION(GENERATE_CONFIG_HEADER OUTPUT LIBRARY_NAME)
   # EXPORT_SYMBOL: what symbol controls the switch between symbol
   #                import/export, usually libname_EXPORTS, with libname in
   #                lower case.
-  # PROJECT_VERSION: the project version
+  # PROJECT_VERSION: the project version. Only supported when using jrl-cmake.
   CONFIGURE_FILE(
-    ${PROJECT_SOURCE_DIR}/cmake/config.hh.cmake
+    ${PROJECT_SOURCE_DIR}/include/metapod/config.in.hh
     ${OUTPUT}
     @ONLY)
 ENDFUNCTION(GENERATE_CONFIG_HEADER)

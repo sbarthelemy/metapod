@@ -23,7 +23,7 @@
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
-# Make Boost.Test generates the main function in test cases.
+# Make Boost.Test generate the main function in test cases.
 ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
 # note: the following line is needed if we link with the dynamic version
 #       of libboost_test_exec_monitor
