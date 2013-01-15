@@ -30,6 +30,11 @@ qi_create_lib(simple_arm SHARED
 qi_use_lib(simple_arm metapod EIGEN3)
 qi_stage_lib(simple_arm)
 
+# simple wrapper to make merging with upstream CMakeLists easier
+FUNCTION(ADD_TESTCASE test_name source_file)
+  QI_CREATE_TEST(${test_name} ${source_file}
+      DEPENDS simple_arm simple_humanoid BOOST BOOST_TEST_EXEC_MONITOR)
+ENDFUNCTION()
 
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
@@ -50,3 +55,4 @@ set(CURRENT_MODEL "simple_humanoid")
 add_subdirectory(use_model use_simple_humanoid)
 set(CURRENT_MODEL "simple_arm")
 add_subdirectory(use_model use_simple_arm)
+add_subdirectory(spatial)

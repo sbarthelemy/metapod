@@ -23,7 +23,8 @@
  */
 
 // Common test tools
-# include "../common.hh"
+#include "../common.hh"
+#include <metapod/algos/jac_point_chain.hh>
 
 using namespace metapod;
 using namespace CURRENT_MODEL_NAMESPACE;
@@ -34,6 +35,8 @@ using namespace CURRENT_MODEL_NAMESPACE;
 # define END_NODE LARM_LINK3
   static const int offset = 0;
 #else
+// This algorithm does not work for robots with less than 6 DoF. So the test is
+// only built for simple_humanoid.
 # define START_NODE HAND
 # define END_NODE ARM
   static const int offset = 6; // offset >3 is needed to ensure J.cols() >0

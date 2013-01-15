@@ -14,22 +14,21 @@
 # GNU General Lesser Public License for more details.
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
-add_definitions(" -DCURRENT_MODEL_NAMESPACE=metapod::${CURRENT_MODEL}")
-add_definitions(
+ADD_DEFINITIONS(" -DCURRENT_MODEL_NAMESPACE=metapod::${CURRENT_MODEL}")
+ADD_DEFINITIONS(
    -DTEST_DIRECTORY="${CMAKE_SOURCE_DIR}/tests/data/${CURRENT_MODEL}")
 STRING(TOUPPER "${CURRENT_MODEL}" CURRENT_MODEL_UPPER)
 ADD_DEFINITIONS(" -DCURRENT_MODEL_IS_${CURRENT_MODEL_UPPER}=1")
-
-# simple wrapper to make merging with upstream CMakeLists easier
-function(ADD_TESTCASE test_name source_file)
-  qi_create_test(${test_name} ${source_file}
-      DEPENDS ${CURRENT_MODEL} BOOST BOOST_TEST_EXEC_MONITOR)
-endfunction()
 
 ADD_TESTCASE(test_rnea_${CURRENT_MODEL} test_rnea.cc)
 ADD_TESTCASE(test_crba_${CURRENT_MODEL} test_crba.cc)
 ADD_TESTCASE(test_bcalc_${CURRENT_MODEL} test_bcalc.cc)
 ADD_TESTCASE(test_jac_point_${CURRENT_MODEL} test_jac_point.cc)
-ADD_TESTCASE(test_jac_point_chain_${CURRENT_MODEL} test_jac_point_chain.cc)
+IF(${CURRENT_MODEL} STREQUAL "simple_humanoid")
+  ADD_TESTCASE(test_jac_point_chain_${CURRENT_MODEL} test_jac_point_chain.cc)
+ENDIF()
 ADD_TESTCASE(test_printstate_${CURRENT_MODEL} test_printstate.cc)
 ADD_TESTCASE(test_initconf_${CURRENT_MODEL} test_initconf.cc)
+ADD_TESTCASE(test_depth_first_traversal_${CURRENT_MODEL} test_depth_first_traversal.cc)
+ADD_TESTCASE(test_backward_traversal_${CURRENT_MODEL} test_backward_traversal.cc)
+ADD_TESTCASE(test_backward_traversal_prev_${CURRENT_MODEL} test_backward_traversal_prev.cc)

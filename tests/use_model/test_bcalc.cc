@@ -23,7 +23,8 @@
  */
 
 // Common test tools
-# include "../common.hh"
+#include "../common.hh"
+#include <metapod/tools/bcalc.hh>
 
 using namespace metapod;
 using namespace CURRENT_MODEL_NAMESPACE;
@@ -33,7 +34,7 @@ BOOST_AUTO_TEST_CASE (test_bcalc)
   // Set configuration vectors (q) to reference values.
   Robot::confVector q;
   std::ifstream qconf(TEST_DIRECTORY "/q.conf");
-  initConf< Robot >::run(qconf, q);
+  initConf<Robot>::run(qconf, q);
   qconf.close();
 
   // Apply the body calculations to the metapod multibody and print
@@ -41,7 +42,7 @@ BOOST_AUTO_TEST_CASE (test_bcalc)
   bcalc< Robot >::run(q);
   const char result_file[] = "bcalc.log";
   std::ofstream log(result_file, std::ofstream::out);
-  printTransforms<Robot::Tree>(log);
+  printTransforms<Robot>(log);
   log.close();
 
   // Compare results with reference file
