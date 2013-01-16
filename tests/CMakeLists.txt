@@ -29,13 +29,23 @@ ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
 #       of libboost_test_exec_monitor
 #ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
 
-# ADD_TESTCASE(NAME)
+# ADD_TESTCASE(NAME SOURCE_FILE1 [SOURCE_FILE2])
 # ------------------------
 #
-# simple wrapper to make merging with upstream CMakeLists easier
-FUNCTION(ADD_TESTCASE test_name source_file)
-  QI_CREATE_TEST(${test_name} ${source_file}
-      DEPENDS BOOST BOOST_TEST_EXEC_MONITOR)
+# Define a test named `NAME'.
+#
+# This macro will
+#
+# * create a binary from user-provided source files and common.hh
+# * link it against Boost
+# * add it to the test suite.
+#
+# The test should #include the common.hh header
+#
+FUNCTION(ADD_TESTCASE NAME)
+  QI_CREATE_TEST(${NAME}
+      SRC ${ARGN} ${PROJECT_SOURCE_DIR}/tests/common.hh
+    DEPENDS BOOST BOOST_TEST_EXEC_MONITOR)
 ENDFUNCTION()
 
 # the "use_model" subfolder is included once per tested model. The tests
