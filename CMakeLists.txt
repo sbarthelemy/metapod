@@ -42,7 +42,7 @@ SET(${PROJECT_NAME}_ROOT_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
   include/${PROJECT_NAME}/macro.hh
   )
-SET(${PROJECT_NAME}_ALGO_HEADERS
+SET(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
   include/${PROJECT_NAME}/algos/jac_point_relative.hh
@@ -95,7 +95,12 @@ QI_CREATE_LIB(metapod
   ${${PROJECT_NAME}_TOOLS_HEADERS}
   ${${PROJECT_NAME}_SPATIAL_HEADERS})
 SET_TARGET_PROPERTIES(metapod PROPERTIES LINKER_LANGUAGE CXX)
-QI_USE_LIB(metapod EIGEN3 BOOST)
+QI_USE_LIB(metapod BOOST)
+# Eigen (at least version 3.0.5) makes gcc report conversion warnings
+# when one assigns to a block. This floods the compilation results.
+# So we include Eigen headers as if they were system headers: the compiler
+# won't report warning coming from them.
+QI_USE_LIB(metapod EIGEN3 ASSUME_SYSTEM_INCLUDE)
 QI_STAGE_HEADER_ONLY_LIB(metapod)
 
 IF(${WITH_SIMPLE_HUMANOID})
