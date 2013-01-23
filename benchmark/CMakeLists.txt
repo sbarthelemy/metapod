@@ -40,6 +40,7 @@ FOREACH(depth IN LISTS depth_list)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_sources}
       COMMAND make_model ${depth}
+      DEPENDS make_model
     )
     QI_CREATE_LIB(${_libname} SHARED ${_sources})
     QI_USE_LIB(${_libname} metapod EIGEN3)
