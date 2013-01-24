@@ -17,5 +17,5 @@ SET(METAPOD_SIMPLE_HUMANOID_MODEL_HEADERS
 QI_CREATE_LIB(metapod_simple_humanoid SHARED
     src/simple_humanoid.cc
     ${METAPOD_SIMPLE_HUMANOID_MODEL_HEADERS})
-QI_USE_LIB(metapod_simple_humanoid metapod EIGEN3)
+QI_USE_LIB(metapod_simple_humanoid metapod)
 QI_STAGE_LIB(metapod_simple_humanoid)

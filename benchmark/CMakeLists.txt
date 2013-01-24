@@ -43,7 +43,7 @@ FOREACH(depth IN LISTS depth_list)
       DEPENDS make_model
     )
     QI_CREATE_LIB(${_libname} SHARED ${_sources})
-    QI_USE_LIB(${_libname} metapod EIGEN3)
+    QI_USE_LIB(${_libname} metapod)
     QI_STAGE_LIB(${_libname})
     LIST(APPEND _model_libs "${_libname}")
 ENDFOREACH()

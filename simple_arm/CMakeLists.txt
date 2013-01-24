@@ -18,5 +18,5 @@ SET(METAPOD_SIMPLE_ARM_MODEL_HEADERS
 QI_CREATE_LIB(metapod_simple_arm SHARED
     src/simple_arm.cc
     ${METAPOD_SIMPLE_ARM_MODEL_HEADERS})
-QI_USE_LIB(metapod_simple_arm metapod EIGEN3)
+QI_USE_LIB(metapod_simple_arm metapod)
 QI_STAGE_LIB(metapod_simple_arm)
