@@ -21,7 +21,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # list of the sample models
-SET(depth_list 1 2 3 4 5)
+#SET(depth_list 1 2 3 4 5)
+SET(depth_list 1 2 3 4)
 
 # build the generator
 QI_CREATE_BIN(make_model make_model.cc)
@@ -33,9 +34,6 @@ FOREACH(depth IN LISTS depth_list)
     SET(_sources
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.cc
-        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/body.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/joint.hh
-        ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/robot.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/config.hh)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_sources}
