@@ -30,7 +30,7 @@ QI_USE_LIB(make_model metapod_robotbuilder)
 
 # build the sample models libraries
 FOREACH(depth IN LISTS depth_list)
-    SET(_libname "sample_${depth}")
+    SET(_libname "s${depth}")
     SET(_sources
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.hh
         ${CMAKE_CURRENT_BINARY_DIR}/models/${_libname}/${_libname}.cc
@@ -40,7 +40,7 @@ FOREACH(depth IN LISTS depth_list)
       COMMAND make_model ${depth}
       DEPENDS make_model
     )
-    QI_CREATE_LIB(${_libname} SHARED ${_sources})
+QI_CREATE_LIB(${_libname} STATIC ${_sources})
     QI_USE_LIB(${_libname} metapod)
     QI_STAGE_LIB(${_libname})
     LIST(APPEND _model_libs "${_libname}")

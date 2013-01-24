@@ -23,13 +23,17 @@
  */
 
 #define FUSION_MAX_VECTOR_SIZE 50
-#ifdef WITH_SIMPLE_HUMANOID
-# include "metapod/models/simple_humanoid/simple_humanoid.hh"
-#endif
-#include "models/sample_1/sample_1.hh"
-#include "models/sample_2/sample_2.hh"
-#include "models/sample_3/sample_3.hh"
-#include "models/sample_4/sample_4.hh"
+//#ifdef WITH_SIMPLE_HUMANOID
+//# include "metapod/models/simple_humanoid/simple_humanoid.hh"
+//#endif
+#define S1_STATIC
+#define S2_STATIC
+#define S3_STATIC
+#define S4_STATIC
+#include "models/s1/s1.hh"
+#include "models/s2/s2.hh"
+#include "models/s3/s3.hh"
+#include "models/s4/s4.hh"
 //#include "models/sample_5/sample_5.hh"
 
 #include "benchmark.hh"
@@ -38,11 +42,11 @@ using namespace metapod::benchmark;
 int main()
 {
 #ifdef WITH_SIMPLE_HUMANOID
-  BENCHMARK(metapod::simple_humanoid);
+  //BENCHMARK(metapod::simple_humanoid);
 #endif
-  BENCHMARK(metapod::sample_1);
-  BENCHMARK(metapod::sample_2);
-  BENCHMARK(metapod::sample_3);
-  BENCHMARK(metapod::sample_4);
+  BENCHMARK(metapod::s1);
+  BENCHMARK(metapod::s2);
+  BENCHMARK(metapod::s3);
+  BENCHMARK(metapod::s4);
   //BENCHMARK(metapod::sample_5);
 }

@@ -95,7 +95,7 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
   }
   std::stringstream ss_name;
-  ss_name << "sample_" << depth;
+  ss_name << "s" << depth;
   generate_model(ss_name.str(), depth);
   return EXIT_SUCCESS;
 }

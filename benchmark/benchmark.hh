@@ -150,6 +150,7 @@ namespace metapod
         confVector q, dq, ddq;
         // vector of the algorithms we want to benchmark
         std::vector< Runner<Robot> > runners;
+        /*
         runners.push_back(Runner<Robot>(
             boost::bind<void>(&jcalc<Robot>::run, _1, _2, _3),
             std::string("jcalc")));
@@ -159,15 +160,18 @@ namespace metapod
         runners.push_back(Runner<Robot>(
             boost::bind<void>(rnea<Robot, true>::run, _1, _2, _3, _4),
                   std::string("rnea")));
+        */
         runners.push_back(Runner<Robot>(
             boost::bind<void>(rnea<Robot, false>::run, _1, _2, _3, _4),
             std::string("rnea (without jcalc)")));
+        /*
         runners.push_back(Runner<Robot>(
             boost::bind<void>(crba<Robot, true>::run, _1, _2),
             std::string("crba")));
         runners.push_back(Runner<Robot>(
             boost::bind<void>(crba<Robot, false>::run, _1, _2),
             std::string("crba (without jcalc)")));
+        */
         /*
         runners.push_back(Runner<Robot>(
             boost::bind<void>(jac_point_robot_wrapper<Robot, false>::run, _1),
@@ -176,7 +180,7 @@ namespace metapod
         // tell which model we are running benchmarks on
         std::cout << "*************\n"
                   << "Model NBDOF : " << Robot::NBDOF << std::endl;
-        for(int i=0; i<100; ++i)
+        for(int i=0; i<1000; ++i)
         {
           q = confVector::Random();
           dq = confVector::Random();
