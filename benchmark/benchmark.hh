@@ -46,6 +46,7 @@
 # include <boost/bind.hpp>
 # include <boost/function.hpp>
 
+# define METAPOD_TIMER_STATIC
 # include <metapod/timer/timer.hh>
 # include <metapod/tools/jcalc.hh>
 # include <metapod/tools/bcalc.hh>

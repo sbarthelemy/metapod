@@ -26,7 +26,7 @@ SET(METAPOD_TIMER_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/timer/config.hh
   include/metapod/timer/timer.hh
   )
-QI_CREATE_LIB(metapod_timer SHARED
+QI_CREATE_LIB(metapod_timer STATIC
   src/timer.cc
   ${METAPOD_TIMER_HEADERS}
   )
