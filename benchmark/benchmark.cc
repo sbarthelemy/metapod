@@ -33,10 +33,13 @@
 //#include "models/sample_5/sample_5.hh"
 
 #include "benchmark.hh"
+#include <immintrin.h>
+
 using namespace metapod::benchmark;
 
 int main()
 {
+  _mm_setcsr( _mm_getcsr() | (1<<15));  // FTZ
 #ifdef WITH_SIMPLE_HUMANOID
   BENCHMARK(metapod::simple_humanoid);
 #endif
