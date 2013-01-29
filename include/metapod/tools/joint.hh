@@ -38,7 +38,8 @@ namespace metapod
     void jcalc(const Vector1d& qi, const Vector1d& dqi);
   };
 
-  inline RevoluteAxisXJoint::RevoluteAxisXJoint()
+  inline RevoluteAxisXJoint::RevoluteAxisXJoint():
+    cj(Spatial::Motion::Zero())
   {
   }
 
@@ -79,6 +80,7 @@ namespace metapod
 
   inline RevoluteAxisAnyJoint::RevoluteAxisAnyJoint(
       double axis_x, double axis_y, double axis_z):
+    cj(Spatial::Motion::Zero()),
     S(axis_x, axis_y, axis_z),
     axis_(axis_x, axis_y, axis_z)
   {
@@ -145,8 +147,8 @@ namespace metapod
     bcalc(qi);
     vj = Spatial::Motion(S.S()*dqi);
     Matrix6d dotS = Matrix6d::Zero();
-    Matrix3d localDotR = Spatial::skew (dqi.segment<3>(3))
-      * S.S().block<3,3>(0,3);
+    Matrix3d localDotR = static_cast<Matrix3d>(Spatial::skew (dqi.segment<3>(3))
+                                               * S.S().block<3,3>(0,3));
     dotS.block<3,3>(0,3) = dotS.block<3,3>(3,0) = localDotR;
     cj = Spatial::Motion(dotS*dqi);
   }
