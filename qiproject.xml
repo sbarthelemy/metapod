@@ -1,4 +1,3 @@
 <project name="metapod">
   <!-- Add your project dependencies here -->
-  <depends buildtime="true" names="eigen3"/>
 </project>

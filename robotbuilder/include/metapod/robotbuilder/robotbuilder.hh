@@ -24,8 +24,7 @@
 
 # include <metapod/robotbuilder/config.hh>
 # include <string>
-# include <Eigen/Eigen>
-# include <memory>
+# include <Eigen/Dense>
 
 namespace metapod {
 
@@ -79,8 +78,9 @@ public:
 private:
   // returns [1.; 0.; 0.]
   static Eigen::Vector3d axisX();
-  const std::auto_ptr<RobotBuilderP> pimpl_;
+  RobotBuilderP * const pimpl_;
   RobotBuilder(const RobotBuilder&); // forbid copy-constuction
+  RobotBuilder& operator=(const RobotBuilder&); // forbid assignment
 };
 }
 #endif

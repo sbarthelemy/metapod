@@ -28,7 +28,7 @@ FUNCTION(EMBED_TEMPLATE OUTPUT TEMPLATE NAME)
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c
     COMMAND embedfile ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c
             ${CMAKE_CURRENT_SOURCE_DIR}/tpl/${TEMPLATE} ${NAME}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tpl/${TEMPLATE}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tpl/${TEMPLATE} embedfile
     )
   SET(${OUTPUT} "${${OUTPUT}};${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c" PARENT_SCOPE)
 ENDFUNCTION()
@@ -45,9 +45,6 @@ SET(METAPOD_ROBOTBUILDER_HEADERS
   include/metapod/robotbuilder/robotbuilder.hh
   )
 EMBED_TEMPLATE(EMBEDDED_FILES "config.in.hh" "config_hh")
-EMBED_TEMPLATE(EMBEDDED_FILES "body.in.hh" "body_hh")
-EMBED_TEMPLATE(EMBEDDED_FILES "joint.in.hh" "joint_hh")
-EMBED_TEMPLATE(EMBEDDED_FILES "robot.in.hh" "robot_hh")
 EMBED_TEMPLATE(EMBEDDED_FILES "init.in.hh" "init_hh")
 EMBED_TEMPLATE(EMBEDDED_FILES "init.in.cc" "init_cc")
 
@@ -55,6 +52,10 @@ QI_CREATE_LIB(metapod_robotbuilder SHARED
   src/robotbuilder.cc
   src/robotbuilder_p.hh
   src/robotbuilder_p.cc
+  src/robotmodel.hh
+  src/robotmodel.cc
+  src/txttemplate.hh
+  src/txttemplate.cc
   ${EMBEDDED_FILES}
   ${METAPOD_ROBOTBUILDER_HEADERS}
   )

@@ -24,25 +24,32 @@ find_package(qibuild)
 include(cmakeutils.cmake)
 enable_testing()
 qi_sanitize_compile_flags(HIDDEN_SYMBOLS)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakemodules")
+
+# Options
+IF(NOT CMAKE_CROSSCOMPILING)
+  SET(NOT_CROSSCOMPILING TRUE)
+ELSE()
+  SET(NOT_CROSSCOMPILING FALSE)
+ENDIF()
+
+OPTION(BENCHMARK "Generate and build the benchmarks" ${NOT_CROSSCOMPILING})
+OPTION(BUILD_METAPODFROMURDF "Build the urdf parser" ${NOT_CROSSCOMPILING})
+OPTION(WITH_SIMPLE_HUMANOID "Generate and build the simple humanoid example
+ model and the related tests" ${BUILD_METAPODFROMURDF})
+OPTION(WITH_SIMPLE_ARM "Generate and build the simple arm example model and
+ the related tests" ${BUILD_METAPODFROMURDF})
 
 # generate config.hh using the same template as JRL-cmake
 generate_config_header(
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
   metapod)
-
-OPTION(WITH_SIMPLE_HUMANOID "Build the simple humanoid example model" ON)
-OPTION(WITH_SIMPLE_ARM "Build the simple arm example model" ON)
-OPTION(BENCHMARK "Build the benchmarking tool" OFF)
-IF (NOT CMAKE_CROSSCOMPILING)
-  SET(BENCHMARK ON)
-ENDIF()
-
 # Set header files.
 SET(${PROJECT_NAME}_ROOT_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
   include/${PROJECT_NAME}/macro.hh
   )
-SET(${PROJECT_NAME}_ALGO_HEADERS
+SET(${PROJECT_NAME}_ALGOS_HEADERS
   include/${PROJECT_NAME}/algos/rnea.hh
   include/${PROJECT_NAME}/algos/crba.hh
   include/${PROJECT_NAME}/algos/jac_point_relative.hh
@@ -53,8 +60,8 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/backward_traversal.hh
   include/${PROJECT_NAME}/tools/backward_traversal_prev.hh
   include/${PROJECT_NAME}/tools/bcalc.hh
-  include/${PROJECT_NAME}/tools/bodymacros.hh
   include/${PROJECT_NAME}/tools/common.hh
+  include/${PROJECT_NAME}/tools/constants.hh
   include/${PROJECT_NAME}/tools/deepest_common_ancestor.hh
   include/${PROJECT_NAME}/tools/depth_first_traversal.hh
   include/${PROJECT_NAME}/tools/fwd.hh
@@ -63,7 +70,7 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/is_ancestor.hh
   include/${PROJECT_NAME}/tools/jac_point_robot.hh
   include/${PROJECT_NAME}/tools/jcalc.hh
-  include/${PROJECT_NAME}/tools/jointmacros.hh
+  include/${PROJECT_NAME}/tools/joint.hh
   include/${PROJECT_NAME}/tools/print.hh
   include/${PROJECT_NAME}/tools/spatial.hh
   include/${PROJECT_NAME}/tools/static_assert.hh
@@ -95,20 +102,43 @@ QI_CREATE_LIB(metapod
   ${${PROJECT_NAME}_TOOLS_HEADERS}
   ${${PROJECT_NAME}_SPATIAL_HEADERS})
 SET_TARGET_PROPERTIES(metapod PROPERTIES LINKER_LANGUAGE CXX)
-QI_USE_LIB(metapod EIGEN3 BOOST)
+QI_USE_LIB(metapod BOOST)
+# Eigen (at least version 3.0.5) makes gcc report conversion warnings
+# when one assigns to a block. This floods the compilation results.
+# So we include Eigen headers as if they were system headers: the compiler
+# won't report warning coming from them.
+QI_USE_LIB(metapod EIGEN3 ASSUME_SYSTEM_INCLUDE)
 QI_STAGE_HEADER_ONLY_LIB(metapod)
-
-IF(${WITH_SIMPLE_HUMANOID})
-  ADD_SUBDIRECTORY(simple_humanoid)
-ENDIF()
-IF(${WITH_SIMPLE_ARM})
-  ADD_SUBDIRECTORY(simple_arm)
-ENDIF()
-ADD_SUBDIRECTORY(tests)
 
 ADD_SUBDIRECTORY(embedfile)
 ADD_SUBDIRECTORY(robotbuilder)
-IF(${BENCHMARK})
+
+# we cannot always build metapodfromurdf, because it depends on ROS bits, which
+# we do not control very well. Moreover, when cross-compiling, we typically do
+# not want to run it on the target, but on the build host. Hence we provide
+# support for finding binary version.
+IF(BUILD_METAPODFROMURDF)
+  ADD_SUBDIRECTORY(metapodfromurdf)
+  SET(WITH_METAPODFROMURDF TRUE)
+ELSE()
+  IF(METAPODFROMURDF_EXECUTABLE)
+    SET(WITH_METAPODFROMURDF TRUE)
+  ELSE()
+    FIND_PACKAGE(metapodfromurdf)
+    SET(WITH_METAPODFROMURDF ${METAPODFROMURDF_FOUND})
+  ENDIF()
+ENDIF()
+
+IF(WITH_SIMPLE_ARM)
+  ADD_SAMPLEMODEL("simple_arm")
+ENDIF()
+IF(WITH_SIMPLE_HUMANOID)
+  ADD_SAMPLEMODEL("simple_humanoid")
+ENDIF()
+
+IF(BENCHMARK)
   ADD_SUBDIRECTORY(timer)
   ADD_SUBDIRECTORY(benchmark)
-ENDIF(${BENCHMARK})
+ENDIF()
+
+ADD_SUBDIRECTORY(tests)

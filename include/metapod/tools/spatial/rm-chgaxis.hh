@@ -126,6 +126,7 @@ namespace metapod
           A(0,iX) = lX & A(0,j) = 0 \text{ if } j \neq iX \\
           A(1,iY) = lY & A(1,j) = 0 \text{ if } j \neq iY \\
           A(2,iZ) = lZ & A(2,j) = 0 \text{ if } j \neq iZ \\
+          \end{matrix}
         \f]
      */
     template < typename traits >
@@ -299,10 +300,10 @@ namespace metapod
         {
           for(unsigned int lj=0;lj<3;++lj)
             if (lj==lind[li])
-              cout << " " << lvalue[li] ;
+              std::cout << " " << lvalue[li] ;
             else
-              cout << " 0.0";
-          cout << endl;
+              std::cout << " 0.0";
+          std::cout << std::endl;
         }
         return os;
       }

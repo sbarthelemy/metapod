@@ -1,9 +1,8 @@
 // Copyright 2012,
 //
-// Maxime Reis
-// Antonio El Khoury
-//
-// JRL/LAAS, CNRS/AIST
+// Maxime Reis (JRL/LAAS, CNRS/AIST)
+// Antonio El Khoury (JRL/LAAS, CNRS/AIST)
+// Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -18,7 +17,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.(2);
 
-
 #ifndef METAPOD_SPATIAL_ALGEBRA_INERTIA_HH
 # define METAPOD_SPATIAL_ALGEBRA_INERTIA_HH
 
@@ -27,10 +25,8 @@
 
 namespace metapod
 {
-
   namespace Spatial
   {
-
     class Inertia
     {
       public:
@@ -40,6 +36,9 @@ namespace metapod
           : m_m(m), m_h(h), m_I(I) {}
         Inertia(FloatType m, const Vector3d & h, const lowerTriangularMatrix & I)
           : m_m(m), m_h(h), m_I(I) {}
+
+        // Initializers
+        static const Inertia Zero() { return Inertia(0., Vector3d::Zero(), lowerTriangularMatrix::Zero()); }
 
         // Getters
         FloatType m() const { return m_m; }
@@ -96,14 +95,14 @@ namespace metapod
         lowerTriangularMatrix m_I;
     };
 
-    template<>
+    template<> inline
     Inertia OperatorMul<Inertia,Inertia,FloatType>::mul(const Inertia & m,
 							const FloatType &a) const
     {
       return Inertia(m.m_m*a, m.m_h*a, m.m_I*a);
     }
 	
-    Inertia operator*(const Inertia & m,
+    inline Inertia operator*(const Inertia & m,
 		      const FloatType &a) 
     {
       OperatorMul<Inertia,Inertia,FloatType> om;
@@ -111,7 +110,7 @@ namespace metapod
     }
 	
     /* Operator Force = Inertia * Motion */
-    template<>
+    template<> inline
     Force OperatorMul<Force,Inertia,Motion>::mul(const Inertia & m,
 						 const Motion &mv) const
     {
@@ -119,8 +118,8 @@ namespace metapod
 		       m.m_m*mv.v() - m.m_h.cross(mv.w()));
     }
     
-    Force operator*(const Inertia &m,
-		    const Motion & mv) 
+    inline Force operator*(const Inertia &m,
+                           const Motion & mv) 
     {
       OperatorMul<Force,Inertia,Motion> om;
       return om.mul(m,mv);

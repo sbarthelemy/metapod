@@ -19,15 +19,8 @@
 #
 # Creation: 14/06/2011
 
-
-# Add Boost path to include directories.
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-
 # Make Boost.Test generate the main function in test cases.
-ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
-# note: the following line is needed if we link with the dynamic version
-#       of libboost_test_exec_monitor
-#ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
+ADD_DEFINITIONS(-DBOOST_TEST_MAIN -DBOOST_TEST_DYN_LINK)
 
 # ADD_TESTCASE(NAME SOURCE_FILE1 [SOURCE_FILE2])
 # ------------------------
@@ -44,8 +37,8 @@ ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
 #
 FUNCTION(ADD_TESTCASE NAME)
   QI_CREATE_TEST(${NAME}
-      SRC ${ARGN} ${PROJECT_SOURCE_DIR}/tests/common.hh
-    DEPENDS BOOST BOOST_TEST_EXEC_MONITOR)
+    SRC ${ARGN} ${PROJECT_SOURCE_DIR}/tests/common.hh
+    DEPENDS BOOST BOOST_UNIT_TEST_FRAMEWORK)
 ENDFUNCTION()
 
 # the "use_model" subfolder is included once per tested model. The tests

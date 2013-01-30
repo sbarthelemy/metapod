@@ -1,8 +1,7 @@
-// Copyright 2011, 2012,
+// Copyright 2011, 2012, 2013
 //
-// Maxime Reis
-//
-// JRL/LAAS, CNRS/AIST
+// Maxime Reis (JRL/LAAS, CNRS/AIST)
+// Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -25,68 +24,13 @@
 #ifndef METAPOD_COMMON_HH
 # define METAPOD_COMMON_HH
 
-# include "metapod/tools/fwd.hh"
 # include "metapod/config.hh"
-# include "metapod/tools/static_assert.hh"
+# include "metapod/tools/fwd.hh"
+# include <metapod/tools/constants.hh>
 # include "metapod/macro.hh"
-# include "metapod/tools/jointmacros.hh"
-# include "metapod/tools/spatial.hh"
-# include "metapod/tools/bcalc.hh"
-# include "metapod/tools/jcalc.hh"
-# include <fstream>
-# include <iostream>
 
 namespace metapod
 {
-  #define GRAVITY_CST 9.81
-
-  inline Spatial::Motion set_gravity()
-  {
-    Vector6d g_tmp;
-    g_tmp << 0,0,0,0,0,GRAVITY_CST;
-    return Spatial::Motion(g_tmp);
-  }
-
-  static const Spatial::Motion minus_g = set_gravity();
-
-  inline Matrix3d Skew(const Vector3d & v)
-  {
-    Matrix3d m;
-    m(0,0) = 0;     m(0,1) = -v(2); m(0,2) = v(1);
-    m(1,0) = v(2);  m(1,1) = 0    ; m(1,2) = -v(0);
-    m(2,0) = -v(1); m(2,1) =  v(0); m(2,2) =  0 ;
-    return m;
-  }
-
-  // Class No-Child. Necessary to end the recursion on the multibody tree.
-  class NC {};
-
-  // Class No-Parent. Used to set the parent body of the freeflyer.
-  class NP
-  {
-  };
-
-  // Class Node. Contains a Body, a Joint, and up to 3 Node children.
-  // Non-existant children make use of the NC class (No-Child).
-  template< typename B,        // Body
-            typename J,        // Joint
-            typename C0 = NC,  // Children nodes
-            typename C1 = NC,
-            typename C2 = NC,
-            typename C3 = NC,
-            typename C4 = NC >
-  class Node
-  {
-    public:
-      typedef B Body;
-      typedef J Joint;
-      typedef C0 Child0;
-      typedef C1 Child1;
-      typedef C2 Child2;
-      typedef C3 Child3;
-      typedef C4 Child4;
-  };
-
   // Constant 3x3 Matrix initialization method.
   inline const Matrix3d matrix3dMaker(
     FloatType m00, FloatType m01, FloatType m02,
@@ -111,6 +55,55 @@ namespace metapod
     Vector6d v;
     v[0] = v0; v[1] = v1; v[2] = v2; v[3] = v3;  v[4] = v4; v[5] = v5;
     return v;
+  }
+
+}
+
+# include "metapod/tools/static_assert.hh"
+# include "metapod/tools/spatial.hh"
+# include <fstream>
+# include <iostream>
+
+namespace metapod
+{
+  class Body
+  {
+  public:
+    Spatial::Force Fext; // input for rnea
+    Spatial::Transform iX0; // temporary/result used in rnea and bcalc
+    Spatial::Motion vi;// temporary used in rnea
+    Spatial::Motion ai; // temporary used in rnea
+    Spatial::Inertia Iic; // temporary used in crba
+    Body():
+      Fext(Spatial::Force::Zero()),
+      iX0(),
+      vi(),
+      ai(),
+      Iic()
+    {}
+  };
+
+  // specializations should map robot node_ids to node classes.
+  template <typename Robot, int id>
+  struct Nodes {};
+
+  inline Spatial::Motion set_gravity()
+  {
+    const FloatType GRAVITY_CST = 9.81;
+    Vector6d g_tmp;
+    g_tmp << 0,0,0,0,0,GRAVITY_CST;
+    return Spatial::Motion(g_tmp);
+  }
+
+  static const Spatial::Motion minus_g = set_gravity();
+
+  inline Matrix3d Skew(const Vector3d & v)
+  {
+    Matrix3d m;
+    m(0,0) = 0;     m(0,1) = -v(2); m(0,2) = v(1);
+    m(1,0) = v(2);  m(1,1) = 0    ; m(1,2) = -v(0);
+    m(2,0) = -v(1); m(2,1) =  v(0); m(2,2) =  0 ;
+    return m;
   }
 
   // Constant Spatial::Inertia initialization method.
