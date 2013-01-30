@@ -51,8 +51,6 @@ IF(WITH_SIMPLE_HUMANOID)
     SET_SOURCE_FILES_PROPERTIES("benchmark.cc" PROPERTIES
         COMPILE_FLAGS " -DWITH_SIMPLE_HUMANOID")
     LIST(APPEND _model_libs "metapod_simple_humanoid")
-    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/simple_humanoid/include)
-    INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/simple_humanoid/include)
 ENDIF()
 
 # and finally, the benchmark
