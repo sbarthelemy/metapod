@@ -7,12 +7,12 @@ QI_CREATE_BIN(metapodfromurdf
 QI_USE_LIB(metapodfromurdf
   metapod_robotbuilder
   boost_program_options urdf metapod_robotbuilder eigen3)
-# rosconsole emits lots "variadiac macro warnings" ignore them.
+# rosconsole emits lots "variadic macro warnings". Let ignore them.
 QI_USE_LIB(metapodfromurdf
    rosconsole
    ASSUME_SYSTEM_INCLUDE)
 QI_STAGE_BIN(metapodfromurdf)
-
+QI_INSTALL_TARGET(metapodfromurdf)
 GET_PROPERTY(METAPODFROMURDF_EXECUTABLE
   TARGET metapodfromurdf PROPERTY LOCATION)
 SET(METAPODFROMURDF_EXECUTABLE ${METAPODFROMURDF_EXECUTABLE} CACHE
