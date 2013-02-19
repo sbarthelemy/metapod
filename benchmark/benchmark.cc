@@ -1,8 +1,8 @@
-// Copyright 2011, 2012,
+// Copyright 2011, 2012, 2013
 //
-// Maxime Reis
-//
-// JRL/LAAS, CNRS/AIST
+// Maxime Reis (JRL/LAAS, CNRS/AIST)
+// Olivier Stasse (JRL/LAAS, CNRS/AIST)
+// Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -26,6 +26,11 @@
 #ifdef WITH_SIMPLE_HUMANOID
 # include "metapod/models/simple_humanoid/simple_humanoid.hh"
 #endif
+#include "models/sample_1/sample_1.hh"
+#include "models/sample_2/sample_2.hh"
+#include "models/sample_3/sample_3.hh"
+#include "models/sample_4/sample_4.hh"
+//#include "models/sample_5/sample_5.hh"
 
 #include "benchmark.hh"
 using namespace metapod::benchmark;
@@ -33,6 +38,11 @@ using namespace metapod::benchmark;
 int main()
 {
 #ifdef WITH_SIMPLE_HUMANOID
-  BENCHMARK(metapod::simple_humanoid);
+  benchmark<metapod::simple_humanoid>::run();
 #endif
+  benchmark<metapod::sample_1>::run();
+  benchmark<metapod::sample_2>::run();
+  benchmark<metapod::sample_3>::run();
+  benchmark<metapod::sample_4>::run();
+  //benchmark<metapod::sample_5>::run();
 }

@@ -1,8 +1,8 @@
-// Copyright 2011, 2012,
+// Copyright 2011, 2012, 2013
 //
-// Maxime Reis
-//
-// JRL/LAAS, CNRS/AIST
+// Maxime Reis (JRL/LAAS, CNRS/AIST)
+// Olivier Stasse (JRL/LAAS, CNRS/AIST)
+// Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -18,17 +18,15 @@
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
- * This file run performance tests on metapods algorithms, on several sample
- * models.
+ * This file run performance tests on metapods algorithms, on a sample model
  */
 
-#define FUSION_MAX_VECTOR_SIZE 50
-#include "models/sample_3/sample_3.hh"
+#include <metapod/models/simple_humanoid/simple_humanoid.hh>
 
 #include "benchmark.hh"
 using namespace metapod::benchmark;
 
 int main()
 {
-  BENCHMARK(metapod::sample_3);
+  benchmark<metapod::simple_humanoid>::run();
 }

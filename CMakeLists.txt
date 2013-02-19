@@ -42,7 +42,6 @@ ENDIF()
 OPTION(BUILD_METAPODFROMURDF
   "Build the urdf parser"
   ${BUILD_METAPODFROMURDF_DEFAULT})
-
 # check if metapodfromurdf is available
 IF(BUILD_METAPODFROMURDF)
   # if we build it, it is available
@@ -61,7 +60,10 @@ OPTION(WITH_SIMPLE_HUMANOID "Generate and build the simple humanoid example
 model and the related tests" ${WITH_METAPODFROMURDF})
 OPTION(WITH_SIMPLE_ARM "Generate and build the simple arm example model and
 the related tests" ${WITH_METAPODFROMURDF})
-OPTION(BENCHMARK "Generate and build the benchmarks" TRUE)
+OPTION(BUILD_MULTI_MODEL_BENCHMARK
+    "Generate and build the multi-model benchmark" TRUE)
+OPTION(BUILD_SINGLE_MODEL_BENCHMARKS
+    "Generate and build the single-model benchmarks" TRUE)
 
 # generate config.hh using the same template as JRL-cmake
 generate_config_header(
@@ -154,7 +156,7 @@ IF(WITH_SIMPLE_HUMANOID)
   ADD_SAMPLEMODEL("simple_humanoid")
 ENDIF()
 
-IF(BENCHMARK)
+IF(BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
   ADD_SUBDIRECTORY(timer)
   ADD_SUBDIRECTORY(benchmark)
 ENDIF()
