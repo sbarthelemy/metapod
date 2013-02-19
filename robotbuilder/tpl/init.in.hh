@@ -23,7 +23,7 @@
 # endif
 # if defined(FUSION_MAX_VECTOR_SIZE) && (@ROBOT_NB_BODIES@ > FUSION_MAX_VECTOR_SIZE)
 // todo: warn or stop
-#endif
+# endif
 # include <boost/fusion/sequence.hpp>
 # include <boost/fusion/include/sequence.hpp>
 # include <boost/fusion/include/vector.hpp>
@@ -59,8 +59,12 @@ public:
   NodeVector;
 
   // member variables
- NodeVector nodes;
- Eigen::Matrix< FloatType, NBDOF, NBDOF > H; // used by crba
+  NodeVector nodes;
+  Eigen::Matrix< FloatType, NBDOF, NBDOF > H; // used by crba
+
+  @ROBOT_CLASS_NAME@():
+    H(Eigen::Matrix< FloatType, NBDOF, NBDOF >::Zero())
+  {}
 };
 
 // map node id to node type
