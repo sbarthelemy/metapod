@@ -21,8 +21,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # list of the sample models
-#SET(depth_list 1 2 3 4 5)
-SET(depth_list 1 2 3 4)
+SET(depth_list 1 2 3 4 )
+#SET(depth_list 1 )
 
 # build the generator
 QI_CREATE_BIN(make_model make_model.cc)
@@ -56,3 +56,15 @@ ENDIF()
 # and finally, the benchmark
 QI_CREATE_BIN(benchmark benchmark.cc benchmark.hh)
 QI_USE_LIB(benchmark metapod_timer ${_model_libs})
+
+QI_CREATE_BIN(benchmark_1 benchmark_1.cc benchmark.hh)
+QI_USE_LIB(benchmark_1 metapod_timer ${_model_libs})
+
+QI_CREATE_BIN(benchmark_2 benchmark_2.cc benchmark.hh)
+QI_USE_LIB(benchmark_2 metapod_timer ${_model_libs})
+
+QI_CREATE_BIN(benchmark_3 benchmark_3.cc benchmark.hh)
+QI_USE_LIB(benchmark_3 metapod_timer ${_model_libs})
+
+QI_CREATE_BIN(benchmark_4 benchmark_4.cc benchmark.hh)
+QI_USE_LIB(benchmark_4 metapod_timer ${_model_libs})

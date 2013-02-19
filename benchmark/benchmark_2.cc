@@ -1,8 +1,8 @@
-// Copyright 2013
+// Copyright 2011, 2012,
 //
-// Maxime Reis (JRL/CNRS/AIST, LAAS/CNRS)
-// Sébastien Barthélémy (Aldebaran Robotics)
-// Olivier Stasse (LAAS/CNRS)
+// Maxime Reis
+//
+// JRL/LAAS, CNRS/AIST
 //
 // This file is part of metapod.
 // metapod is free software: you can redistribute it and/or modify
@@ -17,14 +17,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef METAPOD_JOINT_HH
-# define METAPOD_JOINT_HH
-#include <metapod/tools/common.hh>
+/*
+ * This file run performance tests on metapods algorithms, on several sample
+ * models.
+ */
 
-#include <metapod/tools/joint-freeflyer.hh>
-#include <metapod/tools/joint-aboutxaxis.hh>
-#include <metapod/tools/joint-aboutyaxis.hh>
-#include <metapod/tools/joint-aboutzaxis.hh>
-#include <metapod/tools/joint-anyaxis.hh>
+#define FUSION_MAX_VECTOR_SIZE 50
+#include "models/sample_2/sample_2.hh"
 
-#endif
+#include "benchmark.hh"
+using namespace metapod::benchmark;
+
+int main()
+{
+  BENCHMARK(metapod::sample_2);
+}
