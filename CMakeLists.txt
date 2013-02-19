@@ -94,6 +94,11 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/jac_point_robot.hh
   include/${PROJECT_NAME}/tools/jcalc.hh
   include/${PROJECT_NAME}/tools/joint.hh
+  include/${PROJECT_NAME}/tools/joint-freeflyer.hh
+  include/${PROJECT_NAME}/tools/joint-aboutxaxis.hh
+  include/${PROJECT_NAME}/tools/joint-aboutyaxis.hh
+  include/${PROJECT_NAME}/tools/joint-aboutzaxis.hh
+  include/${PROJECT_NAME}/tools/joint-anyaxis.hh
   include/${PROJECT_NAME}/tools/print.hh
   include/${PROJECT_NAME}/tools/spatial.hh
   include/${PROJECT_NAME}/tools/static_assert.hh
@@ -110,9 +115,11 @@ SET(${PROJECT_NAME}_SPATIAL_HEADERS
   include/${PROJECT_NAME}/tools/spatial/rm-aboutxaxis.hh
   include/${PROJECT_NAME}/tools/spatial/rm-aboutyaxis.hh
   include/${PROJECT_NAME}/tools/spatial/rm-aboutzaxis.hh
+  include/${PROJECT_NAME}/tools/spatial/rm-binaryop.hh
   include/${PROJECT_NAME}/tools/spatial/rm-chgaxis.hh
   include/${PROJECT_NAME}/tools/spatial/rm-general.hh
   include/${PROJECT_NAME}/tools/spatial/rm-identity.hh
+  include/${PROJECT_NAME}/tools/spatial/rm-mulop.hh
   include/${PROJECT_NAME}/tools/spatial/rotation-matrix.hh
   include/${PROJECT_NAME}/tools/spatial/transform.hh
   )
