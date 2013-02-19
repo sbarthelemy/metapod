@@ -101,6 +101,12 @@ namespace metapod
 
       }
       
+      template <class T> friend
+      T operator*(const T &aT, RotationMatrixIdentity alti)
+      {
+	return aT * alti.m_scalar  ;
+      }
+
       Vector3d col(int x) const
       {
 	Vector3d r=Vector3d::Zero();
