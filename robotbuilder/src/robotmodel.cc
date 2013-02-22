@@ -8,18 +8,35 @@ namespace {
 class CompareLinkBodyName
 {
 public:
-  CompareLinkBodyName(const std::string& body_name):
-      body_name_(body_name)
+  CompareLinkBodyName(const std::string& name):
+      name_(name)
   {}
   bool operator()(const metapod::Link& link)
   {
-    if (link.body_name_ == body_name_)
+    if (link.body_name_ == name_)
       return true;
     else
       return false;
   }
 private:
-  const std::string body_name_;
+  const std::string name_;
+};
+
+class CompareLinkJointName
+{
+public:
+  CompareLinkJointName(const std::string& name):
+      name_(name)
+  {}
+  bool operator()(const metapod::Link& link)
+  {
+    if (link.joint_name_ == name_)
+      return true;
+    else
+      return false;
+  }
+private:
+  const std::string name_;
 };
 
 }
@@ -181,45 +198,24 @@ void RobotModel::add_link(const Link& link)
   links_.push_back(link);
 }
 
-int RobotModel::find_link_by_body_name(const std::string& body_name) const
+int RobotModel::find_link_by_body_name(const std::string& name) const
 {
-  if (body_name == "NP")
+  if (name == "NP")
     return NO_PARENT;
   std::vector<Link>::const_iterator it =
-      std::find_if(links_.begin(), links_.end(), ::CompareLinkBodyName(body_name));
+      std::find_if(links_.begin(), links_.end(), ::CompareLinkBodyName(name));
   if (it == links_.end())
     return NO_NODE;
   return it->id_;
 }
 
-  void RobotModel::set_link_xt_type(int link_id,
-                                   const std::string &xt_type) 
-  {
-    assert(links_[link_id].child_id_.size() <
-           static_cast<size_t>(std::numeric_limits<int>::max()));
-    links_[link_id].xt_type_ = xt_type;
-  }
-
-  const std::string & RobotModel::xt_type(int link_id) const
-  {
-    assert(links_[link_id].child_id_.size() <
-           static_cast<size_t>(std::numeric_limits<int>::max()));
-    return links_[link_id].xt_type_;
-  }
-
-  void RobotModel::set_link_sxp_type(int link_id,
-                                   const std::string &sxp_type) 
-  {
-    assert(links_[link_id].child_id_.size() <
-           static_cast<size_t>(std::numeric_limits<int>::max()));
-    links_[link_id].sxp_type_ = sxp_type;
-  }
-
-  const std::string & RobotModel::sxp_type(int link_id) const
-  {
-    assert(links_[link_id].child_id_.size() <
-           static_cast<size_t>(std::numeric_limits<int>::max()));
-    return links_[link_id].sxp_type_;
-  }
+int RobotModel::find_link_by_joint_name(const std::string& name) const
+{
+  std::vector<Link>::const_iterator it =
+      std::find_if(links_.begin(), links_.end(), ::CompareLinkJointName(name));
+  if (it == links_.end())
+    return NO_NODE;
+  return it->id_;
+}
 
 }
