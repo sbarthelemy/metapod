@@ -1,7 +1,6 @@
 // Copyright 2011, 2012, 2013
 //
 // Maxime Reis (JRL/LAAS, CNRS/AIST)
-// Antonio El Khoury (JRL/LAAS, CNRS/AIST)
 // Sébastien Barthélémy (Aldebaran Robotics)
 //
 // This file is part of metapod.
@@ -17,38 +16,40 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * This test computes the point articular jacobian for all bodies of a
- * test model with a reference configuration, then compares the
- * computed jacobian with the reference jacobian
- */
+// This test solves the forward kinematics problem on a test model with a
+// reference configuration, then compares the computed transforms with the
+// reference ones
+
 
 // Common test tools
-#include "common.hh"
-#include <metapod/tools/jac_point_robot.hh>
+# include "common.hh"
+# include <metapod/algos/jac.hh>
+# include <metapod/tools/jcalc.hh>
 
 using namespace metapod;
 
-BOOST_AUTO_TEST_CASE (test_jac_point)
+BOOST_AUTO_TEST_CASE (test_jac)
 {
-  // Set configuration vectors (q) to reference values.
+  // Set configuration vector to reference values.
   CURRENT_MODEL_ROBOT::confVector q;
   std::ifstream qconf(TEST_DIRECTORY "/q.conf");
   initConf<CURRENT_MODEL_ROBOT>::run(qconf, q);
   qconf.close();
 
   CURRENT_MODEL_ROBOT robot;
+  jcalc< CURRENT_MODEL_ROBOT>::run(
+      robot, q, CURRENT_MODEL_ROBOT::confVector::Zero());
+  typedef Eigen::Matrix<FloatType,
+                        6 * CURRENT_MODEL_ROBOT::NBBODIES,
+                        CURRENT_MODEL_ROBOT::NBDOF> Jacobian;
+  Jacobian J = Jacobian::Zero();
+  jac< CURRENT_MODEL_ROBOT>::run(robot, J);
 
-  // Compute the jacobian and print the result in a log file.
-  jac_point_robot<CURRENT_MODEL_ROBOT>::RobotJacobian J =
-      jac_point_robot<CURRENT_MODEL_ROBOT>::RobotJacobian::Zero();
-  jac_point_robot<CURRENT_MODEL_ROBOT>::run(robot, q, J);
-
-  const char result_file[] = "jac_point.log";
+  const char result_file[] = "jac.log";
   std::ofstream log(result_file, std::ofstream::out);
-  log << J << std::endl;;
+  log << "kinematic_jacobian\n" << J << std::endl;
   log.close();
 
-  // Compare results with reference file.
-  compareLogs(result_file, TEST_DIRECTORY "/jac_point.ref", 1e-8);
+  // Compare results with reference file
+  compareLogs(result_file, TEST_DIRECTORY "/jac.ref", 1e-3);
 }
