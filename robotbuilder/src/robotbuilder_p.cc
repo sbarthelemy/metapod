@@ -346,6 +346,7 @@ RobotBuilder::Status RobotBuilderP::addLink(const std::string& parent_body_name,
       break;
     }
   case RobotBuilder::FREE_FLYER:
+  case RobotBuilder::FREE_FLYER_BODY:
     {
       joint_nb_dof = 6;
       break;
@@ -402,6 +403,10 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
     {
     case metapod::RobotBuilder::FREE_FLYER:
       joint_type = "FreeFlyerJoint";
+      joint_rotation_type = "Spatial::RotationMatrix";
+      break;
+    case metapod::RobotBuilder::FREE_FLYER_BODY:
+      joint_type = "FreeFlyerBodyJoint";
       joint_rotation_type = "Spatial::RotationMatrix";
       break;
     case metapod::RobotBuilder::REVOLUTE_AXIS_X:

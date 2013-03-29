@@ -22,6 +22,7 @@
 #include <metapod/tools/common.hh>
 
 #include <metapod/tools/joint-freeflyer.hh>
+#include <metapod/tools/joint-freeflyerbody.hh>
 #include <metapod/tools/joint-aboutxaxis.hh>
 #include <metapod/tools/joint-aboutyaxis.hh>
 #include <metapod/tools/joint-aboutzaxis.hh>

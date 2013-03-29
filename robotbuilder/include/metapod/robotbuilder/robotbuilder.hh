@@ -34,6 +34,7 @@ class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder
 {
 public:
   enum JointType { FREE_FLYER,
+                   FREE_FLYER_BODY,
                    REVOLUTE_AXIS_X,
                    REVOLUTE_AXIS_Y,
                    REVOLUTE_AXIS_Z,
