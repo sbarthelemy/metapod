@@ -1,6 +1,8 @@
 metapod
 ========
 
+[![Build Status](https://travis-ci.org/laas/metapod.png?branch=master)](https://travis-ci.org/laas/metapod)
+
 This software provides robot dynamics algorithms.
 It uses a combination of a specific representation of robot models and C++
 templates, such that each algorithm remains model-independant, yet is optimized
@@ -38,3 +40,16 @@ Install qibuild then
 
     qc --release
     qm --release
+
+If you want to build the urdf converter, you'll need to install ROS too, and
+to run
+
+    source /opt/ros/fuerte/setup.bash
+
+before running qc.
+
+Documentation
+-------------
+
+Development branch documentation is [available
+online](http://laas.github.com/metapod/doxygen/HEAD/).
