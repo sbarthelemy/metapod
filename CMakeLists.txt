@@ -61,6 +61,7 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/jcalc.hh
   include/${PROJECT_NAME}/tools/joint.hh
   include/${PROJECT_NAME}/tools/joint-freeflyer.hh
+  include/${PROJECT_NAME}/tools/joint-freeflyerbody.hh
   include/${PROJECT_NAME}/tools/joint-aboutxaxis.hh
   include/${PROJECT_NAME}/tools/joint-aboutyaxis.hh
   include/${PROJECT_NAME}/tools/joint-aboutzaxis.hh
