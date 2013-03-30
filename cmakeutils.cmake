@@ -14,8 +14,20 @@
 # GNU General Lesser Public License for more details.
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
-# Copyright 2010, 2012,
+# Copyright 2010, 2012, 2013
 
+FUNCTION(FIND_GENERATOR GENERATOR_NAME)
+  SET(WITH_${GENERATOR_NAME} FALSE)
+  # maybe the user passed the location
+  IF(${GENERATOR_NAME}_EXECUTABLE)
+    SET(WITH_${GENERATOR_NAME} TRUE)
+  ELSE()
+    # last resort: search for it
+    FIND_PACKAGE(${GENERATOR_NAME} QUIET)
+    SET(WITH_${GENERATOR_NAME} ${${GENERATOR_NAME}_FOUND})
+  ENDIF()
+  SET(WITH_${GENERATOR_NAME} ${WITH_${GENERATOR_NAME}} PARENT_SCOPE)
+ENDFUNCTION()
 
 # GENERATE_CONFIG_HEADER
 #
@@ -50,7 +62,7 @@ ENDFUNCTION(GENERATE_CONFIG_HEADER)
 # Call metapodfromurdf to create one of the sample models
 #
 # NAME: the name of the model. Either simple_arm or simple_humanoid.
-FUNCTION(ADD_SAMPLEMODEL name)
+FUNCTION(ADD_SAMPLEURDFMODEL name)
   IF(NOT WITH_METAPODFROMURDF)
     ERROR("Could not find metapodfromurdf")
   ENDIF()
