@@ -48,6 +48,16 @@ to run
 
 before running qc.
 
+If you want to cross compile (say, for the atom cross toolchain), you must
+first compile the code generators on you building host (see above), then cross
+compile, while passing the path to the code generators:
+
+    BIN_DIR=${HOME}/work/master/lib/metapod/build-linux64-release/sdk/bin
+    qc --release -c atom \
+      -DMETAPOD_BINARYTREEMODEL_EXECUTABLE=${BIN_DIR}/metapod_binarytreemodel
+      -DMETAPODFROMURDF_EXECUTABLE=${BIN_DIR}/metapodfromurdf
+    qm --release -c atom
+
 Documentation
 -------------
 
