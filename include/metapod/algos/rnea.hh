@@ -54,7 +54,7 @@ template< typename Robot > struct rnea< Robot, false >
       // iX0 = iXλ(i) * λ(i)X0
       // vi = iXλ(i) * vλ(i) + vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
-      node.body.iX0 = node.sXp * parent.body.iX0;
+      robot.iX0(node_id) = node.sXp * robot.iX0(parent_id);
       node.body.vi = node.sXp * parent.body.vi + node.joint.vj;
       node.body.ai = sum(node.sXp * parent.body.ai,
                          Spatial::Motion(node.joint.S.S() * ddqi),
@@ -78,9 +78,9 @@ template< typename Robot > struct rnea< Robot, false >
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
       // (with aλ(i) = a0 = -g, cf. Rigid Body Dynamics Algorithms for a
       // detailed explanation of how the gravity force is applied)
-      node.body.iX0 = node.sXp;
+      robot.iX0(node_id) = node.sXp;
       node.body.vi = node.joint.vj;
-      node.body.ai = sum((node.body.iX0 * minus_g),
+      node.body.ai = sum((robot.iX0(node_id) * minus_g),
                           Spatial::Motion(node.joint.S.S() * ddqi),
                           node.joint.cj,
                           (node.body.vi^node.joint.vj));
@@ -133,7 +133,7 @@ template< typename Robot > struct rnea< Robot, false >
       const Spatial::Inertia &I = robot.I(node_id);
       node.joint.f = sum((I * node.body.ai),
                          (node.body.vi^( I * node.body.vi )),
-                         (node.body.iX0 * -node.body.Fext ));
+                         (robot.iX0(node_id) * -node.body.Fext ));
     }
 
     METAPOD_HOT

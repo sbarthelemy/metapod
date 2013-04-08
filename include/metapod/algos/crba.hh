@@ -36,15 +36,15 @@ namespace internal {
 template < typename Robot, int parent_id, int node_id >
 struct crba_update_parent_inertia
 {
-  typedef typename Nodes<Robot, parent_id>::type Parent;
   typedef typename Nodes<Robot, node_id>::type Node;
   static void run(Robot& robot)
   {
-    Parent& parent = boost::fusion::at_c<parent_id>(robot.nodes);
     Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    parent.body.Iic = parent.body.Iic + node.sXp.applyInv(node.body.Iic);
+    robot.Iic(parent_id) = robot.Iic(parent_id) +
+                           node.sXp.applyInv(robot.Iic(node_id));
   }
 };
+
 // Do nothing if parent_id is NO_PARENT
 template < typename Robot, int node_id >
 struct crba_update_parent_inertia<Robot, NO_PARENT, node_id>
@@ -93,15 +93,14 @@ template< typename Robot > struct crba<Robot, false>
     // forward propagation
     static void discover(AnyRobot& robot)
     {
-      NI& ni = boost::fusion::at_c<node_id>(robot.nodes);
-      ni.body.Iic = robot.I(node_id);
+      robot.Iic(node_id) = robot.I(node_id);
     }
 
     static void finish(AnyRobot& robot)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
       internal::crba_update_parent_inertia<AnyRobot, Node::parent_id, node_id>::run(robot);
-      node.joint_F = node.body.Iic * node.joint.S;
+      node.joint_F = robot.Iic(node_id) * node.joint.S;
 
       robot.H.template block<Node::Joint::NBDOF, Node::Joint::NBDOF>(
               Node::q_idx, Node::q_idx)

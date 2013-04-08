@@ -36,12 +36,10 @@ template< typename Robot, int node_id, bool has_parent=true >
 struct UpdateBodyAbsolutePose
 {
   typedef typename Nodes<Robot, node_id>::type Node;
-  typedef typename Nodes<Robot, Node::parent_id>::type Parent;
   static void run(Robot& robot)
   {
     Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    Parent& parent = boost::fusion::at_c<Node::parent_id>(robot.nodes);
-    node.body.iX0 = node.sXp * parent.body.iX0;
+    robot.iX0(node_id) = node.sXp * robot.iX0(Node::parent_id);
   }
 };
 
@@ -53,7 +51,7 @@ struct UpdateBodyAbsolutePose<Robot, node_id, false>
   static void run(Robot& robot)
   {
     Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    node.body.iX0 = node.sXp;
+    robot.iX0(node_id) = node.sXp;
   }
 };
 

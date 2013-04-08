@@ -115,10 +115,8 @@ struct jac_point_chain_internal_freeflyer<Robot, start_node_id, end_node_id,
   typedef typename Nodes<Robot, end_node_id>::type EndNode;
 
   static void run(Robot& robot, const Vector3d& e_p, Jacobian& J) {
-    StartNode& start_node = boost::fusion::at_c<start_node_id>(robot.nodes);
-    EndNode& end_node = boost::fusion::at_c<end_node_id>(robot.nodes);
     // Compute point coordinates in world frame.
-    Vector3d p =  end_node.body.iX0.applyInv(e_p);
+    Vector3d p =  robot.iX0(end_node_id).applyInv(e_p);
     // Compute jacobian block for freeflyer. Formula is given by:
     // Ji = pX0 * (sX0)^(-1) * Sff,
     // where pX0 is the word transform in the point frame,
@@ -127,7 +125,8 @@ struct jac_point_chain_internal_freeflyer<Robot, start_node_id, end_node_id,
     // located at the start body joint.
     J.template block<3,3>(0,3+offset) = Matrix3d::Identity ();
     J.template block<3,3>(3,offset) = Matrix3d::Identity ();
-    Spatial::Transform pXs = start_node.body.iX0.inverse ().toPointFrame (p);
+    Spatial::Transform pXs =
+        robot.iX0(start_node_id).inverse().toPointFrame(p);
     J.template block<3,3>(3,3+offset) = Spatial::skew (- (pXs.E() * pXs.r()));
   }
 };

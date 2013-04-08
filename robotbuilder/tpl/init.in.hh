@@ -62,6 +62,10 @@ public:
 
   // inertias expressed in body frames
   static Spatial::Inertia inertias[@ROBOT_NB_BODIES@];
+  // temporary/result used in rnea and bcalc
+  Spatial::Transform iX0_[@ROBOT_NB_BODIES@];
+  // temporary used in crba
+  Spatial::Inertia Iic_[@ROBOT_NB_BODIES@];
   NodeVector nodes;
   Eigen::Matrix< FloatType, NBDOF, NBDOF > H; // used by crba
 
@@ -75,6 +79,22 @@ public:
 
   const Spatial::Inertia & I(int node_id) const {
     return inertias[node_id];
+  }
+
+  Spatial::Inertia & Iic(int node_id) {
+    return Iic_[node_id];
+  }
+
+  const Spatial::Inertia & Iic(int node_id) const {
+    return Iic_[node_id];
+  }
+
+  Spatial::Transform & iX0(int node_id) {
+    return iX0_[node_id];
+  }
+
+  const Spatial::Transform & iX0(int node_id) const {
+    return iX0_[node_id];
   }
 };
 

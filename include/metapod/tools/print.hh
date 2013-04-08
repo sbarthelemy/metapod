@@ -40,7 +40,7 @@ template < typename Robot, int node_id > struct PrintStateVisitor
        << "Xt :\n" << Node::Xt << "\n"
        << "Xj :\n" << node.joint.Xj << "\n"
        << "S :\n" << node.joint.S.S() << "\n"
-       << "iX0 :\n" << node.body.iX0 << "\n"
+       << "iX0 :\n" << robot.iX0(node_id) << "\n"
        << "vi :\n" << node.body.vi << "\n"
        << "ai :\n" << node.body.ai << "\n"
        << "I :\n" << robot.I(node_id) << "\n"
@@ -85,10 +85,9 @@ template < typename Robot, int node_id> struct PrintTransformsVisitor
   typedef typename Nodes<Robot, node_id>::type Node;
   static void discover(const Robot& robot, std::ostream & os)
   {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
     os << Node::body_name << "\n"
-       << node.body.iX0.E() << "\n"
-       << node.body.iX0.r().transpose() << "\n"
+       << robot.iX0(node_id).E() << "\n"
+       << robot.iX0(node_id).r().transpose() << "\n"
        << std::endl;
   }
   static void finish(const Robot&, std::ostream & ) {}

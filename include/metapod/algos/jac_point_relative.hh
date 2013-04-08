@@ -35,11 +35,8 @@ namespace internal {
 // kinematics model.
 template< typename Robot, int node_id >
 struct convert_to_world {
-  typedef typename Nodes<Robot, node_id>::type Node;
-
   static Vector3d run(const Robot& robot, const Vector3d & b_p) {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    return node.body.iX0.applyInv(b_p);
+    return robot.iX0(node_id).applyInv(b_p);
   }
 };
 
@@ -101,7 +98,7 @@ struct jac_point_relative {
       // iX0 is the world transform in the ith body frame,
       // Si is the ith joint motion subspace matrix.
       J.template block<6, Node::Joint::NBDOF>(0, Node::q_idx + offset) =
-          - node.body.iX0.inverse().toPointFrame(p).apply(node.joint.S);
+          - robot.iX0(node_id).inverse().toPointFrame(p).apply(node.joint.S);
     }
 
     static void finish(Robot&, const Vector3d &, Jacobian &) {}
@@ -120,7 +117,7 @@ struct jac_point_relative {
       // iX0 is the world transform in the ith body frame,
       // Si is the ith joint motion subspace matrix.
       J.template block<6, Node::Joint::NBDOF>(0,  Node::q_idx + offset) =
-          node.body.iX0.inverse().toPointFrame(p).apply(node.joint.S);
+          robot.iX0(node_id).inverse().toPointFrame(p).apply(node.joint.S);
       }
 
       static void finish(Robot&, const Vector3d &, Jacobian &) {}
