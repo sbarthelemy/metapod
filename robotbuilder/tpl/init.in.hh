@@ -66,6 +66,7 @@ public:
   Spatial::Transform iX0_[@ROBOT_NB_BODIES@];
   // temporary used in crba
   Spatial::Inertia Iic_[@ROBOT_NB_BODIES@];
+  Body bodies[@ROBOT_NB_BODIES@];
   NodeVector nodes;
   Eigen::Matrix< FloatType, NBDOF, NBDOF > H; // used by crba
 
@@ -87,6 +88,26 @@ public:
 
   const Spatial::Inertia & Iic(int node_id) const {
     return Iic_[node_id];
+  }
+
+  Spatial::Motion & vi(int node_id) {
+    return bodies[node_id].vi;
+  }
+
+  const Spatial::Motion & vi(int node_id) const {
+    return bodies[node_id].vi;
+  }
+
+  Spatial::Motion & ai(int node_id) {
+    return bodies[node_id].ai;
+  }
+
+  const Spatial::Motion & ai(int node_id) const {
+    return bodies[node_id].ai;
+  }
+
+  const Spatial::Force & Fext(int node_id) const {
+    return bodies[node_id].Fext;
   }
 
   Spatial::Transform & iX0(int node_id) {

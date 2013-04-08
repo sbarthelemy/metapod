@@ -504,7 +504,6 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
       "    Spatial::TransformT<Spatial::rm_mul_op<@joint_rotation_type@, @R_joint_parent_type@>::rm> sXp;\n"
       "    Eigen::Matrix<FloatType, 6, Joint::NBDOF> joint_F; // used by crba\n"
       "    Joint joint;\n"
-      "    Body body;\n"
       "  };\n");
   out.node_type_definitions << tpl1.format(repl);
 

@@ -50,16 +50,15 @@ template< typename Robot > struct rnea< Robot, false >
         const Eigen::Matrix< FloatType, Node::Joint::NBDOF, 1 > & ddqi)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-      Parent& parent = boost::fusion::at_c<parent_id>(robot.nodes);
       // iX0 = iXλ(i) * λ(i)X0
       // vi = iXλ(i) * vλ(i) + vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
       robot.iX0(node_id) = node.sXp * robot.iX0(parent_id);
-      node.body.vi = node.sXp * parent.body.vi + node.joint.vj;
-      node.body.ai = sum(node.sXp * parent.body.ai,
+      robot.vi(node_id) = node.sXp * robot.vi(parent_id) + node.joint.vj;
+      robot.ai(node_id) = sum(node.sXp * robot.vi(parent_id),
                          Spatial::Motion(node.joint.S.S() * ddqi),
                          node.joint.cj,
-                         (node.body.vi^node.joint.vj));
+                         (robot.vi(node_id)^node.joint.vj));
     }
   };
 
@@ -79,11 +78,11 @@ template< typename Robot > struct rnea< Robot, false >
       // (with aλ(i) = a0 = -g, cf. Rigid Body Dynamics Algorithms for a
       // detailed explanation of how the gravity force is applied)
       robot.iX0(node_id) = node.sXp;
-      node.body.vi = node.joint.vj;
-      node.body.ai = sum((robot.iX0(node_id) * minus_g),
+      robot.vi(node_id) = node.joint.vj;
+      robot.ai(node_id) = sum((robot.iX0(node_id) * minus_g),
                           Spatial::Motion(node.joint.S.S() * ddqi),
                           node.joint.cj,
-                          (node.body.vi^node.joint.vj));
+                          (robot.vi(node_id)^node.joint.vj));
     }
 
   };
@@ -131,9 +130,9 @@ template< typename Robot > struct rnea< Robot, false >
 
       // fi = Ii * ai + vi x* (Ii * vi) - iX0* * fix
       const Spatial::Inertia &I = robot.I(node_id);
-      node.joint.f = sum((I * node.body.ai),
-                         (node.body.vi^( I * node.body.vi )),
-                         (robot.iX0(node_id) * -node.body.Fext ));
+      node.joint.f = sum((I * robot.ai(node_id)),
+                         (robot.vi(node_id)^( I * robot.vi(node_id))),
+                         (robot.iX0(node_id) * -robot.Fext(node_id) ));
     }
 
     METAPOD_HOT
