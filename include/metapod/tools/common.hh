@@ -70,16 +70,16 @@ namespace metapod
   {
   public:
     Spatial::Force Fext; // input for rnea
-    //Spatial::Transform iX0; // temporary/result used in rnea and bcalc
+    Spatial::Transform iX0; // temporary/result used in rnea and bcalc
     Spatial::Motion vi;// temporary used in rnea
     Spatial::Motion ai; // temporary used in rnea
-    //Spatial::Inertia Iic; // temporary used in crba
+    Spatial::Inertia Iic; // temporary used in crba
     Body():
       Fext(Spatial::Force::Zero()),
-      //iX0(),
+      iX0(),
       vi(),
-      ai()
-      //Iic()
+      ai(),
+      Iic()
     {}
   };
 
