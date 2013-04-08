@@ -86,16 +86,8 @@ public:
     return bodies[node_id].Iic;
   }
 
-  Spatial::Motion & vi(int node_id) {
-    return bodies[node_id].vi;
-  }
-
   const Spatial::Motion & vi(int node_id) const {
     return bodies[node_id].vi;
-  }
-
-  Spatial::Motion & ai(int node_id) {
-    return bodies[node_id].ai;
   }
 
   const Spatial::Motion & ai(int node_id) const {

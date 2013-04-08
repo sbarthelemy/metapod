@@ -43,7 +43,6 @@ template< typename Robot > struct rnea< Robot, false >
   struct update_kinematics
   {
     typedef typename Nodes<Robot, node_id>::type Node;
-    typedef typename Nodes<Robot, parent_id>::type Parent;
 
     static void run(
         Robot & robot,
@@ -53,12 +52,14 @@ template< typename Robot > struct rnea< Robot, false >
       // iX0 = iXλ(i) * λ(i)X0
       // vi = iXλ(i) * vλ(i) + vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
-      robot.iX0(node_id) = node.sXp * robot.iX0(parent_id);
-      robot.vi(node_id) = node.sXp * robot.vi(parent_id) + node.joint.vj;
-      robot.ai(node_id) = sum(node.sXp * robot.vi(parent_id),
+      Body &body = robot.bodies[node_id];
+      Body &parent_body = robot.bodies[parent_id];
+      body.iX0 = node.sXp * parent_body.iX0;
+      body.vi = node.sXp * parent_body.vi + node.joint.vj;
+      body.ai = sum(node.sXp * parent_body.vi,
                          Spatial::Motion(node.joint.S.S() * ddqi),
                          node.joint.cj,
-                         (robot.vi(node_id)^node.joint.vj));
+                         (body.vi^node.joint.vj));
     }
   };
 
@@ -77,12 +78,13 @@ template< typename Robot > struct rnea< Robot, false >
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
       // (with aλ(i) = a0 = -g, cf. Rigid Body Dynamics Algorithms for a
       // detailed explanation of how the gravity force is applied)
-      robot.iX0(node_id) = node.sXp;
-      robot.vi(node_id) = node.joint.vj;
-      robot.ai(node_id) = sum((robot.iX0(node_id) * minus_g),
-                          Spatial::Motion(node.joint.S.S() * ddqi),
-                          node.joint.cj,
-                          (robot.vi(node_id)^node.joint.vj));
+      Body &body = robot.bodies[node_id];
+      body.iX0 = node.sXp;
+      body.vi = node.joint.vj;
+      body.ai = sum((body.iX0 * minus_g),
+                    Spatial::Motion(node.joint.S.S() * ddqi),
+                    node.joint.cj,
+                    (body.vi^node.joint.vj));
     }
 
   };
@@ -130,9 +132,10 @@ template< typename Robot > struct rnea< Robot, false >
 
       // fi = Ii * ai + vi x* (Ii * vi) - iX0* * fix
       const Spatial::Inertia &I = robot.I(node_id);
-      node.joint.f = sum((I * robot.ai(node_id)),
-                         (robot.vi(node_id)^( I * robot.vi(node_id))),
-                         (robot.iX0(node_id) * -robot.Fext(node_id) ));
+      Body &body = robot.bodies[node_id];
+      node.joint.f = sum((I * body.ai),
+                         (body.vi^( I * body.vi)),
+                         (body.iX0 * -body.Fext));
     }
 
     METAPOD_HOT
