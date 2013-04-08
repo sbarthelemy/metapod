@@ -94,7 +94,7 @@ template< typename Robot > struct crba<Robot, false>
     static void discover(AnyRobot& robot)
     {
       NI& ni = boost::fusion::at_c<node_id>(robot.nodes);
-      ni.body.Iic = robot.inertias[node_id];
+      ni.body.Iic = robot.I(node_id);
     }
 
     static void finish(AnyRobot& robot)

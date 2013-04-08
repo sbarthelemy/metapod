@@ -68,6 +68,14 @@ public:
   @ROBOT_CLASS_NAME@():
     H(Eigen::Matrix< FloatType, NBDOF, NBDOF >::Zero())
   {}
+
+  Spatial::Inertia & I(int node_id) {
+    return inertias[node_id];
+  }
+
+  const Spatial::Inertia & I(int node_id) const {
+    return inertias[node_id];
+  }
 };
 
 // map node id to node type
