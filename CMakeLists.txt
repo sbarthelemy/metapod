@@ -1,4 +1,4 @@
-# Copyright 2011, 2012,
+# Copyright 2011, 2012, 2013
 #
 # Maxime Reis (JRL/LAAS, CNRS/AIST)
 # Antonio El Khoury (JRL/LAAS, CNRS/AIST)
@@ -106,6 +106,14 @@ QI_USE_LIB(metapod BOOST)
 # won't report warning coming from them.
 QI_USE_LIB(metapod EIGEN3 ASSUME_SYSTEM_INCLUDE)
 QI_STAGE_HEADER_ONLY_LIB(metapod)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_ROOT_HEADERS}
+  SUBFOLDER metapod)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_ALGOS_HEADERS}
+  SUBFOLDER metapod/algos)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_TOOLS_HEADERS}
+  SUBFOLDER metapod/tools)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_SPATIAL_HEADERS}
+  SUBFOLDER metapod/tools/spatial)
 
 # We build the generator tools only if we are not cross compiling.
 # When cross compiling, the generators are searched for on the building host.

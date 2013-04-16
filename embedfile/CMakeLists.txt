@@ -15,5 +15,5 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-QI_CREATE_BIN(embedfile src/embedfile.cc)
+QI_CREATE_BIN(embedfile src/embedfile.cc NO_INSTALL)
 QI_USE_LIB(embedfile boost_program_options)
