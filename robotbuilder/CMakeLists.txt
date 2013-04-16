@@ -61,3 +61,5 @@ QI_CREATE_LIB(metapod_robotbuilder SHARED
   )
 QI_USE_LIB(metapod_robotbuilder boost boost_filesystem boost_regex eigen3)
 QI_STAGE_LIB(metapod_robotbuilder)
+QI_INSTALL_HEADER(${METAPOD_ROBOTBUILDER_HEADERS}
+  SUBFOLDER metapod/robotbuilder)
