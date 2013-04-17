@@ -63,33 +63,63 @@ ENDFUNCTION(GENERATE_CONFIG_HEADER)
 #
 # NAME: the name of the model. Either simple_arm or simple_humanoid.
 FUNCTION(ADD_SAMPLEURDFMODEL name)
-  IF(NOT WITH_METAPODFROMURDF)
-    ERROR("Could not find metapodfromurdf")
-  ENDIF()
   SET(_libname "metapod_${name}")
   SET(_urdf_file "${PROJECT_SOURCE_DIR}/data/${name}.urdf")
   SET(_config_file "${PROJECT_SOURCE_DIR}/data/${name}.config")
   SET(_license_file "${PROJECT_SOURCE_DIR}/data/metapod_license_file.txt")
-  SET(_model_dir "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/models/${name}")
+  SET(_gen_dir "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/models")
+  SET(_pregen_dir "${PROJECT_SOURCE_DIR}/pregeneratedmodels")
   INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
+  SET(_gen_sources "")
+  SET(_pregen_sources "")
   SET(_sources
-    ${_model_dir}/config.hh
-    ${_model_dir}/${name}.hh
-    ${_model_dir}/${name}.cc)
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${_sources}
-    COMMAND ${METAPODFROMURDF_EXECUTABLE}
-    --name ${name}
-    --libname ${_libname}
-    --directory ${_model_dir}
-    --config-file ${_config_file}
-    --license-file ${_license_file}
-    ${_urdf_file}
-    DEPENDS ${METAPODFROMURDF_EXECUTABLE} ${_urdf_file} ${_config_file}
-      ${_license_file}
-    MAIN_DEPENDENCY ${_urdf_file}
-    )
-  QI_CREATE_LIB(${_libname} ${_sources})
+      config.hh
+      ${name}.hh
+      ${name}.cc)
+  FOREACH(f ${_sources})
+    LIST(APPEND _gen_sources ${_gen_dir}/${name}/${f})
+    LIST(APPEND _pregen_sources ${_pregen_dir}/${name}/${f})
+  ENDFOREACH()
+  IF(WITH_METAPODFROMURDF)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_gen_sources}
+      COMMAND ${METAPODFROMURDF_EXECUTABLE}
+      --name ${name}
+      --libname ${_libname}
+      --directory ${_gen_dir}/${name}
+      --config-file ${_config_file}
+      --license-file ${_license_file}
+      ${_urdf_file}
+      DEPENDS ${METAPODFROMURDF_EXECUTABLE} ${_urdf_file} ${_config_file}
+        ${_license_file}
+      MAIN_DEPENDENCY ${_urdf_file}
+      )
+
+    FIND_PROGRAM(python_executable
+      NAMES python2 python python.exe
+      NO_CMAKE_FIND_ROOT_PATH)
+    IF(python_executable)
+      QI_ADD_TEST(
+        check_pregenerated_${name}_is_up_to_date
+        ${python_executable}
+        ARGUMENTS ${PROJECT_SOURCE_DIR}/cmp_files.py
+                  ${_gen_dir}/${name}
+                  ${_pregen_dir}/${name}
+                  ${_sources})
+    ENDIF()
+
+  ELSE()
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_gen_sources}
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+              ${_pregen_dir}/${name}
+              ${_gen_dir}/${name}
+      DEPENDS ${_pregen_sources}
+      COMMENT "metapodfromurdf is not available, copying pregenerated files instead"
+      )
+  ENDIF()
+
+  QI_CREATE_LIB(${_libname} ${_gen_sources})
   QI_USE_LIB(${_libname} metapod)
   QI_STAGE_LIB(${_libname})
 ENDFUNCTION()

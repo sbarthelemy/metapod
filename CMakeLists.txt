@@ -147,18 +147,12 @@ ELSE()
   FIND_GENERATOR(METAPODFROMURDF)
 ENDIF()
 
-CMAKE_DEPENDENT_OPTION(WITH_SIMPLE_HUMANOID
-  "Generate and build the simple humanoid example model and the related tests.
-  (Only possible if metapodfromurdf is available.)"
-  ON
-  WITH_METAPODFROMURDF
-  OFF)
-CMAKE_DEPENDENT_OPTION(WITH_SIMPLE_ARM
-  "Generate and build the simple arm example model and the related tests.
-  (Only possible if metapodfromurdf is available.)"
-  ON
-  WITH_METAPODFROMURDF
-  OFF)
+OPTION(WITH_SIMPLE_HUMANOID
+  "Build the simple humanoid example model and the related tests."
+  ON)
+OPTION(WITH_SIMPLE_ARM
+  "Build the simple arm example model and the related tests."
+  ON)
 
 OPTION(BUILD_MULTI_MODEL_BENCHMARK
     "Generate and build the multi-model benchmark" TRUE)
