@@ -36,6 +36,7 @@ IF(WITH_METAPOD_BINARYTREEMODEL)
             COMMAND ${METAPOD_BINARYTREEMODEL_EXECUTABLE} ${depth}
             DEPENDS ${METAPOD_BINARYTREEMODEL_EXECUTABLE}
         )
+        SET_SOURCE_FILES_PROPERTIES(${_sources} GENERATED)
         QI_CREATE_LIB(${_libname} SHARED ${_sources})
         QI_USE_LIB(${_libname} metapod)
         QI_STAGE_LIB(${_libname})

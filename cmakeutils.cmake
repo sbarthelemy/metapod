@@ -55,6 +55,9 @@ FUNCTION(GENERATE_CONFIG_HEADER OUTPUT LIBRARY_NAME)
     ${PROJECT_SOURCE_DIR}/robotbuilder/tpl/config.in.hh
     ${OUTPUT}
     @ONLY)
+  SET_SOURCE_FILES_PROPERTIES(
+    ${OUTPUT}
+    GENERATED)
 ENDFUNCTION(GENERATE_CONFIG_HEADER)
 
 # ADD_SAMPLEMODEL
@@ -118,6 +121,7 @@ FUNCTION(ADD_SAMPLEURDFMODEL name)
       COMMENT "metapodfromurdf is not available, copying pregenerated files instead"
       )
   ENDIF()
+  SET_SOURCE_FILES_PROPERTIES(${_gen_sources} GENERATED)
 
   QI_CREATE_LIB(${_libname} ${_gen_sources})
   QI_USE_LIB(${_libname} metapod)
