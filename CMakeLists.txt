@@ -91,21 +91,18 @@ SET(${PROJECT_NAME}_SPATIAL_HEADERS
   include/${PROJECT_NAME}/tools/spatial/transform.hh
   )
 
-INCLUDE_DIRECTORIES("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
+FIND_PACKAGE(BOOST)
+INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
 
-QI_CREATE_LIB(metapod
-  ${${PROJECT_NAME}_ROOT_HEADERS}
-  ${${PROJECT_NAME}_ALGOS_HEADERS}
-  ${${PROJECT_NAME}_TOOLS_HEADERS}
-  ${${PROJECT_NAME}_SPATIAL_HEADERS})
-SET_TARGET_PROPERTIES(metapod PROPERTIES LINKER_LANGUAGE CXX)
-QI_USE_LIB(metapod BOOST)
 # Eigen (at least version 3.0.5) makes gcc report conversion warnings
 # when one assigns to a block. This floods the compilation results.
 # So we include Eigen headers as if they were system headers: the compiler
 # won't report warning coming from them.
-QI_USE_LIB(metapod EIGEN3 ASSUME_SYSTEM_INCLUDE)
-QI_STAGE_HEADER_ONLY_LIB(metapod)
+FIND_PACKAGE(EIGEN3)
+INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
+
+INCLUDE_DIRECTORIES("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
+QI_STAGE_HEADER_ONLY_LIB(metapod DEPENDS BOOST EIGEN3)
 QI_INSTALL_HEADER(${${PROJECT_NAME}_ROOT_HEADERS}
   SUBFOLDER metapod)
 QI_INSTALL_HEADER(${${PROJECT_NAME}_ALGOS_HEADERS}
