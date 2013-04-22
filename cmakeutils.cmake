@@ -123,7 +123,7 @@ FUNCTION(ADD_SAMPLEURDFMODEL name)
   ENDIF()
   SET_SOURCE_FILES_PROPERTIES(${_gen_sources} GENERATED)
 
-  QI_CREATE_LIB(${_libname} ${_gen_sources})
+  QI_CREATE_LIB(${_libname} SHARED ${_gen_sources})
   QI_USE_LIB(${_libname} metapod)
   QI_STAGE_LIB(${_libname})
 ENDFUNCTION()
