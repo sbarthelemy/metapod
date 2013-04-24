@@ -48,6 +48,20 @@ template< typename Robot, int node_id > struct JcalcVisitor
   {}
 };
 
+template< typename Robot, int node_id >
+struct JcalcPosVisitor
+{
+  typedef typename Nodes<Robot, node_id>::type Node;
+  static void discover(Robot& robot, const typename Robot::confVector& q)
+  {
+    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    node.joint.bcalc(q.template segment< Node::Joint::NBDOF >(Node::q_idx));
+    node.sXp = node.joint.Xj * node.Xt;
+  }
+  static void finish(Robot&, const typename Robot::confVector&)
+  {}
+};
+
 } // end of namespace metapod::internal
 
 template< typename Robot > struct jcalc
@@ -57,6 +71,15 @@ template< typename Robot > struct jcalc
                   const typename Robot::confVector& dq)
   {
     depth_first_traversal<internal::JcalcVisitor, Robot>::run(robot, q, dq);
+  }
+};
+
+template< typename Robot > struct jcalc_pos
+{
+  static void run(Robot& robot,
+                  const typename Robot::confVector& q)
+  {
+    depth_first_traversal<internal::JcalcPosVisitor, Robot>::run(robot, q);
   }
 };
 
