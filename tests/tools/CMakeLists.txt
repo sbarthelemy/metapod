@@ -20,3 +20,8 @@ ADD_TESTCASE(test_timer test_timer.cc)
 IF(TARGET test_timer)
   QI_USE_LIB(test_timer metapod_timer)
 ENDIF()
+
+ADD_TESTCASE(test_eigenalign test_eigenalign.cc)
+IF(TARGET test_eigenalign)
+  QI_USE_LIB(test_eigenalign eigen3)
+ENDIF()
