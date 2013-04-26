@@ -17,4 +17,6 @@
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
 ADD_TESTCASE(test_timer test_timer.cc)
-QI_USE_LIB(test_timer metapod_timer)
+IF(TARGET test_timer)
+  QI_USE_LIB(test_timer metapod_timer)
+ENDIF()
