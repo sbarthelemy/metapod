@@ -62,7 +62,8 @@ ENDFUNCTION(GENERATE_CONFIG_HEADER)
 
 # ADD_SAMPLEURDFMODEL
 #
-# Call metapodfromurdf to create one of the sample models
+# Call metapodfromurdf to create one of the sample models. If not available
+# use pregenerated files.
 #
 # NAME: the name of the model. Either simple_arm or simple_humanoid.
 FUNCTION(ADD_SAMPLEURDFMODEL name)
