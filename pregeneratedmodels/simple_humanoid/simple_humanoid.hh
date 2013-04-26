@@ -54,6 +54,11 @@ namespace metapod {
 
 class METAPOD_SIMPLE_HUMANOID_DLLAPI simple_humanoid {
 public:
+  // the following new/delete operators are only needed if there is a
+  // member variable of fixed-size vectorizable Eigen type (or a member
+  // having such a member).
+  // It's not easy to tell in advance, so let always use the aligned operators.
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // Global constants or variable of the robot
   enum { NBDOF = 35 };
   enum { NBBODIES = 30 };
