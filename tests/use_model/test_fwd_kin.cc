@@ -29,7 +29,7 @@
 
 using namespace metapod;
 
-BOOST_AUTO_TEST_CASE (test_bcalc)
+BOOST_AUTO_TEST_CASE (test_fwd_kin)
 {
   // Set configuration vectors (q) to reference values.
   CURRENT_MODEL_ROBOT::confVector q;
