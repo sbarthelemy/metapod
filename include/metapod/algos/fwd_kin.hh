@@ -90,8 +90,10 @@ template< typename Robot, int node_id >
 struct FwdKiniX1Visitor
 {
   typedef typename Nodes<Robot, node_id>::type Node;
+
+  template <typename Derived>
   static void discover(Robot& robot, Spatial::Transform *iX1,
-                       Eigen::Matrix<FloatType, 6, Robot::NBDOF> &J)
+                       Eigen::MatrixBase<Derived> &J)
   {
     SetBodyPose<Robot, node_id, has_parent<Robot, node_id>::value>::run(robot, iX1);
     Node& node = boost::fusion::at_c<node_id>(robot.nodes);
@@ -99,8 +101,9 @@ struct FwdKiniX1Visitor
         = iX1[node_id].inverse().apply(node.joint.S);
   }
 
+  template <typename Derived>
   static void finish(Robot&, Spatial::Transform *,
-                     Eigen::Matrix<FloatType, 6, Robot::NBDOF> &)
+                     Eigen::MatrixBase<Derived> &)
   {}
 };
 
@@ -128,9 +131,12 @@ template< typename Robot > struct fwd_kin_iX1
       "fwd_kin_iX1 only supports models with a single root link");
   typedef typename Nodes<Robot, Robot::child0_id>::type Node;
   // assume sXp is up to date, for all joints but the root one
+  template <typename Derived>
   static void run(Robot& robot, Spatial::Transform *iX1,
-                  Eigen::Matrix<FloatType, 6, Robot::NBDOF> &J)
+                  Eigen::MatrixBase<Derived> &J)
   {
+    assert(J.rows() == 6);
+    assert(J.cols() ==  Robot::NBDOF);
     // start a depth first traversal but skip the root node
     internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child0_id>::run(robot, iX1, J);
     internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child1_id>::run(robot, iX1, J);
