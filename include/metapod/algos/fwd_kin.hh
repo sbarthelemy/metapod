@@ -18,9 +18,15 @@
 /*
  * Implementation of the forward kinematics routine.
  * This algorithm only works for models with a single root body.
- * It updates the body global transform (iX0) using two steps:
+ * It updates the bodies global transforms (iX0), the bodies transforms
+ * relative to the root body (iX1) and the "composite jacobian" (J) in two
+ * steps:
  *
- *  1. fwd_kin_iX1 computes iX1 for all the bodies but the firts (root) one
+ *  1. fwd_kin_iX1 computes iX1 for all the bodies but the first one (ie. the
+ *     root one).
+ *     It also computes the "composite" jacobian J, with the exception
+ *     of the part relative to the first joint, which is constant anyway, and
+ *     which the user is expected to set himself.
  *  2. fwd_kin_iX0_from_iX1 updates 1X0 (it is sXp for the root joint) and uses
  *     it to compute iX0 for all the bodies.
  *
@@ -37,6 +43,14 @@
  *    hence  Xj0 = Xt0.inv() * fX1.inv() * fX0
  * e. call jcalc_pos on the root joint
  * f. call fwd_kin_iX0_from_iX1
+ *
+ * The "composite jacobian" is such that each columns are basis twists of the
+ * corresponding joint child body (relative to the joint parent body) expressed
+ * in root body frame.
+ * It follows from this definition that the first columns, corresponding to rhe
+ * root joint are constant.
+ * With knowledge of the kinematic tree, the matrix can be used to construct
+ * other jacobians.
  *
  */
 
@@ -76,11 +90,17 @@ template< typename Robot, int node_id >
 struct FwdKiniX1Visitor
 {
   typedef typename Nodes<Robot, node_id>::type Node;
-  static void discover(Robot& robot, Spatial::Transform *iX1)
+  static void discover(Robot& robot, Spatial::Transform *iX1,
+                       Eigen::Matrix<FloatType, 6, Robot::NBDOF> &J)
   {
     SetBodyPose<Robot, node_id, has_parent<Robot, node_id>::value>::run(robot, iX1);
+    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    J.template block<6, Node::Joint::NBDOF>(0, Node::q_idx)
+        = iX1[node_id].inverse().apply(node.joint.S);
   }
-  static void finish(Robot&, Spatial::Transform *)
+
+  static void finish(Robot&, Spatial::Transform *,
+                     Eigen::Matrix<FloatType, 6, Robot::NBDOF> &)
   {}
 };
 
@@ -107,15 +127,16 @@ template< typename Robot > struct fwd_kin_iX1
                         Robot::child4_id == NO_CHILD,
       "fwd_kin_iX1 only supports models with a single root link");
   typedef typename Nodes<Robot, Robot::child0_id>::type Node;
-  // assume sXp is up to date, for all joints for the root one
-  static void run(Robot& robot, Spatial::Transform *iX1)
+  // assume sXp is up to date, for all joints but the root one
+  static void run(Robot& robot, Spatial::Transform *iX1,
+                  Eigen::Matrix<FloatType, 6, Robot::NBDOF> &J)
   {
     // start a depth first traversal but skip the root node
-    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child0_id>::run(robot, iX1);
-    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child1_id>::run(robot, iX1);
-    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child2_id>::run(robot, iX1);
-    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child3_id>::run(robot, iX1);
-    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child4_id>::run(robot, iX1);
+    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child0_id>::run(robot, iX1, J);
+    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child1_id>::run(robot, iX1, J);
+    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child2_id>::run(robot, iX1, J);
+    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child3_id>::run(robot, iX1, J);
+    internal::depth_first_traversal_internal<internal::FwdKiniX1Visitor, Robot, Node::child4_id>::run(robot, iX1, J);
   }
 };
 
