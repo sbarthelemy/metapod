@@ -36,11 +36,12 @@ BOOST_AUTO_TEST_CASE (test_crba)
   CURRENT_MODEL_ROBOT robot;
 
   // Apply the CRBA to the metapod multibody and print the result in a log file
-  crba< CURRENT_MODEL_ROBOT, true >::run(robot, q); // Update geometry and run the CRBA
+  Eigen::Matrix<metapod::FloatType, CURRENT_MODEL_ROBOT::NBDOF, CURRENT_MODEL_ROBOT::NBDOF> H = H.Zero();
+  crba< CURRENT_MODEL_ROBOT, true >::run(robot, H, q); // Update geometry and run the CRBA
   const char result_file[] = "crba.log";
   std::ofstream log(result_file, std::ofstream::out);
 
-  log << "generalized_mass_matrix\n" << robot.H << std::endl;
+  log << "generalized_mass_matrix\n" << H << std::endl;
   log.close();
 
   // Compare results with reference file

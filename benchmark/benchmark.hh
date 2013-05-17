@@ -138,6 +138,18 @@ namespace metapod
       typename jac<Robot>::Jacobian J_;
     };
 
+    // wrapping crba directly with boost::bind does not work
+    template <typename Robot>
+    class crba_wrapper {
+    public:
+      crba_wrapper() : H_(H_.Zero()) {}
+      void operator()(Robot& robot) {
+        crba<Robot, false>::run(robot, H_);
+      }
+    private:
+      Eigen::Matrix<metapod::FloatType, Robot::NBDOF, Robot::NBDOF> H_;
+    };
+
     // wrapping jac_point_robot directly with boost::bind
     // does not work because the J argument (an Eigen matrix) has
     // alignement constraints.
@@ -176,10 +188,7 @@ namespace metapod
             boost::bind<void>(rnea<Robot, false>::run, _1, _2, _3, _4),
             std::string("rnea (without jcalc)")));
         runners.push_back(Runner<Robot>(
-            boost::bind<void>(crba<Robot, true>::run, _1, _2),
-            std::string("crba")));
-        runners.push_back(Runner<Robot>(
-            boost::bind<void>(crba<Robot, false>::run, _1, _2),
+            boost::bind<void>(crba_wrapper<Robot>(), _1),
             std::string("crba (without jcalc)")));
         runners.push_back(Runner<Robot>(
             boost::bind<void>(jac_wrapper<Robot>(), _1),

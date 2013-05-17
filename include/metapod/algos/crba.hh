@@ -69,64 +69,76 @@ template< typename Robot > struct crba<Robot, false>
     {
       typedef typename Nodes<AnyyRobot, nj_id>::type NJ;
       typedef typename Nodes<AnyyRobot, prev_nj_id>::type PrevNJ;
-      static void discover(AnyyRobot& robot)
+
+      template< typename Derived>
+      static void discover(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H)
       {
         NI& ni = boost::fusion::at_c<node_id>(robot.nodes);
         NJ& nj = boost::fusion::at_c<nj_id>(robot.nodes);
         PrevNJ& prev_nj = boost::fusion::at_c<prev_nj_id>(robot.nodes);
         ni.joint_F = prev_nj.sXp.mulMatrixTransposeBy(ni.joint_F);
-        robot.H.template
+        H.template
           block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
                ( NI::q_idx, NJ::q_idx )
           = ni.joint_F.transpose() * nj.joint.S.S();
-        robot.H.template
+        H.template
           block< NJ::Joint::NBDOF, NI::Joint::NBDOF >
                ( NJ::q_idx, NI::q_idx )
-          = robot.H.template
+          = H.template
               block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
                    ( NI::q_idx, NJ::q_idx ).transpose();
       }
 
-      static void finish(AnyyRobot&) {}
+      template< typename Derived>
+      static void finish(AnyyRobot &, Eigen::MatrixBase<Derived> &) {}
     };
 
     // forward propagation
-    static void discover(AnyRobot& robot)
+    template< typename Derived>
+    static void discover(AnyRobot& robot, Eigen::MatrixBase<Derived> &)
     {
       NI& ni = boost::fusion::at_c<node_id>(robot.nodes);
       ni.body.Iic = robot.inertias[node_id];
     }
 
-    static void finish(AnyRobot& robot)
+    template< typename Derived>
+    static void finish(AnyRobot& robot, Eigen::MatrixBase<Derived> &H)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
       internal::crba_update_parent_inertia<AnyRobot, Node::parent_id, node_id>::run(robot);
       node.joint_F = node.body.Iic * node.joint.S;
 
-      robot.H.template block<Node::Joint::NBDOF, Node::Joint::NBDOF>(
+      H.template block<Node::Joint::NBDOF, Node::Joint::NBDOF>(
               Node::q_idx, Node::q_idx)
                        = node.joint.S.transpose() * node.joint_F;
-      backward_traversal_prev< BwdtVisitor, Robot, node_id >::run(robot);
+      backward_traversal_prev< BwdtVisitor, Robot, node_id >::run(robot, H);
     }
   };
 
-  static void run(Robot& robot, const typename Robot::confVector& )
+  template< typename Derived>
+  static void run(Robot& robot, Eigen::MatrixBase<Derived> &H, const typename Robot::confVector& )
   {
-    depth_first_traversal< DftVisitor, Robot >::run(robot);
+    assert(H.rows() ==  Robot::NBDOF);
+    assert(H.cols() ==  Robot::NBDOF);
+    depth_first_traversal< DftVisitor, Robot >::run(robot, H);
   }
-  static void run(Robot& robot)
+  template< typename Derived>
+  static void run(Robot& robot, Eigen::MatrixBase<Derived> &H)
   {
-    depth_first_traversal< DftVisitor, Robot >::run(robot);
+    assert(H.rows() ==  Robot::NBDOF);
+    assert(H.cols() ==  Robot::NBDOF);
+    depth_first_traversal< DftVisitor, Robot >::run(robot, H);
   }
 };
 
 // frontend
 template< typename Robot > struct crba< Robot, true >
 {
-  static void run(Robot& robot, const typename Robot::confVector& q)
+  template< typename Derived>
+  static void run(Robot& robot, Eigen::MatrixBase<Derived> &H, const typename Robot::confVector& q)
   {
     jcalc< Robot >::run(robot, q, Robot::confVector::Zero());
-    crba< Robot, false >::run(robot);
+    crba< Robot, false >::run(robot, H);
   }
 };
 
