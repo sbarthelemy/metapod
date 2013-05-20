@@ -130,10 +130,12 @@ namespace metapod
     template <typename Robot>
     class jac_wrapper {
     public:
-      static void run(Robot& robot) {
-        typename jac<Robot>::Jacobian J;
-        jac<Robot>::run(robot, J);
+      jac_wrapper() : J_(J_.Zero()) {}
+      void operator()(Robot& robot) {
+        jac<Robot>::run(robot, J_);
       }
+    private:
+      typename jac<Robot>::Jacobian J_;
     };
 
     // wrapping jac_point_robot directly with boost::bind
@@ -142,10 +144,12 @@ namespace metapod
     template < typename Robot, bool call_bcalc >
     class jac_point_robot_wrapper {
     public:
-      static void run(Robot& robot, typename Robot::confVector q) {
-        typename jac_point_robot<Robot, call_bcalc>::RobotJacobian J;
-        jac_point_robot<Robot, call_bcalc>::run(robot, q, J);
+      jac_point_robot_wrapper() : J_(J_.Zero()) {}
+      void operator()(Robot& robot, typename Robot::confVector q) {
+        jac_point_robot<Robot, call_bcalc>::run(robot, q, J_);
       }
+    private:
+      typename jac_point_robot<Robot, call_bcalc>::RobotJacobian J_;
     };
 
     template < typename Robot >
@@ -178,10 +182,10 @@ namespace metapod
             boost::bind<void>(crba<Robot, false>::run, _1, _2),
             std::string("crba (without jcalc)")));
         runners.push_back(Runner<Robot>(
-            boost::bind<void>(jac_wrapper<Robot>::run, _1),
+            boost::bind<void>(jac_wrapper<Robot>(), _1),
             std::string("jac (without jcalc)")));
         runners.push_back(Runner<Robot>(
-            boost::bind<void>(jac_point_robot_wrapper<Robot, false>::run, _1, _2),
+            boost::bind<void>(jac_point_robot_wrapper<Robot, false>(), _1, _2),
             std::string("jac_point_robot (without bcalc)")));
         // tell which model we are running benchmarks on
         std::cout << "*************\n"
