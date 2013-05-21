@@ -46,8 +46,9 @@ BOOST_AUTO_TEST_CASE (test_fwd_kin)
   iX1[0] = metapod::Spatial::Transform::Identity();
   typedef Eigen::Matrix<metapod::FloatType, 6, CURRENT_MODEL_ROBOT::NBDOF> Jacobian;
   Jacobian J = Jacobian::Zero();
+  Eigen::Matrix<metapod::FloatType, 3, 1> mass_com;
   metapod::jcalc_pos<CURRENT_MODEL_ROBOT>::run(robot, q);
-  metapod::fwd_kin_iX1<CURRENT_MODEL_ROBOT>::run(robot, iX1, J);
+  metapod::fwd_kin_iX1<CURRENT_MODEL_ROBOT>::run(robot, iX1, J, mass_com);
   metapod::fwd_kin_iX0_from_iX1<CURRENT_MODEL_ROBOT>::run(robot, iX1);
   const char result_file[] = "bcalc.log";
   std::ofstream log(result_file, std::ofstream::out);
