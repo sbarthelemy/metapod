@@ -79,7 +79,7 @@ template< typename Robot > struct crba<Robot, false>
         ni.joint_F = prev_nj.sXp.mulMatrixTransposeBy(ni.joint_F);
         H.template
           block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
-               ( NI::q_idx, NJ::q_idx )
+               ( NI::q_idx, NJ::q_idx ).noalias()
           = ni.joint_F.transpose() * nj.joint.S.S();
         H.template
           block< NJ::Joint::NBDOF, NI::Joint::NBDOF >
@@ -109,7 +109,7 @@ template< typename Robot > struct crba<Robot, false>
       node.joint_F = node.body.Iic * node.joint.S;
 
       H.template block<Node::Joint::NBDOF, Node::Joint::NBDOF>(
-              Node::q_idx, Node::q_idx)
+              Node::q_idx, Node::q_idx).noalias()
                        = node.joint.S.transpose() * node.joint_F;
       backward_traversal_prev< BwdtVisitor, Robot, node_id >::run(robot, H);
     }

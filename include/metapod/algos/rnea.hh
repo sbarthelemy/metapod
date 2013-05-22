@@ -145,8 +145,8 @@ template< typename Robot > struct rnea< Robot, false >
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
       // backward computations follow
       // τi = SiT * fi
-      node.joint.torque = node.joint.S.S().transpose()
-                          * node.joint.f.toVector();
+      node.joint.torque.noalias() = node.joint.S.S().transpose()
+                                    * node.joint.f.toVector();
       update_force<node_id, Node::parent_id>::run(robot);
     }
 
