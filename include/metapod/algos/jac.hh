@@ -47,7 +47,7 @@ struct jac {
         // contribution of the ancestor joint to the current body velocity,
         // copied from the parent body jacobian (which we just computed)
         J.template
-            block<6, Ancestor::Joint::NBDOF>(6*Node::id, Ancestor::q_idx) =
+            block<6, Ancestor::Joint::NBDOF>(6*Node::id, Ancestor::q_idx).noalias() =
             sXp_matrix * J.template
             block<6, Ancestor::Joint::NBDOF>(6*Parent::id, Ancestor::q_idx);
     }
