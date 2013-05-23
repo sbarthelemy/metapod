@@ -45,6 +45,7 @@
 # include <iostream>
 # include <boost/bind.hpp>
 # include <boost/function.hpp>
+# include <boost/shared_ptr.hpp>
 
 # include <metapod/timer/timer.hh>
 # include <metapod/tools/jcalc.hh>
@@ -124,30 +125,35 @@ namespace metapod
       int outer_loop_count_;
     };
 
-    // wrapping jac directly with boost::bind
-    // does not work because the J argument (an Eigen matrix) has
-    // alignement constraints.
+    // wrapping jac directly with boost::bind does not work because the J
+    // argument (an Eigen matrix) has alignement constraints.
+    // We store a pointer to J instead of storing J directly so that
+    // jac_wrapper does not have alignement constraints.
+    // Another solution would be to add boost::ref support to the algorithm.
     template <typename Robot>
     class jac_wrapper {
     public:
-      jac_wrapper() : J_(J_.Zero()) {}
+      typedef typename jac<Robot>::Jacobian Jacobian;
+      jac_wrapper() : J_(new Jacobian(Jacobian::Zero())) {}
       void operator()(Robot& robot) {
-        jac<Robot>::run(robot, J_);
+        jac<Robot>::run(robot, *J_);
       }
     private:
-      typename jac<Robot>::Jacobian J_;
+      boost::shared_ptr<Jacobian> J_;
     };
 
     // wrapping crba directly with boost::bind does not work
     template <typename Robot>
     class crba_wrapper {
     public:
-      crba_wrapper() : H_(H_.Zero()) {}
+      typedef Eigen::Matrix<metapod::FloatType, Robot::NBDOF, Robot::NBDOF>
+              MassMatrix;
+      crba_wrapper() : H_(new MassMatrix(MassMatrix::Zero())) {}
       void operator()(Robot& robot) {
-        crba<Robot, false>::run(robot, H_);
+        crba<Robot, false>::run(robot, *H_);
       }
     private:
-      Eigen::Matrix<metapod::FloatType, Robot::NBDOF, Robot::NBDOF> H_;
+      boost::shared_ptr<MassMatrix> H_;
     };
 
     // wrapping jac_point_robot directly with boost::bind
@@ -156,12 +162,14 @@ namespace metapod
     template < typename Robot, bool call_bcalc >
     class jac_point_robot_wrapper {
     public:
-      jac_point_robot_wrapper() : J_(J_.Zero()) {}
+      typedef typename jac_point_robot<Robot, call_bcalc>::RobotJacobian
+              RobotJacobian;
+      jac_point_robot_wrapper() : J_(new RobotJacobian(RobotJacobian::Zero())) {}
       void operator()(Robot& robot, typename Robot::confVector q) {
-        jac_point_robot<Robot, call_bcalc>::run(robot, q, J_);
+        jac_point_robot<Robot, call_bcalc>::run(robot, q, *J_);
       }
     private:
-      typename jac_point_robot<Robot, call_bcalc>::RobotJacobian J_;
+      boost::shared_ptr<RobotJacobian> J_;
     };
 
     template < typename Robot >
