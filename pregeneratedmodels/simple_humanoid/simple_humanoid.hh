@@ -778,10 +778,8 @@ public:
   // inertias expressed in body frames
   static Spatial::Inertia inertias[30];
   NodeVector nodes;
-  Eigen::Matrix< FloatType, NBDOF, NBDOF > H; // used by crba
 
-  simple_humanoid():
-    H(Eigen::Matrix< FloatType, NBDOF, NBDOF >::Zero())
+  simple_humanoid()
   {}
 };
 
