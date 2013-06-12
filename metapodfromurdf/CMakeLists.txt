@@ -6,11 +6,19 @@ QI_CREATE_BIN(metapodfromurdf
   src/metapodfromurdf.cpp)
 QI_USE_LIB(metapodfromurdf
   metapod_robotbuilder
-  boost_program_options urdf metapod_robotbuilder eigen3)
-# rosconsole emits lots "variadic macro warnings". Let ignore them.
-QI_USE_LIB(metapodfromurdf
-   rosconsole
-   ASSUME_SYSTEM_INCLUDE)
+  boost boost_program_options metapod_robotbuilder eigen3)
+IF(USE_URDF_FROM_ROS_FUERTE)
+  SET_SOURCE_FILES_PROPERTIES("src/metapodfromurdf.cpp" PROPERTIES
+      COMPILE_FLAGS "-DUSE_URDF_FROM_ROS_FUERTE")
+  # rosconsole emits lots "variadic macro warnings". Let ignore them.
+  QI_USE_LIB(metapodfromurdf
+     urdf rosconsole
+     ASSUME_SYSTEM_INCLUDE)
+ELSE()
+  QI_USE_LIB(metapodfromurdf urdfdom)
+  # without the following line, it won't compile
+  target_link_libraries(metapodfromurdf ${urdfdom_LIBRARIES})
+ENDIF()
 QI_STAGE_BIN(metapodfromurdf)
 QI_INSTALL_TARGET(metapodfromurdf)
 SET(METAPODFROMURDF_EXECUTABLE metapodfromurdf CACHE
