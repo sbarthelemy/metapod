@@ -17,6 +17,47 @@ While the upstream metapod uses jrl-cmake as a build system, the Aldebaran
 Robotics fork uses
 [qibuild](www.aldebaran-robotics.com/documentation/qibuild/index.html).
 
+Content
+-------
+
+  * include/metapod/spatial: header-only spatial algebra library.
+
+  * include/metapod: header-only library of robot dynamics algorithms.
+    Algorithms consist of the combination of *compile-time* traversal
+    algorithms and visitors. They can be applied to a robot model which is
+    a class with a specific structure.
+
+  * robotbuilder: a library to help generating the source code of robot
+    model classes.
+
+  * embedfile: an utility executable used to embed templates in the
+    robotbuilder library.
+
+  * metapodfromurdf: an utility executable based on robotbuilder and liburdf
+    which generates the the source code of robot model classes from an URDF
+    description.
+
+  * binarytreemodel: an utility executable based on robotbuilder which
+    generates the source code of robot model classes with a binary kinematic
+    tree. Those models are named sample_[1-4]and are used for benckmarks.
+
+  * data: URDF definition of the simple_arm and simple_humanoid models which
+    are used for examples, tests and benchmarks.
+
+  * tests: some tests for metapod and metapod::Spatial
+
+  * timer: a portable timer library used for the benchmarks.
+
+  * benchmark: some benchmarks
+
+  * doc: some doc.
+
+  * pregeneratedmodels: a cached copy of the generated source code of the
+    (ususally generated on the fly) robot models. Only used when the source
+    code cannot be generated (because liburdfdom is not available, or the
+    generator cannot be run because we're cross-compiling).
+
+
 Dependencies
 ------------
 
