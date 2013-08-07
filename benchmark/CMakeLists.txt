@@ -54,7 +54,8 @@ IF(WITH_METAPOD_BINARYTREEMODEL)
                 @ONLY)
             QI_CREATE_BIN(${_benchname}
                 ${CMAKE_CURRENT_BINARY_DIR}/${_benchname}.cc
-                benchmark.hh)
+                benchmark.hh
+                NO_INSTALL)
             QI_USE_LIB(${_benchname} metapod_timer ${_libname})
         ENDIF()
     ENDFOREACH()
@@ -72,7 +73,7 @@ IF(WITH_SIMPLE_HUMANOID)
     # benchmark it alone
     IF(BUILD_SINGLE_MODEL_BENCHMARKS)
         SET(_benchname "benchmark_${_libname}")
-        QI_CREATE_BIN(${_benchname} ${_benchname}.cc benchmark.hh)
+        QI_CREATE_BIN(${_benchname} ${_benchname}.cc benchmark.hh NO_INSTALL)
         QI_USE_LIB(${_benchname} metapod_timer ${_libname})
     ENDIF()
 ENDIF()
@@ -81,6 +82,6 @@ ENDIF()
 IF(BUILD_MULTI_MODEL_BENCHMARK AND _model_libs)
     SET_SOURCE_FILES_PROPERTIES("benchmark.cc" PROPERTIES
         COMPILE_FLAGS "${benchmark_cc_definitions}")
-    QI_CREATE_BIN(benchmark benchmark.cc benchmark.hh)
+    QI_CREATE_BIN(benchmark benchmark.cc benchmark.hh NO_INSTALL)
     QI_USE_LIB(benchmark metapod_timer ${_model_libs})
 ENDIF()

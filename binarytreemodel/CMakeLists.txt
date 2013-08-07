@@ -15,10 +15,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-QI_CREATE_BIN(metapod_binarytreemodel src/binarytreemodel.cc)
+QI_CREATE_BIN(metapod_binarytreemodel src/binarytreemodel.cc NO_INSTALL)
 QI_USE_LIB(metapod_binarytreemodel metapod_robotbuilder)
 QI_STAGE_BIN(metapod_binarytreemodel)
-QI_INSTALL_TARGET(metapod_binarytreemodel)
 SET(METAPOD_BINARYTREEMODEL_EXECUTABLE metapod_binarytreemodel
   CACHE STRING
   "Set by cmake if metapod_binarytreemodel is built, by the user otherwise")
