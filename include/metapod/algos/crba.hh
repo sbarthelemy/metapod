@@ -40,8 +40,8 @@ struct crba_update_parent_inertia
   typedef typename Nodes<Robot, node_id>::type Node;
   static void run(Robot& robot)
   {
-    Parent& parent = boost::fusion::at_c<parent_id>(robot.nodes);
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Parent& parent = get_node<parent_id>(robot);
+    Node& node = get_node<node_id>(robot);
     parent.body.Iic = parent.body.Iic + node.sXp.applyInv(node.body.Iic);
   }
 };
@@ -73,9 +73,9 @@ template< typename Robot > struct crba<Robot, false>
       template< typename Derived>
       static void discover(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H)
       {
-        NI& ni = boost::fusion::at_c<node_id>(robot.nodes);
-        NJ& nj = boost::fusion::at_c<nj_id>(robot.nodes);
-        PrevNJ& prev_nj = boost::fusion::at_c<prev_nj_id>(robot.nodes);
+        NI& ni = get_node<node_id>(robot);
+        NJ& nj = get_node<nj_id>(robot);
+        PrevNJ& prev_nj = get_node<prev_nj_id>(robot);
         ni.joint_F = prev_nj.sXp.mulMatrixTransposeBy(ni.joint_F);
         H.template
           block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
@@ -97,14 +97,14 @@ template< typename Robot > struct crba<Robot, false>
     template< typename Derived>
     static void discover(AnyRobot& robot, Eigen::MatrixBase<Derived> &)
     {
-      NI& ni = boost::fusion::at_c<node_id>(robot.nodes);
+      NI& ni = get_node<node_id>(robot);
       ni.body.Iic = robot.inertias[node_id];
     }
 
     template< typename Derived>
     static void finish(AnyRobot& robot, Eigen::MatrixBase<Derived> &H)
     {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       internal::crba_update_parent_inertia<AnyRobot, Node::parent_id, node_id>::run(robot);
       node.joint_F = node.body.Iic * node.joint.S;
 

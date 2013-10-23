@@ -517,11 +517,6 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
   if (!is_last_link)
     out.nodes_type_list << ",\n";
 
-  const TxtTemplate tpl3(
-                         "template <> struct Nodes <@ROBOT_CLASS_NAME@, @node_id@> "
-                         "{typedef @ROBOT_CLASS_NAME@::Node@node_id@ type;};\n");
-  out.map_node_id_to_type << tpl3.format(repl);
-
   // fill bits for init.cc
   const TxtTemplate tpl4(
       "const std::string @ROBOT_CLASS_NAME@::Node@node_id@::joint_name = std::string(\"@joint_name@\");\n"
@@ -602,7 +597,6 @@ RobotBuilder::Status RobotBuilderP::write() const
   repl["nodeid_enum_definition"] = streams.nodeid_enum_definition.str();
   repl["node_type_definitions"] = streams.node_type_definitions.str();
   repl["nodes_type_list"] = streams.nodes_type_list.str();
-  repl["map_node_id_to_type"] = streams.map_node_id_to_type.str();
 
   for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE; ++i) {
     std::stringstream key;

@@ -28,7 +28,9 @@
 # include "metapod/tools/fwd.hh"
 # include <metapod/tools/constants.hh>
 # include "metapod/macro.hh"
-
+# include <boost/fusion/sequence.hpp>
+# include <boost/fusion/include/sequence.hpp>
+# include <boost/fusion/include/vector.hpp>
 namespace metapod
 {
   // Constant 3x3 Matrix initialization method.
@@ -83,9 +85,26 @@ namespace metapod
     {}
   };
 
-  // specializations should map robot node_ids to node classes.
+  // map robot node_ids to node classes.
   template <typename Robot, int id>
-  struct Nodes {};
+  struct Nodes {
+    typedef typename boost::fusion::result_of::value_at_c<typename Robot::NodeVector, id>::type type;
+  };
+
+  // map robot node_ids to node instances.
+  template<int id, typename Robot>
+  typename Nodes<Robot, id>::type &
+  get_node(Robot &robot)
+  {
+    return boost::fusion::at_c<id>(robot.nodes);
+  }
+
+  template<int id, typename Robot>
+  const typename Nodes<Robot, id>::type &
+  get_node(const Robot &robot)
+  {
+    return boost::fusion::at_c<id>(robot.nodes);
+  }
 
   inline Spatial::Motion set_gravity()
   {

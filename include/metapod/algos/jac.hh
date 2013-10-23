@@ -56,7 +56,7 @@ struct jac {
     };
 
     static void discover(AnyRobot& robot, Jacobian& J) {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       // contribution of the current joint to the current body velocity
       J.template block<6, Node::Joint::NBDOF>(6*Node::id, Node::q_idx)
           = node.joint.S.S();

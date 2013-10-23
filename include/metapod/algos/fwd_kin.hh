@@ -71,7 +71,7 @@ struct SetBodyPose
   typedef typename Nodes<Robot, node_id>::type Node;
   static void run(Robot& robot, Spatial::Transform *iX1)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     iX1[node_id] = node.sXp * iX1[Node::parent_id];
   }
 };
@@ -83,7 +83,7 @@ struct SetBodyPose<Robot, node_id, false>
   typedef typename Nodes<Robot, node_id>::type Node;
   static void run(Robot& robot, Spatial::Transform *iX1)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     iX1[node_id] = node.sXp;
   }
 };
@@ -99,7 +99,7 @@ struct FwdKiniX1Visitor
                        Eigen::MatrixBase<Derived1> &mass_com)
   {
     SetBodyPose<Robot, node_id, has_parent<Robot, node_id>::value>::run(robot, iX1);
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     J.template block<6, Node::Joint::NBDOF>(0, Node::q_idx)
         = iX1[node_id].inverse().apply(node.joint.S);
     const metapod::Spatial::Inertia &I = robot.inertias[node_id];
@@ -119,7 +119,7 @@ struct FwdKiniX0FromiX1Visitor
   typedef typename Nodes<Robot, node_id>::type Node;
   static void discover(Robot& robot, const Spatial::Transform *iX1, const Spatial::Transform &_1X0)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     node.body.iX0 = iX1[node_id] * _1X0;
   }
   static void finish(Robot& , const Spatial::Transform *, const Spatial::Transform &)
@@ -169,7 +169,7 @@ template< typename Robot > struct fwd_kin_iX0_from_iX1
   // assume sXp is up to date for the root joint
   static void run(Robot& robot, const Spatial::Transform iX1[])
   {
-    Node& node = boost::fusion::at_c<Robot::child0_id>(robot.nodes);
+    Node& node = get_node<Robot::child0_id>(robot);
     node.body.iX0 = node.sXp;
     // start a depth first traversal but skip the root node
     internal::depth_first_traversal_internal<internal::FwdKiniX0FromiX1Visitor, Robot, Node::child0_id>::run(robot, iX1, node.body.iX0);

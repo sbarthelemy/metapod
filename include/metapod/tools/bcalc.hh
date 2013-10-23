@@ -39,8 +39,8 @@ struct UpdateBodyAbsolutePose
   typedef typename Nodes<Robot, Node::parent_id>::type Parent;
   static void run(Robot& robot)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    Parent& parent = boost::fusion::at_c<Node::parent_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
+    Parent& parent = get_node<Node::parent_id>(robot);
     node.body.iX0 = node.sXp * parent.body.iX0;
   }
 };
@@ -52,7 +52,7 @@ struct UpdateBodyAbsolutePose<Robot, node_id, false>
   typedef typename Nodes<Robot, node_id>::type Node;
   static void run(Robot& robot)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     node.body.iX0 = node.sXp;
   }
 };
@@ -63,7 +63,7 @@ struct BcalcVisitor
   typedef typename Nodes<Robot, node_id>::type Node;
   static void discover(Robot& robot, const typename Robot::confVector& q)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     node.joint.bcalc(q.template segment< Node::Joint::NBDOF >(Node::q_idx));
     node.sXp = node.joint.Xj * node.Xt;
     UpdateBodyAbsolutePose<Robot, node_id, has_parent<Robot, node_id>::value>::run(robot);

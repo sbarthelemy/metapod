@@ -49,8 +49,8 @@ template< typename Robot > struct rnea< Robot, false >
         Robot & robot,
         const Eigen::Matrix< FloatType, Node::Joint::NBDOF, 1 > & ddqi)
     {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-      Parent& parent = boost::fusion::at_c<parent_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
+      Parent& parent = get_node<parent_id>(robot);
       // iX0 = iXλ(i) * λ(i)X0
       // vi = iXλ(i) * vλ(i) + vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
@@ -72,7 +72,7 @@ template< typename Robot > struct rnea< Robot, false >
         Robot & robot,
         const Eigen::Matrix< FloatType, Node::Joint::NBDOF, 1 > & ddqi)
     {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       // iX0 = iXλ(i)
       // vi = vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
@@ -96,8 +96,8 @@ template< typename Robot > struct rnea< Robot, false >
 
     static void run(Robot & robot)
     {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-      Parent& parent = boost::fusion::at_c<parent_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
+      Parent& parent = get_node<parent_id>(robot);
       // fλ(i) = fλ(i) + λ(i)Xi* * fi
       parent.joint.f = parent.joint.f + node.sXp.applyInv(node.joint.f);
     }
@@ -120,7 +120,7 @@ template< typename Robot > struct rnea< Robot, false >
                          const confVector & ,
                          const confVector & ddq)
     {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       // Extract subvector corresponding to current Node
       const Eigen::Matrix< FloatType, Node::Joint::NBDOF, 1 > ddqi =
         ddq.template segment<Node::Joint::NBDOF>(Node::q_idx);
@@ -142,7 +142,7 @@ template< typename Robot > struct rnea< Robot, false >
                        const confVector & ,
                        const confVector & )
     {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       // backward computations follow
       // τi = SiT * fi
       node.joint.torque.noalias() = node.joint.S.S().transpose()

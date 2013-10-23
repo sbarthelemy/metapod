@@ -35,9 +35,6 @@
 
 # include "config.hh"
 
-# include <metapod/tools/common.hh>
-# include <metapod/tools/joint.hh>
-
 // by default, boost fusion vector only provides constructor for vectors with
 // up to 10 elements.
 # if !defined(FUSION_MAX_VECTOR_SIZE) && (30 > 10)
@@ -49,6 +46,8 @@
 # include <boost/fusion/sequence.hpp>
 # include <boost/fusion/include/sequence.hpp>
 # include <boost/fusion/include/vector.hpp>
+# include <metapod/tools/common.hh>
+# include <metapod/tools/joint.hh>
 
 namespace metapod {
 
@@ -782,39 +781,6 @@ public:
   simple_humanoid()
   {}
 };
-
-// map node id to node type
-template <> struct Nodes <simple_humanoid, 0> {typedef simple_humanoid::Node0 type;};
-template <> struct Nodes <simple_humanoid, 1> {typedef simple_humanoid::Node1 type;};
-template <> struct Nodes <simple_humanoid, 2> {typedef simple_humanoid::Node2 type;};
-template <> struct Nodes <simple_humanoid, 3> {typedef simple_humanoid::Node3 type;};
-template <> struct Nodes <simple_humanoid, 4> {typedef simple_humanoid::Node4 type;};
-template <> struct Nodes <simple_humanoid, 5> {typedef simple_humanoid::Node5 type;};
-template <> struct Nodes <simple_humanoid, 6> {typedef simple_humanoid::Node6 type;};
-template <> struct Nodes <simple_humanoid, 7> {typedef simple_humanoid::Node7 type;};
-template <> struct Nodes <simple_humanoid, 8> {typedef simple_humanoid::Node8 type;};
-template <> struct Nodes <simple_humanoid, 9> {typedef simple_humanoid::Node9 type;};
-template <> struct Nodes <simple_humanoid, 10> {typedef simple_humanoid::Node10 type;};
-template <> struct Nodes <simple_humanoid, 11> {typedef simple_humanoid::Node11 type;};
-template <> struct Nodes <simple_humanoid, 12> {typedef simple_humanoid::Node12 type;};
-template <> struct Nodes <simple_humanoid, 13> {typedef simple_humanoid::Node13 type;};
-template <> struct Nodes <simple_humanoid, 14> {typedef simple_humanoid::Node14 type;};
-template <> struct Nodes <simple_humanoid, 15> {typedef simple_humanoid::Node15 type;};
-template <> struct Nodes <simple_humanoid, 16> {typedef simple_humanoid::Node16 type;};
-template <> struct Nodes <simple_humanoid, 17> {typedef simple_humanoid::Node17 type;};
-template <> struct Nodes <simple_humanoid, 18> {typedef simple_humanoid::Node18 type;};
-template <> struct Nodes <simple_humanoid, 19> {typedef simple_humanoid::Node19 type;};
-template <> struct Nodes <simple_humanoid, 20> {typedef simple_humanoid::Node20 type;};
-template <> struct Nodes <simple_humanoid, 21> {typedef simple_humanoid::Node21 type;};
-template <> struct Nodes <simple_humanoid, 22> {typedef simple_humanoid::Node22 type;};
-template <> struct Nodes <simple_humanoid, 23> {typedef simple_humanoid::Node23 type;};
-template <> struct Nodes <simple_humanoid, 24> {typedef simple_humanoid::Node24 type;};
-template <> struct Nodes <simple_humanoid, 25> {typedef simple_humanoid::Node25 type;};
-template <> struct Nodes <simple_humanoid, 26> {typedef simple_humanoid::Node26 type;};
-template <> struct Nodes <simple_humanoid, 27> {typedef simple_humanoid::Node27 type;};
-template <> struct Nodes <simple_humanoid, 28> {typedef simple_humanoid::Node28 type;};
-template <> struct Nodes <simple_humanoid, 29> {typedef simple_humanoid::Node29 type;};
-
 
 } // closing namespace metapod
 

@@ -115,8 +115,8 @@ struct jac_point_chain_internal_freeflyer<Robot, start_node_id, end_node_id,
   typedef typename Nodes<Robot, end_node_id>::type EndNode;
 
   static void run(Robot& robot, const Vector3d& e_p, Jacobian& J) {
-    StartNode& start_node = boost::fusion::at_c<start_node_id>(robot.nodes);
-    EndNode& end_node = boost::fusion::at_c<end_node_id>(robot.nodes);
+    StartNode& start_node = get_node<start_node_id>(robot);
+    EndNode& end_node = get_node<end_node_id>(robot);
     // Compute point coordinates in world frame.
     Vector3d p =  end_node.body.iX0.applyInv(e_p);
     // Compute jacobian block for freeflyer. Formula is given by:

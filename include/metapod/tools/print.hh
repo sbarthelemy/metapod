@@ -34,7 +34,7 @@ template < typename Robot, int node_id > struct PrintStateVisitor
   typedef typename Nodes<Robot, node_id>::type Node;
   static void discover(const Robot & robot, std::ostream & os)
   {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    const Node& node = get_node<node_id>(robot);
     os << Node::body_name << " :\n"
        << "sXp :\n" << node.sXp << "\n"
        << "Xt :\n" << Node::Xt << "\n"
@@ -85,7 +85,7 @@ template < typename Robot, int node_id> struct PrintTransformsVisitor
   typedef typename Nodes<Robot, node_id>::type Node;
   static void discover(const Robot& robot, std::ostream & os)
   {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    const Node& node = get_node<node_id>(robot);
     os << Node::body_name << "\n"
        << node.body.iX0.E() << "\n"
        << node.body.iX0.r().transpose() << "\n"
@@ -109,7 +109,7 @@ template < typename Robot, int node_id> struct PrintTorquesVisitor
 
   static void discover(const Robot& robot, std::ostream& os)
   {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    const Node& node = get_node<node_id>(robot);
     os << Node::joint_name << "\n"
        << node.joint.torque << "\n"
        << std::endl;
@@ -132,7 +132,7 @@ template < typename Robot, int node_id> struct GetTorquesVisitor
 
   static void discover(const Robot& robot, typename Robot::confVector& v)
   {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    const Node& node = get_node<node_id>(robot);
     v.template
     segment<Node::Joint::NBDOF>(Node::q_idx) = node.joint.torque;
   }

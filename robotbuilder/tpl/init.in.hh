@@ -17,9 +17,6 @@
 
 # include "config.hh"
 
-# include <metapod/tools/common.hh>
-# include <metapod/tools/joint.hh>
-
 // by default, boost fusion vector only provides constructor for vectors with
 // up to 10 elements.
 # if !defined(FUSION_MAX_VECTOR_SIZE) && (@ROBOT_NB_BODIES@ > 10)
@@ -31,6 +28,8 @@
 # include <boost/fusion/sequence.hpp>
 # include <boost/fusion/include/sequence.hpp>
 # include <boost/fusion/include/vector.hpp>
+# include <metapod/tools/common.hh>
+# include <metapod/tools/joint.hh>
 
 namespace metapod {
 
@@ -76,9 +75,6 @@ public:
   @ROBOT_CLASS_NAME@()
   {}
 };
-
-// map node id to node type
-@map_node_id_to_type@
 
 } // closing namespace metapod
 

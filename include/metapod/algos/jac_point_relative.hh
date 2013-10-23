@@ -38,7 +38,7 @@ struct convert_to_world {
   typedef typename Nodes<Robot, node_id>::type Node;
 
   static Vector3d run(const Robot& robot, const Vector3d & b_p) {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    const Node& node = get_node<node_id>(robot);
     return node.body.iX0.applyInv(b_p);
   }
 };
@@ -94,7 +94,7 @@ struct jac_point_relative {
     typedef typename Nodes<Robot, node_id>::type Node;
 
     static void discover(Robot& robot, const Vector3d & p, Jacobian & J) {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       // Compute jacobian block for current node. Formula is given by:
       // Ji = - pX0 * (iX0)^(-1) * Si,
       // where pX0 is the word transform in the point frame,
@@ -113,7 +113,7 @@ struct jac_point_relative {
     typedef typename Nodes<Robot, node_id>::type Node;
 
     static void discover(Robot& robot, const Vector3d & p, Jacobian & J) {
-      Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+      Node& node = get_node<node_id>(robot);
       // Compute jacobian block for current node. Formula is given by:
       // Ji = pX0 * (iX0)^(-1) * Si,
       // where pX0 is the word transform in the point frame,

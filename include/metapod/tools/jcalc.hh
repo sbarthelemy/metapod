@@ -36,7 +36,7 @@ template< typename Robot, int node_id > struct JcalcVisitor
                        const typename Robot::confVector& q,
                        const typename Robot::confVector& dq)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     node.joint.jcalc(
       q.template segment< Node::Joint::NBDOF >(Node::q_idx),
       dq.template segment< Node::Joint::NBDOF >(Node::q_idx));
@@ -54,7 +54,7 @@ struct JcalcPosVisitor
   typedef typename Nodes<Robot, node_id>::type Node;
   static void discover(Robot& robot, const typename Robot::confVector& q)
   {
-    Node& node = boost::fusion::at_c<node_id>(robot.nodes);
+    Node& node = get_node<node_id>(robot);
     node.joint.bcalc(q.template segment< Node::Joint::NBDOF >(Node::q_idx));
     node.sXp = node.joint.Xj * node.Xt;
   }

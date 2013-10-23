@@ -77,7 +77,6 @@ private:
     std::ostringstream node_type_definitions;
     std::ostringstream nodeid_enum_definition;
     std::ostringstream nodes_type_list;
-    std::ostringstream map_node_id_to_type;
     // for content in init.cc
     std::ostringstream init_nodes;
     std::ostringstream init_inertias;

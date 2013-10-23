@@ -35,9 +35,6 @@
 
 # include "config.hh"
 
-# include <metapod/tools/common.hh>
-# include <metapod/tools/joint.hh>
-
 // by default, boost fusion vector only provides constructor for vectors with
 // up to 10 elements.
 # if !defined(FUSION_MAX_VECTOR_SIZE) && (3 > 10)
@@ -49,6 +46,8 @@
 # include <boost/fusion/sequence.hpp>
 # include <boost/fusion/include/sequence.hpp>
 # include <boost/fusion/include/vector.hpp>
+# include <metapod/tools/common.hh>
+# include <metapod/tools/joint.hh>
 
 namespace metapod {
 
@@ -161,12 +160,6 @@ public:
   simple_arm()
   {}
 };
-
-// map node id to node type
-template <> struct Nodes <simple_arm, 0> {typedef simple_arm::Node0 type;};
-template <> struct Nodes <simple_arm, 1> {typedef simple_arm::Node1 type;};
-template <> struct Nodes <simple_arm, 2> {typedef simple_arm::Node2 type;};
-
 
 } // closing namespace metapod
 

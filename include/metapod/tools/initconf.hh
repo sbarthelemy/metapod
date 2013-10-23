@@ -44,8 +44,7 @@ struct InitConfVisitor
   {
     typedef typename Nodes<Robot, node_id>::type Node;
     findString(Node::joint_name, log);
-    const int NB_DOF = boost::fusion::result_of::value_at_c<typename Robot::NodeVector, node_id>::type::Joint::NBDOF;
-    for(int i=0; i<NB_DOF; ++i)
+    for(int i=0; i<Node::Joint::NBDOF; ++i)
       log >> v[Node::q_idx+i];
   }
   static void finish(std::ifstream &, typename Robot::confVector &) {}
