@@ -252,17 +252,17 @@ RobotBuilder::Status RobotBuilderP::init()
 }
 
 // parent_body_name: "NP" (no parent) or the parent body name
-RobotBuilder::Status RobotBuilderP::addLink(const std::string& parent_body_name,
-                                            const std::string& joint_name,
-                                            unsigned int joint_type,
-                                            const Eigen::Matrix3d & R_joint_parent,
-                                            const Eigen::Vector3d & r_parent_joint,
-                                            const std::string& body_name,
-                                            double body_mass,
-                                            const Eigen::Vector3d & body_center_of_mass,
-                                            const Eigen::Matrix3d & body_rotational_inertia,
-                                            const Eigen::Vector3d & joint_axis,
-                                            int dof_index)
+RobotBuilder::Status RobotBuilderP::addLink(
+    const std::string& parent_body_name,
+    const std::string& joint_name,
+    const RobotBuilder::Joint &joint,
+    const Eigen::Matrix3d & R_joint_parent,
+    const Eigen::Vector3d & r_parent_joint,
+    const std::string& body_name,
+    double body_mass,
+    const Eigen::Vector3d & body_center_of_mass,
+    const Eigen::Matrix3d & body_rotational_inertia,
+    int dof_index)
 {
 
   if (!is_initialized_) {
@@ -334,31 +334,6 @@ RobotBuilder::Status RobotBuilderP::addLink(const std::string& parent_body_name,
       return RobotBuilder::STATUS_FAILURE;
     }
 
-  // deal with joint type
-  unsigned int joint_nb_dof;
-  switch (joint_type) {
-  case RobotBuilder::REVOLUTE_AXIS_ANY:
-  case RobotBuilder::REVOLUTE_AXIS_X:
-  case RobotBuilder::REVOLUTE_AXIS_Y:
-  case RobotBuilder::REVOLUTE_AXIS_Z:
-    {
-      joint_nb_dof = 1;
-      break;
-    }
-  case RobotBuilder::FREE_FLYER:
-  case RobotBuilder::FREE_FLYER_BODY:
-    {
-      joint_nb_dof = 6;
-      break;
-    }
-  default:
-    {
-      std::cerr
-        << "ERROR: Joint '" << joint_name << "' is of unknown type"
-        << std::endl;
-      return RobotBuilder::STATUS_FAILURE;
-    }
-  }
   // deal with joint_index
   int joint_position_in_conf = -1;
   if (use_dof_index_)
@@ -382,51 +357,21 @@ RobotBuilder::Status RobotBuilderP::addLink(const std::string& parent_body_name,
                        link_id,
                        parent_id,
                        joint_name,
-                       joint_type,
+                       joint,
                        R_joint_parent,
                        r_parent_joint,
                        body_name,
                        body_mass,
                        body_center_of_mass,
                        body_rotational_inertia,
-                       joint_axis,
                        joint_position_in_conf));
-  nb_dof_ += joint_nb_dof;
+  nb_dof_ += joint.nb_dof();
   return RobotBuilder::STATUS_SUCCESS;
 }
 
 void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
                               TmpStreams &out) const
 {
-  std::string joint_type, joint_rotation_type;
-  switch(model_.joint_type(link_id))
-    {
-    case metapod::RobotBuilder::FREE_FLYER:
-      joint_type = "FreeFlyerJoint";
-      joint_rotation_type = "Spatial::RotationMatrix";
-      break;
-    case metapod::RobotBuilder::FREE_FLYER_BODY:
-      joint_type = "FreeFlyerBodyJoint";
-      joint_rotation_type = "Spatial::RotationMatrix";
-      break;
-    case metapod::RobotBuilder::REVOLUTE_AXIS_X:
-      joint_type = "RevoluteAxisXJoint";
-      joint_rotation_type = "Spatial::RotationMatrixAboutX";
-      break;
-    case metapod::RobotBuilder::REVOLUTE_AXIS_Y:
-      joint_type = "RevoluteAxisYJoint";
-      joint_rotation_type = "Spatial::RotationMatrixAboutY";
-      break;
-    case metapod::RobotBuilder::REVOLUTE_AXIS_Z:
-      joint_type = "RevoluteAxisZJoint";
-      joint_rotation_type = "Spatial::RotationMatrixAboutZ";
-      break;
-    case metapod::RobotBuilder::REVOLUTE_AXIS_ANY:
-      joint_type = "RevoluteAxisAnyJoint";
-      joint_rotation_type = "Spatial::RotationMatrix";
-      break;
-    }
-
   Eigen::IOFormat comma_fmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                             ", ", ", ");
   const int parent_id = model_.parent_id(link_id);
@@ -434,8 +379,8 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
   repl["node_id"] = ::to_string(link_id);
   repl["node_name"] = ::node_name(model_, link_id);
   repl["dof_index"] = ::to_string(model_.dof_index(link_id));
-  repl["joint_type"] = joint_type;
-  repl["joint_rotation_type"] = joint_rotation_type;
+  repl["joint_type"] = model_.joint(link_id).joint_class();
+  repl["joint_rotation_type"] = model_.joint(link_id).rotation_class();
   repl["joint_name"] = model_.joint_name(link_id);
 
   const Eigen::Matrix3d &R_joint_parent = model_.R_joint_parent(link_id);
@@ -526,12 +471,7 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
       "    @r_parent_joint@);\n"
       "@ROBOT_CLASS_NAME@::Node@node_id@::Node@node_id@():\n"
       "  joint(@joint_args@) {}\n\n");
-  if (model_.joint_type(link_id) == RobotBuilder::REVOLUTE_AXIS_ANY)
-    {
-      std::stringstream ss;
-      ss << model_.joint_axis(link_id).format(comma_fmt);
-      repl["joint_args"] = ss.str();
-    }
+  repl["joint_args"] = model_.joint(link_id).ctor_args();
   out.init_nodes << tpl4.format(repl);
   const TxtTemplate tpl5(
       "    spatialInertiaMaker(\n"

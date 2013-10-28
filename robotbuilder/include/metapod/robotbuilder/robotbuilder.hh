@@ -24,6 +24,7 @@
 
 # include <metapod/robotbuilder/config.hh>
 # include <string>
+# include <vector>
 # include <Eigen/Dense>
 
 namespace metapod {
@@ -32,7 +33,86 @@ class RobotBuilderP; // private implementation
 
 class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder
 {
-public:
+ public:
+  class Joint {
+   public:
+    virtual Joint* clone() const = 0;
+    virtual unsigned int nb_dof() const = 0;
+    virtual std::string joint_class() const = 0;
+    virtual std::string rotation_class() const = 0;
+    virtual std::string ctor_args() const {return std::string();}
+  };
+
+  class FreeFlyerJoint : public Joint {
+   public:
+    FreeFlyerJoint() {}
+    Joint* clone() const {return new FreeFlyerJoint(*this);}
+    unsigned int nb_dof() const {return 6;}
+    std::string joint_class() const {return "FreeFlyerJoint";}
+    std::string rotation_class() const {
+      return "Spatial::RotationMatrix";}
+  };
+
+  class FreeFlyerBodyJoint : public Joint {
+   public:
+    FreeFlyerBodyJoint() {}
+    Joint* clone() const {return new FreeFlyerBodyJoint(*this);}
+    unsigned int nb_dof() const {return 6;}
+    std::string joint_class() const {return "FreeFlyerBodyJoint";}
+    std::string rotation_class() const {
+      return "Spatial::RotationMatrix";}
+  };
+
+  class RevoluteAxisXJoint : public Joint {
+   public:
+    RevoluteAxisXJoint() {}
+    Joint* clone() const {return new RevoluteAxisXJoint(*this);}
+    unsigned int nb_dof() const {return 1;}
+    std::string joint_class() const {return "RevoluteAxisXJoint";}
+    std::string rotation_class() const {
+      return "Spatial::RotationMatrixAboutX";}
+  };
+
+  class RevoluteAxisYJoint : public Joint {
+   public:
+    RevoluteAxisYJoint() {}
+    Joint* clone() const {return new RevoluteAxisYJoint(*this);}
+    unsigned int nb_dof() const {return 1;}
+    std::string joint_class() const {return "RevoluteAxisYJoint";}
+    std::string rotation_class() const {
+      return "Spatial::RotationMatrixAboutY";}
+  };
+
+  class RevoluteAxisZJoint : public Joint {
+   public:
+    RevoluteAxisZJoint() {}
+    Joint* clone() const {return new RevoluteAxisZJoint(*this);}
+    unsigned int nb_dof() const {return 1;}
+    std::string joint_class() const {return "RevoluteAxisZJoint";}
+    std::string rotation_class() const {
+      return "Spatial::RotationMatrixAboutZ";}
+  };
+
+  class RevoluteAxisAnyJoint : public Joint {
+   public:
+    RevoluteAxisAnyJoint(const Eigen::Vector3d &axis):
+      axis_(axis) {}
+    Joint* clone() const {return new RevoluteAxisAnyJoint(*this);}
+    unsigned int nb_dof() const {return 1;}
+    std::string joint_class() const {return "RevoluteAxisAnyJoint";}
+    std::string rotation_class() const {
+      return "Spatial::RotationMatrix";}
+    std::string ctor_args() const {
+      Eigen::IOFormat comma_fmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                ", ", ", ");
+      std::stringstream ss;
+      ss << axis_.format(comma_fmt);
+      return ss.str();
+    }
+   private:
+    const Eigen::Vector3d axis_;
+  };
+
   enum JointType { FREE_FLYER,
                    FREE_FLYER_BODY,
                    REVOLUTE_AXIS_X,
@@ -70,17 +150,16 @@ public:
   Status addLink(
       const std::string& parent_body_name,
       const std::string& joint_name,
-      unsigned int joint_type,
+      const Joint &joint,
       const Eigen::Matrix3d & R_joint_parent,
       const Eigen::Vector3d & r_parent_joint,
       const std::string& body_name,
       double body_mass,
       const Eigen::Vector3d & body_center_of_mass,
       const Eigen::Matrix3d & body_rotational_inertia,
-      const Eigen::Vector3d & joint_axis=axisX(),
       int dof_index=-1);
   Status write();
-private:
+ private:
   // returns [1.; 0.; 0.]
   static Eigen::Vector3d axisX();
   RobotBuilderP * const pimpl_;

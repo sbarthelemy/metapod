@@ -125,7 +125,7 @@ Status addSubTree(
   // add root itself
   // convert the joint
   boost::shared_ptr<urdf::Joint> jnt = root->parent_joint;
-  unsigned int metapod_joint_type;
+  boost::shared_ptr<metapod::RobotBuilder::Joint> metapod_joint;
   switch (jnt->type) {
     case urdf::Joint::REVOLUTE:
     case urdf::Joint::CONTINUOUS: {
@@ -133,26 +133,27 @@ Status addSubTree(
           jnt->axis.x == 1. && jnt->axis.y == 0. && jnt->axis.z == 0.) {
         logInform("Adding joint '%s' as a REVOLUTE_AXIS_X joint",
                   jnt->name.c_str());
-        metapod_joint_type = metapod::RobotBuilder::REVOLUTE_AXIS_X;
+        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisXJoint());
       } else if (prefer_fixed_axis &&
                  jnt->axis.x == 0. && jnt->axis.y == 1. && jnt->axis.z == 0.) {
         logInform("Adding joint '%s' as a REVOLUTE_AXIS_Y joint",
                   jnt->name.c_str());
-        metapod_joint_type = metapod::RobotBuilder::REVOLUTE_AXIS_Y;
+        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisYJoint());
       } else if (prefer_fixed_axis &&
                  jnt->axis.x == 0. && jnt->axis.y == 0. && jnt->axis.z == 1.) {
         logInform("Adding joint '%s' as a REVOLUTE_AXIS_Z joint",
                   jnt->name.c_str());
-        metapod_joint_type = metapod::RobotBuilder::REVOLUTE_AXIS_Z;
+        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisZJoint());
       } else {
         logInform("Adding joint '%s' as a REVOLUTE_AXIS_ANY joint",
                   jnt->name.c_str());
-        metapod_joint_type = metapod::RobotBuilder::REVOLUTE_AXIS_ANY;
+        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisAnyJoint(
+                              toEigen(jnt->axis)));
       }
       break;
     }
     case urdf::Joint::FLOATING: {
-      metapod_joint_type = metapod::RobotBuilder::FREE_FLYER;
+      metapod_joint.reset(new metapod::RobotBuilder::FreeFlyerJoint());
       logInform("Adding joint '%s' as a FREE_FLYER joint", jnt->name.c_str());
       break;
     }
@@ -190,14 +191,13 @@ Status addSubTree(
   Status status = builder.addLink(
       has_parent ? parent_body_name : std::string("NP"),
       jnt->name,
-      metapod_joint_type,
+      *metapod_joint,
       toEigen(jnt->parent_to_joint_origin_transform.rotation).transpose(), // R_joint_parent
       toEigen(jnt->parent_to_joint_origin_transform.position), // r_parent_joint
       root->name,
       mass,
       center_of_mass,
       rotational_inertia,
-      toEigen(jnt->axis),
       dof_index);
   if (status == STATUS_FAILURE)
     return STATUS_FAILURE;

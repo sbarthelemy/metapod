@@ -60,27 +60,25 @@ RobotBuilder::Status RobotBuilder::set_license(const std::string& text)
 RobotBuilder::Status RobotBuilder::addLink(
     const std::string& parent_body_name,
     const std::string& joint_name,
-    unsigned int joint_type,
+    const Joint &joint,
     const Eigen::Matrix3d & joint_Xt_E,
     const Eigen::Vector3d & joint_Xt_r,
     const std::string& body_name,
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
     const Eigen::Matrix3d & body_rotational_inertia,
-    const Eigen::Vector3d & joint_axis,
     int dof_index)
 {
   return pimpl_->addLink(
     parent_body_name,
     joint_name,
-    joint_type,
+    joint,
     joint_Xt_E,
     joint_Xt_r,
     body_name,
     body_mass,
     body_center_of_mass,
     body_rotational_inertia,
-    joint_axis,
     dof_index);
 }
 

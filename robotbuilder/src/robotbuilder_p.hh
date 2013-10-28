@@ -36,11 +36,11 @@ class RobotBuilderP
 public:
   RobotBuilderP();
   ~RobotBuilderP();
-  RobotBuilder::Status set_name(const std::string& name);
-  RobotBuilder::Status set_libname(const std::string& libname);
-  RobotBuilder::Status set_directory(const std::string& directory);
+  RobotBuilder::Status set_name(const std::string &name);
+  RobotBuilder::Status set_libname(const std::string &libname);
+  RobotBuilder::Status set_directory(const std::string &directory);
   RobotBuilder::Status set_use_dof_index(bool);
-  RobotBuilder::Status set_license(const std::string& text);
+  RobotBuilder::Status set_license(const std::string &text);
   RobotBuilder::Status init();
 
   // R_joint_parent is the rotation matrix which converts vector from the
@@ -57,16 +57,15 @@ public:
   // has been called. In such a case, consistent dof indexes should be provided
   // for each link.
   RobotBuilder::Status addLink(
-      const std::string& parent_body_name,
-      const std::string& joint_name,
-      unsigned int joint_type,
-      const Eigen::Matrix3d & R_joint_parent,
-      const Eigen::Vector3d & r_parent_joint,
+      const std::string &parent_body_name,
+      const std::string &joint_name,
+      const RobotBuilder::Joint &joint,
+      const Eigen::Matrix3d &R_joint_parent,
+      const Eigen::Vector3d &r_parent_joint,
       const std::string& body_name,
       double body_mass,
-      const Eigen::Vector3d & body_center_of_mass,
-      const Eigen::Matrix3d & body_rotational_inertia,
-      const Eigen::Vector3d & joint_axis,
+      const Eigen::Vector3d &body_center_of_mass,
+      const Eigen::Matrix3d &body_rotational_inertia,
       int dof_index=-1);
   RobotBuilder::Status write() const;
 private:
@@ -81,12 +80,12 @@ private:
     std::ostringstream init_nodes;
     std::ostringstream init_inertias;
   };
-  void writeLink(int link_id, const ReplMap& replacements,
-                 TmpStreams& out) const;
-  void writeTemplate(const std::string& output_filename,
+  void writeLink(int link_id, const ReplMap &replacements,
+                 TmpStreams &out) const;
+  void writeTemplate(const std::string &output_filename,
                      const std::string &input_template,
-                     const ReplMap& replacements) const;
-  RobotBuilderP(const RobotBuilderP&); // forbid copy-constuction
+                     const ReplMap &replacements) const;
+  RobotBuilderP(const RobotBuilderP &); // forbid copy-constuction
   int nb_dof_;
   bool is_initialized_;
   bool use_dof_index_;

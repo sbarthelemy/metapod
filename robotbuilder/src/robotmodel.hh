@@ -21,6 +21,8 @@
 # include <string>
 # include <Eigen/Dense>
 # include <vector>
+# include <boost/shared_ptr.hpp>
+# include <metapod/robotbuilder/robotbuilder.hh>
 
 namespace metapod {
 
@@ -30,7 +32,7 @@ public:
   int id_;
   int parent_id_;
   std::string joint_name_;
-  unsigned int joint_type_;
+  boost::shared_ptr<RobotBuilder::Joint> joint_;
   Eigen::Matrix3d R_joint_parent_;
   Eigen::Vector3d r_parent_joint_;
   std::string body_name_;
@@ -45,14 +47,13 @@ public:
     int id,
     int parent_id,
     const std::string& joint_name,
-    unsigned int joint_type,
+    const RobotBuilder::Joint &joint,
     const Eigen::Matrix3d & R_joint_parent,
     const Eigen::Vector3d & r_parent_joint,
     const std::string& body_name,
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
     const Eigen::Matrix3d & body_rotational_inertia,
-    const Eigen::Vector3d & joint_axis,
     int dof_index);
 };
 
@@ -62,7 +63,7 @@ public:
   int nb_links() const; // NP does not count
   int parent_id(int link_id) const;
   const std::string& joint_name(int link_id) const;
-  int joint_type(int link_id) const;
+  const RobotBuilder::Joint &joint(int link_id) const;
   const Eigen::Matrix3d& R_joint_parent(int link_id) const;
   const Eigen::Vector3d& r_parent_joint(int link_id) const;
   const std::string& body_name(int link_id) const;

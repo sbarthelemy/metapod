@@ -54,7 +54,8 @@ void addNode(metapod::RobotBuilder & builder, int label, int parent_label)
   body_name << "B" << label;
   joint_name << "J" << label;
   builder.addLink(parent_body_name.str(),
-                  joint_name.str(), metapod::RobotBuilder::REVOLUTE_AXIS_X,
+                  joint_name.str(),
+                  metapod::RobotBuilder::RevoluteAxisXJoint(),
                   randomRotation3d(), Eigen::Vector3d::Random(),
                   body_name.str(), 1.,
                   Eigen::Vector3d::Random(), Eigen::Matrix3d::Random());

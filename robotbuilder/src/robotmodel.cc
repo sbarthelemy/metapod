@@ -47,26 +47,24 @@ Link::Link(
     int id,
     int parent_id,
     const std::string& joint_name,
-    unsigned int joint_type,
+    const RobotBuilder::Joint &joint,
     const Eigen::Matrix3d & R_joint_parent,
     const Eigen::Vector3d & r_parent_joint,
     const std::string& body_name,
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
     const Eigen::Matrix3d & body_rotational_inertia,
-    const Eigen::Vector3d & joint_axis,
     int dof_index):
   id_(id),
   parent_id_(parent_id),
   joint_name_(joint_name),
-  joint_type_(joint_type),
+  joint_(joint.clone()),
   R_joint_parent_(R_joint_parent),
   r_parent_joint_(r_parent_joint),
   body_name_(body_name),
   body_mass_(body_mass),
   body_center_of_mass_(body_center_of_mass),
   body_rotational_inertia_(body_rotational_inertia),
-  joint_axis_(joint_axis),
   dof_index_(dof_index)
 {}
 
@@ -89,10 +87,10 @@ const std::string& RobotModel::joint_name(int link_id) const
   return links_[link_id].joint_name_;
 }
 
-int RobotModel::joint_type(int link_id) const
+const RobotBuilder::Joint &RobotModel::joint(int link_id) const
 {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
-  return links_[link_id].joint_type_;
+  return *(links_[link_id].joint_);
 }
 
 const Eigen::Matrix3d& RobotModel::R_joint_parent(int link_id) const
@@ -131,12 +129,6 @@ const Eigen::Matrix3d& RobotModel::body_rotational_inertia(int link_id) const
 {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].body_rotational_inertia_;
-}
-
-const Eigen::Vector3d& RobotModel::joint_axis(int link_id) const
-{
-  assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
-  return links_[link_id].joint_axis_;
 }
 
 int RobotModel::dof_index(int link_id) const
