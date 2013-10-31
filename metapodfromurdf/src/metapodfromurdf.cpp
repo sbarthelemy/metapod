@@ -37,6 +37,11 @@ typedef metapod::RobotBuilder::Status Status;
 const Status STATUS_SUCCESS = metapod::RobotBuilder::STATUS_SUCCESS;
 const Status STATUS_FAILURE = metapod::RobotBuilder::STATUS_FAILURE;
 
+bool prefer_fixed_axis = false;
+bool add_root_floating_joint = false;
+std::string root_floating_joint_name;
+std::map<std::string, int> joint_dof_index;
+
 // Utility functions
 Eigen::Vector3d toEigen(urdf::Vector3 v)
 {
@@ -109,104 +114,138 @@ bool LinkComparer::operator()(boost::shared_ptr<urdf::Link> link0,
   }
 }
 
-// Function that recursively calls itself while traversing the URDF tree.
-Status addSubTree(
-    metapod::RobotBuilder& builder, const LinkComparer& link_comparer,
-    boost::shared_ptr<const urdf::Link> root,
-    const std::string& parent_body_name,
-    bool prefer_fixed_axis,
-    const std::map<std::string, int>& joint_dof_index,
-    bool has_parent)
+
+Status convertJoint(
+    boost::shared_ptr<const urdf::Joint> urdf_joint,
+    std::string &joint_name,
+    boost::shared_ptr<metapod::RobotBuilder::Joint> &metapod_joint,
+    Eigen::Matrix3d &joint_Xt_E, // R_joint_parent
+    Eigen::Vector3d &joint_Xt_r) // r_parent_joint
 {
-  const std::string tab("\t");
-
-  std::vector<boost::shared_ptr<urdf::Link> > children = root->child_links;
-
-  // add root itself
-  // convert the joint
-  boost::shared_ptr<urdf::Joint> jnt = root->parent_joint;
-  boost::shared_ptr<metapod::RobotBuilder::Joint> metapod_joint;
-  switch (jnt->type) {
+  joint_name = urdf_joint->name;
+  switch (urdf_joint->type) {
     case urdf::Joint::REVOLUTE:
     case urdf::Joint::CONTINUOUS: {
-      if (prefer_fixed_axis &&
-          jnt->axis.x == 1. && jnt->axis.y == 0. && jnt->axis.z == 0.) {
-        logInform("Adding joint '%s' as a REVOLUTE_AXIS_X joint",
-                  jnt->name.c_str());
-        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisXJoint());
-      } else if (prefer_fixed_axis &&
-                 jnt->axis.x == 0. && jnt->axis.y == 1. && jnt->axis.z == 0.) {
-        logInform("Adding joint '%s' as a REVOLUTE_AXIS_Y joint",
-                  jnt->name.c_str());
-        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisYJoint());
-      } else if (prefer_fixed_axis &&
-                 jnt->axis.x == 0. && jnt->axis.y == 0. && jnt->axis.z == 1.) {
-        logInform("Adding joint '%s' as a REVOLUTE_AXIS_Z joint",
-                  jnt->name.c_str());
-        metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisZJoint());
+      if (prefer_fixed_axis) {
+        if (urdf_joint->axis.x == 1. &&
+            urdf_joint->axis.y == 0. &&
+            urdf_joint->axis.z == 0.) {
+          logInform("Adding joint '%s' as a REVOLUTE_AXIS_X joint",
+                    urdf_joint->name.c_str());
+          metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisXJoint());
+        } else if (urdf_joint->axis.x == 0. &&
+                   urdf_joint->axis.y == 1. &&
+                   urdf_joint->axis.z == 0.) {
+          logInform("Adding joint '%s' as a REVOLUTE_AXIS_Y joint",
+                    urdf_joint->name.c_str());
+          metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisYJoint());
+        } else if (urdf_joint->axis.x == 0. &&
+                   urdf_joint->axis.y == 0. &&
+                   urdf_joint->axis.z == 1.) {
+          logInform("Adding joint '%s' as a REVOLUTE_AXIS_Z joint",
+                    urdf_joint->name.c_str());
+          metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisZJoint());
+        }
       } else {
         logInform("Adding joint '%s' as a REVOLUTE_AXIS_ANY joint",
-                  jnt->name.c_str());
+                  urdf_joint->name.c_str());
         metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisAnyJoint(
-                              toEigen(jnt->axis)));
+                            toEigen(urdf_joint->axis)));
       }
       break;
     }
     case urdf::Joint::FLOATING: {
       metapod_joint.reset(new metapod::RobotBuilder::FreeFlyerJoint());
-      logInform("Adding joint '%s' as a FREE_FLYER joint", jnt->name.c_str());
+      logInform("Adding joint '%s' as a FREE_FLYER joint",
+                urdf_joint->name.c_str());
       break;
     }
     default: {
-      logError("Joint '%s' is of unknown type", jnt->name.c_str());
+      logError("Joint '%s' is of unknown type", urdf_joint->name.c_str());
       return STATUS_FAILURE;
       break;
     }
   }
-  // constructs the optional inertia
-  double mass = 1.;
-  Eigen::Vector3d center_of_mass = Eigen::Vector3d::Zero();
-  Eigen::Matrix3d rotational_inertia = Eigen::Matrix3d::Identity();
-  if (root->inertial) {
-    mass = root->inertial->mass; // TODO: check mass >0
-    urdf::Pose& p = root->inertial->origin;
-    center_of_mass = toEigen(p.position);
-    // metapod expects the rotational inertia in a frame aligned with the frame
-    // of the link, but with origin at center of mass
-    // urdf specifies it in a frame whose origin is the link center of mass,
-    // and whose basis is arbitrary
-    // So, let's rotate it! (Yeah!)
-    Eigen::Matrix3d R = toEigen(p.rotation);
-    Eigen::Matrix3d tmp;
-    tmp << root->inertial->ixx, root->inertial->ixy, root->inertial->ixz,
-      root->inertial->ixy, root->inertial->iyy, root->inertial->iyz,
-      root->inertial->ixz, root->inertial->iyz, root->inertial->izz;
-    rotational_inertia.noalias() = R * tmp * R.transpose();
-  }
-  int dof_index = -1;
-  std::map<std::string, int>::const_iterator it =
-    joint_dof_index.find(jnt->name);
-  if (it != joint_dof_index.end())
-    dof_index = it->second;
-  Status status = builder.addLink(
-      has_parent ? parent_body_name : std::string("NP"),
-      jnt->name,
-      *metapod_joint,
-      toEigen(jnt->parent_to_joint_origin_transform.rotation).transpose(), // R_joint_parent
-      toEigen(jnt->parent_to_joint_origin_transform.position), // r_parent_joint
-      root->name,
-      mass,
-      center_of_mass,
-      rotational_inertia,
-      dof_index);
-  if (status == STATUS_FAILURE)
-    return STATUS_FAILURE;
+  joint_Xt_E = toEigen(
+        urdf_joint->parent_to_joint_origin_transform.rotation).transpose();
+  joint_Xt_r = toEigen(urdf_joint->parent_to_joint_origin_transform.position);
+  return STATUS_SUCCESS;
+}
 
+// Function that recursively calls itself while traversing the URDF tree.
+Status addSubTree(
+    metapod::RobotBuilder& builder, const LinkComparer& link_comparer,
+    boost::shared_ptr<const urdf::Link> root,
+    const std::string& parent_body_name)
+{
+  Status status;
+  // data for the new metapod joint
+  boost::shared_ptr<metapod::RobotBuilder::Joint> metapod_joint;
+  std::string joint_name;
+  Eigen::Matrix3d joint_Xt_E = Eigen::Matrix3d::Identity(); // R_joint_parent
+  Eigen::Vector3d joint_Xt_r = Eigen::Vector3d::Zero(); // r_parent_joint
+
+  boost::shared_ptr<urdf::Joint> urdf_joint = root->parent_joint;
+  if (urdf_joint) {
+    status = convertJoint(urdf_joint,
+                          joint_name, metapod_joint, joint_Xt_E, joint_Xt_r);
+    if (status == STATUS_FAILURE)
+      return STATUS_FAILURE;
+  }
+  else if (add_root_floating_joint) {
+    // we are at the root of the urdf tree
+    metapod_joint.reset(new metapod::RobotBuilder::FreeFlyerJoint());
+    joint_name = root_floating_joint_name;
+  }
+
+  if (metapod_joint) {
+    // we have a joint to add, pick a dof idx,
+    // look for the body and add a link
+    int dof_index = -1;
+    std::map<std::string, int>::const_iterator it =
+      joint_dof_index.find(joint_name);
+    if (it != joint_dof_index.end())
+      dof_index = it->second;
+
+    // data for the inertia
+    double mass = 1.;
+    Eigen::Vector3d center_of_mass = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d rotational_inertia = Eigen::Matrix3d::Identity();
+    if (root->inertial) {
+      mass = root->inertial->mass;
+      urdf::Pose& p = root->inertial->origin;
+      center_of_mass = toEigen(p.position);
+      // metapod expects the rotational inertia in a frame aligned with the
+      //  frame of the link, but with origin at center of mass
+      // urdf specifies it in a frame whose origin is the link center of mass,
+      // and whose basis is arbitrary
+      // So, let's rotate it! (Yeah!)
+      Eigen::Matrix3d R = toEigen(p.rotation);
+      Eigen::Matrix3d tmp;
+      tmp << root->inertial->ixx, root->inertial->ixy, root->inertial->ixz,
+             root->inertial->ixy, root->inertial->iyy, root->inertial->iyz,
+             root->inertial->ixz, root->inertial->iyz, root->inertial->izz;
+      rotational_inertia.noalias() = R * tmp * R.transpose();
+    }
+    status = builder.addLink(
+        parent_body_name,
+        joint_name,
+        *metapod_joint,
+        joint_Xt_E,
+        joint_Xt_r,
+        root->name, // body name
+        mass,
+        center_of_mass,
+        rotational_inertia,
+        dof_index);
+    if (status == STATUS_FAILURE)
+      return STATUS_FAILURE;
+  }
+
+  std::vector<boost::shared_ptr<urdf::Link> > children = root->child_links;
   std::sort(children.begin(), children.end(), link_comparer);
   for (size_t i=0; i<children.size(); ++i) {
-    const bool has_parent = true;
-    status = addSubTree(builder, link_comparer,children[i], root->name,
-                        prefer_fixed_axis, joint_dof_index, has_parent);
+    status = addSubTree(builder, link_comparer,children[i], root->name);
     if (status == STATUS_FAILURE)
       return STATUS_FAILURE;
   }
@@ -215,23 +254,12 @@ Status addSubTree(
 
 Status treeFromUrdfModel(const urdf::ModelInterface& robot_model,
                          metapod::RobotBuilder& builder,
-                         const LinkComparer& link_comparer,
-                         bool prefer_fixed_axis,
-                         const std::map<std::string, int>& joint_dof_index) {
+                         const LinkComparer& link_comparer) {
   //  add all children
-  const bool has_parent = false;
-  for (size_t i=0; i<robot_model.getRoot()->child_links.size(); ++i) {
-    // TODO: what happens when there are two robots?
-    Status status = addSubTree(builder, link_comparer,
-                               robot_model.getRoot()->child_links[i],
-                               std::string("GROUND"),
-                               prefer_fixed_axis,
-                               joint_dof_index,
-                               has_parent);
-    if (status == STATUS_FAILURE)
-      return STATUS_FAILURE;
-  }
-  return STATUS_SUCCESS;
+  boost::shared_ptr<const urdf::Link> root = robot_model.getRoot();
+  return addSubTree(builder, link_comparer,
+                    root,
+                    std::string("NP"));
 }
 
 namespace po = boost::program_options;
@@ -266,7 +294,9 @@ int main(int argc, char** argv) {
     ("joint", po::value<std::vector<std::string> >(),
      "joint name, pass several of them to specify joints ordering")
     ("prefer-fixed-axis",
-     "use REVOLUTE_AXIS_X instead of REVOLUTE_AXIS_ANY when possible.");
+     "use REVOLUTE_AXIS_{X,Y,Z} instead of REVOLUTE_AXIS_ANY when possible.")
+    ("add-root-floating-joint", po::value<std::string>(),
+     "add a free floating joint to the root of the kinematic tree");
 
 
   // Hidden options, will be allowed both on command line and
@@ -291,7 +321,6 @@ int main(int argc, char** argv) {
       "Options");
   visible.add(generic).add(config);
   po::variables_map vm;
-  std::map<std::string, int> joint_dof_index;
   metapod::RobotBuilder builder;
   LinkComparer link_comparer;
   try {
@@ -317,8 +346,13 @@ int main(int argc, char** argv) {
       }
     }
     po::notify(vm);
-    if (vm.count("joint-dof-index"))
-    {
+    if (vm.count("add-root-floating-joint")) {
+      add_root_floating_joint = true;
+      root_floating_joint_name =
+          vm["add-root-floating-joint"].as<std::string>();
+    }
+
+    if (vm.count("joint-dof-index")) {
       std::vector<std::string> pairs =
         vm["joint-dof-index"].as<std::vector<std::string> >();
       for (std::vector<std::string>::const_iterator it = pairs.begin();
@@ -408,12 +442,10 @@ int main(int argc, char** argv) {
   if (vm.count("joint")) {
     link_comparer.init(vm["joint"].as<std::vector<std::string> >());
   }
-  bool prefer_fixed_axis = false;
   if (vm.count("prefer-fixed-axis")) {
     prefer_fixed_axis = true;
   }
-  Status status = treeFromUrdfModel(*robot_model, builder, link_comparer,
-                                    prefer_fixed_axis, joint_dof_index);
+  Status status = treeFromUrdfModel(*robot_model, builder, link_comparer);
   if (status == STATUS_FAILURE) {
     return STATUS_FAILURE;
   }
