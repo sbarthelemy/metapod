@@ -129,9 +129,20 @@ class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder {
   Status set_name(const std::string &name);
   Status set_libname(const std::string &libname);
   Status set_directory(const std::string &directory);
-  Status set_use_dof_index(bool);
   Status set_license(const std::string &text);
-
+  // Ensure there is a joint variable bound to the joints whose names are
+  // given, using the (optionally) provided dof_index.
+  // If no such a variable already exists, it will be created. If several
+  // variables are bound to the listed joints, they will get merged.
+  // The call will fail if several conflicting dof_indexes were requested.
+  //
+  // Note that calling this method is only needed if you want to declare
+  // joints as coupled (they will share a single joint variable) or force the
+  // dof index.
+  RobotBuilder::Status RequireJointVariable(
+      const std::vector<std::string> &joints_names,
+      unsigned int nb_dof,
+      int dof_index=-1);
   // parent_body_name: "NP" (no parent) or the parent body name
   //
   // R_joint_parent is the rotation matrix which converts vector from the
@@ -143,10 +154,6 @@ class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder {
   // frame, then p_joint is given by
   //
   //   p_joint = R_joint_parent * (p_parent - r_parent_joint)
-  //
-  // dof_index will only be taken into account if set_use_dof_index(true)
-  // has been called. In such a case, consistent dof indexes should be provided
-  // for each link.
   Status AddLink(
       const std::string &parent_body_name,
       const std::string &joint_name,
@@ -156,8 +163,7 @@ class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder {
       const std::string &body_name,
       double body_mass,
       const Eigen::Vector3d &body_center_of_mass,
-      const Eigen::Matrix3d &body_rotational_inertia,
-      int dof_index=-1);
+      const Eigen::Matrix3d &body_rotational_inertia);
   Status Write();
  private:
   // returns [1.; 0.; 0.]

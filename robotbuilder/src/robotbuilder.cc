@@ -42,12 +42,15 @@ RobotBuilder::Status RobotBuilder::set_libname(const std::string & libname) {
   return pimpl_->set_libname(libname);
 }
 
-RobotBuilder::Status RobotBuilder::set_use_dof_index(bool flag) {
-  return pimpl_->set_use_dof_index(flag);
-}
-
 RobotBuilder::Status RobotBuilder::set_license(const std::string& text) {
   return pimpl_->set_license(text);
+}
+
+RobotBuilder::Status RobotBuilder::RequireJointVariable(
+    const std::vector<std::string> &joints_names,
+    unsigned int nb_dof,
+    int dof_index) {
+  return pimpl_->RequireJointVariable(joints_names, nb_dof, dof_index);
 }
 
 RobotBuilder::Status RobotBuilder::AddLink(
@@ -59,8 +62,7 @@ RobotBuilder::Status RobotBuilder::AddLink(
     const std::string& body_name,
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
-    const Eigen::Matrix3d & body_rotational_inertia,
-    int dof_index) {
+    const Eigen::Matrix3d & body_rotational_inertia) {
   return pimpl_->AddLink(
     parent_body_name,
     joint_name,
@@ -70,8 +72,7 @@ RobotBuilder::Status RobotBuilder::AddLink(
     body_name,
     body_mass,
     body_center_of_mass,
-    body_rotational_inertia,
-    dof_index);
+    body_rotational_inertia);
 }
 
 RobotBuilder::Status RobotBuilder::Write() {

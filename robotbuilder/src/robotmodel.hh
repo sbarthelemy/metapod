@@ -21,6 +21,7 @@
 # include <string>
 # include <Eigen/Dense>
 # include <vector>
+# include <set>
 # include <boost/shared_ptr.hpp>
 # include <metapod/robotbuilder/robotbuilder.hh>
 
@@ -39,7 +40,6 @@ class Link {
   Eigen::Vector3d body_center_of_mass_;
   Eigen::Matrix3d body_rotational_inertia_;
   Eigen::Vector3d joint_axis_;
-  int dof_index_;
   std::vector<int> child_id_; // children
 
   Link(
@@ -52,9 +52,20 @@ class Link {
     const std::string& body_name,
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
-    const Eigen::Matrix3d & body_rotational_inertia,
-    int dof_index);
+    const Eigen::Matrix3d & body_rotational_inertia);
 };
+
+class Variable {
+ public:
+  std::set<std::string> joint_names;
+  unsigned int nb_dof;
+  int dof_index;
+  Variable(const std::set<std::string> &joint_names, unsigned int nb_dof,
+           int dof_index=-1);
+  Variable(const std::vector<std::string> &joint_names, unsigned int nb_dof,
+           int dof_index=-1);
+};
+
 
 class RobotModel {
  public:
@@ -69,16 +80,31 @@ class RobotModel {
   const Eigen::Vector3d &body_center_of_mass(int link_id) const;
   const Eigen::Matrix3d &body_rotational_inertia(int link_id) const;
   const Eigen::Vector3d &joint_axis(int link_id) const;
-  int dof_index(int link_id) const;
   int nb_children(int link_id) const;
   int child_id(int link_id, unsigned int rank) const;
+  bool RequireVariable(const std::vector<std::string> &joint_names,
+                       unsigned int nb_dof, int dof_index=-1);
+  // return the number of degrees of freedom of the joint variable bound to the
+  // joint, or -1 if the joint is not found
+  int nb_dof(const std::string &joint_name) const;
+  int dof_index(const std::string &joint_name) const;
+  int dof_index(int link_id) const;
+  // return the number of degrees of freedom of all the joint variables
+  unsigned int nb_dof() const;
+  bool FindVariableByJointName(const std::string &name) const;
   void AddLink(const Link &link);
   int FindLinkByBodyName(const std::string &name) const;
   int FindLinkByJointName(const std::string &name) const;
+  // For all joint variables, where dof_index==-1, assign a dof_index.
+  // Could fail if the dof indexes it chooses overlap. In such a case the user
+  // Can add the variable in another order or set the dof_index explicitly.
+  // Retrun true in case of success
+  bool AssignDofIndexes();
 
  private:
   std::vector<int> roots_id_;
   std::vector<Link> links_; // link_id -> Link mapping
+  std::vector<Variable> variables_;
 };
 
 }

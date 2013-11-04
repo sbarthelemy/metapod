@@ -199,14 +199,15 @@ Status AddSubTree(
   }
 
   if (metapod_joint) {
-    // we have a joint to add, pick a dof idx,
-    // look for the body and add a link
-    int dof_index = -1;
+    // we have a joint to add
     std::map<std::string, int>::const_iterator it =
       joint_dof_index.find(joint_name);
-    if (it != joint_dof_index.end())
-      dof_index = it->second;
-
+    if (it != joint_dof_index.end() && it->second !=-1) {
+      // a specific dof_index was required, add a joint variable bound to this
+      // joint_index
+      builder.RequireJointVariable(std::vector<std::string>(1, joint_name),
+                                   metapod_joint->nb_dof(), it->second);
+    }
     // data for the inertia
     double mass = 1.;
     Eigen::Vector3d center_of_mass = Eigen::Vector3d::Zero();
@@ -236,8 +237,7 @@ Status AddSubTree(
         root->name, // body name
         mass,
         center_of_mass,
-        rotational_inertia,
-        dof_index);
+        rotational_inertia);
     if (status == STATUS_FAILURE)
       return STATUS_FAILURE;
   }
@@ -366,7 +366,6 @@ int main(int argc, char** argv) {
         }
         joint_dof_index[tokens[0]] = value;
       }
-      builder.set_use_dof_index(true);
     }
   }
   catch(boost::program_options::error) {

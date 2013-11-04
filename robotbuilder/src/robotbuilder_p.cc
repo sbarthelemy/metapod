@@ -164,9 +164,7 @@ extern "C" const size_t init_cc_len;
 namespace metapod {
 
 RobotBuilderP::RobotBuilderP()
-    : nb_dof_(0),
-      is_initialized_(false),
-      use_dof_index_(false),
+    : is_initialized_(false),
       root_body_name_("NP")
 {}
 
@@ -201,18 +199,6 @@ RobotBuilder::Status RobotBuilderP::set_libname(const std::string &name) {
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::set_use_dof_index(bool flag) {
-  if (is_initialized_)
-    {
-      std::cerr
-        << "ERROR: one cannot call set_use_dof_index() after having called"
-        << " addLink()" << std::endl;
-      return RobotBuilder::STATUS_FAILURE;
-    }
-  use_dof_index_ = flag;
-  return RobotBuilder::STATUS_SUCCESS;
-}
-
 RobotBuilder::Status
 RobotBuilderP::set_root_body_name(const std::string &name) {
   if (is_initialized_) {
@@ -242,11 +228,19 @@ void RobotBuilderP::WriteTemplate(const std::string &output_filename,
   output_stream.close();
 }
 
-
 RobotBuilder::Status RobotBuilderP::Init() {
   assert(!is_initialized_);
   is_initialized_ = true;
   return RobotBuilder::STATUS_SUCCESS;
+}
+
+RobotBuilder::Status RobotBuilderP::RequireJointVariable(
+    const std::vector<std::string> &joints_names,
+    unsigned int nb_dof,
+    int dof_index) {
+  if (model_.RequireVariable(joints_names, nb_dof, dof_index))
+    return RobotBuilder::STATUS_SUCCESS;
+  return RobotBuilder::STATUS_FAILURE;
 }
 
 RobotBuilder::Status RobotBuilderP::AddLink(
@@ -258,8 +252,7 @@ RobotBuilder::Status RobotBuilderP::AddLink(
     const std::string &body_name,
     double body_mass,
     const Eigen::Vector3d &body_center_of_mass,
-    const Eigen::Matrix3d &body_rotational_inertia,
-    int dof_index) {
+    const Eigen::Matrix3d &body_rotational_inertia) {
   if (!is_initialized_) {
     RobotBuilder::Status status = Init();
     if (status == RobotBuilder::STATUS_FAILURE)
@@ -323,19 +316,11 @@ RobotBuilder::Status RobotBuilderP::AddLink(
         << " joints." << std::endl;
     return RobotBuilder::STATUS_FAILURE;
     }
-
-  // deal with joint_index
-  int joint_position_in_conf = -1;
-  if (use_dof_index_) {
-    if (dof_index < 0) {
-      std::cerr
-          << "ERROR: dof_index for joint '" << joint_name << "' is inconsitent"
-          << std::endl;
-          return RobotBuilder::STATUS_FAILURE;
-    }
-    joint_position_in_conf = dof_index;
-  } else {
-    joint_position_in_conf = nb_dof_;
+  // ensure there is a joint variable for this joint
+  bool ok = model_.RequireVariable(std::vector<std::string>(1, joint_name),
+                                   joint.nb_dof());
+  if (!ok) {
+    return RobotBuilder::STATUS_FAILURE;
   }
   // add the link for real
   int link_id = model_.nb_links();
@@ -348,9 +333,7 @@ RobotBuilder::Status RobotBuilderP::AddLink(
                       body_name,
                       body_mass,
                       body_center_of_mass,
-                      body_rotational_inertia,
-                      joint_position_in_conf));
-  nb_dof_ += joint.nb_dof();
+                      body_rotational_inertia));
   return RobotBuilder::STATUS_SUCCESS;
 }
 
@@ -464,7 +447,7 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
   out.init_inertias << tpl5.Format(repl);
 }
 
-RobotBuilder::Status RobotBuilderP::Write() const
+RobotBuilder::Status RobotBuilderP::Write()
 {
   if (!is_initialized_) {
     std::cerr
@@ -484,6 +467,13 @@ RobotBuilder::Status RobotBuilderP::Write() const
     std::cerr
         << "ERROR: the robot library name has not been provided."
         << std::endl;
+    return RobotBuilder::STATUS_FAILURE;
+  }
+  if (!model_.AssignDofIndexes()) {
+    std::cerr
+        << "ERROR: could not assign dof indexes to the joints."
+        << "Try adding the joint variables in another order or set the dof"
+        << " indexes explicitly." << std::endl;
     return RobotBuilder::STATUS_FAILURE;
   }
 
@@ -508,7 +498,7 @@ RobotBuilder::Status RobotBuilderP::Write() const
   repl["ROBOT_CLASS_NAME"] = name_;
   repl["ROBOT_NAME"] = name_;
   repl["LICENSE"] = license_;
-  repl["ROBOT_NB_DOF"] = ::to_string(nb_dof_);
+  repl["ROBOT_NB_DOF"] = ::to_string(model_.nb_dof());
   repl["ROBOT_NB_BODIES"] = ::to_string(model_.nb_links());
 
   // add the links to the temporary streams

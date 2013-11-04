@@ -38,11 +38,22 @@ class RobotBuilderP {
   RobotBuilder::Status set_name(const std::string &name);
   RobotBuilder::Status set_libname(const std::string &libname);
   RobotBuilder::Status set_directory(const std::string &directory);
-  RobotBuilder::Status set_use_dof_index(bool);
   RobotBuilder::Status set_root_body_name(const std::string &name);
   RobotBuilder::Status set_license(const std::string &text);
   RobotBuilder::Status Init();
-
+  // Ensure there is a joint variable bound to the joints whose names are
+  // given, using the (optionally) provided dof_index.
+  // If no such a variable already exists, it will be created. If several
+  // variables are bound to the listed joints, they will get merged.
+  // The call will fail if several conflicting dof_indexes were requested.
+  //
+  // Note that calling this method is only needed if you want to declare
+  // joints as coupled (they will share a single joint variable) or force the
+  // dof index.
+  RobotBuilder::Status RequireJointVariable(
+      const std::vector<std::string> &joints_names,
+      unsigned int nb_dof,
+      int dof_index=-1);
   // R_joint_parent is the rotation matrix which converts vector from the
   // parent body frame to the joint frame coordinate systems.
   // r_parent_joint is a 3D vector giving the position of the joint frame
@@ -52,10 +63,6 @@ class RobotBuilderP {
   // frame, then p_joint is given by
   //
   //   p_joint = R_joint_parent * (p_parent - r_parent_joint)
-  //
-  // dof_index will only be taken into account if set_use_dof_index(true)
-  // has been called. In such a case, consistent dof indexes should be provided
-  // for each link.
   RobotBuilder::Status AddLink(
       const std::string &parent_body_name,
       const std::string &joint_name,
@@ -65,9 +72,8 @@ class RobotBuilderP {
       const std::string &body_name,
       double body_mass,
       const Eigen::Vector3d &body_center_of_mass,
-      const Eigen::Matrix3d &body_rotational_inertia,
-      int dof_index=-1);
-  RobotBuilder::Status Write() const;
+      const Eigen::Matrix3d &body_rotational_inertia);
+  RobotBuilder::Status Write();
 
  private:
   typedef std::map<std::string, std::string> ReplMap;
@@ -87,9 +93,7 @@ class RobotBuilderP {
                      const std::string &input_template,
                      const ReplMap &replacements) const;
   RobotBuilderP(const RobotBuilderP &); // forbid copy-constuction
-  int nb_dof_;
   bool is_initialized_;
-  bool use_dof_index_;
   RobotModel model_;
   std::string name_;
   std::string libname_;
