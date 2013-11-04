@@ -20,44 +20,37 @@
 
 namespace metapod {
 
-RobotBuilder::RobotBuilder()
-  : pimpl_(new RobotBuilderP())
-{}
+RobotBuilder::RobotBuilder() : pimpl_(new RobotBuilderP()) {}
 
 // For pimpl, we need the destructor to be defined (even empty) here (ie.after
 // the declaration of the private implementation).
 // Note that a compiler-generated destructor would not be.
-RobotBuilder::~RobotBuilder()
-{
+RobotBuilder::~RobotBuilder() {
   delete pimpl_;
 }
 
-RobotBuilder::Status RobotBuilder::set_directory(const std::string & directory)
-{
+RobotBuilder::Status
+RobotBuilder::set_directory(const std::string & directory) {
   return pimpl_->set_directory(directory);
 }
 
-RobotBuilder::Status RobotBuilder::set_name(const std::string & name)
-{
+RobotBuilder::Status RobotBuilder::set_name(const std::string & name) {
   return pimpl_->set_name(name);
 }
 
-RobotBuilder::Status RobotBuilder::set_libname(const std::string & libname)
-{
+RobotBuilder::Status RobotBuilder::set_libname(const std::string & libname) {
   return pimpl_->set_libname(libname);
 }
 
-RobotBuilder::Status RobotBuilder::set_use_dof_index(bool flag)
-{
+RobotBuilder::Status RobotBuilder::set_use_dof_index(bool flag) {
   return pimpl_->set_use_dof_index(flag);
 }
 
-RobotBuilder::Status RobotBuilder::set_license(const std::string& text)
-{
+RobotBuilder::Status RobotBuilder::set_license(const std::string& text) {
   return pimpl_->set_license(text);
 }
 
-RobotBuilder::Status RobotBuilder::addLink(
+RobotBuilder::Status RobotBuilder::AddLink(
     const std::string& parent_body_name,
     const std::string& joint_name,
     const Joint &joint,
@@ -67,9 +60,8 @@ RobotBuilder::Status RobotBuilder::addLink(
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
     const Eigen::Matrix3d & body_rotational_inertia,
-    int dof_index)
-{
-  return pimpl_->addLink(
+    int dof_index) {
+  return pimpl_->AddLink(
     parent_body_name,
     joint_name,
     joint,
@@ -82,13 +74,11 @@ RobotBuilder::Status RobotBuilder::addLink(
     dof_index);
 }
 
-RobotBuilder::Status RobotBuilder::write()
-{
-  return pimpl_->write();
+RobotBuilder::Status RobotBuilder::Write() {
+  return pimpl_->Write();
 }
 
-Eigen::Vector3d RobotBuilder::axisX()
-{
+Eigen::Vector3d RobotBuilder::axisX() {
   Eigen::Vector3d v = Eigen::Vector3d::Zero();
   v[0] = 1.;
   return v;

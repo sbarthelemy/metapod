@@ -30,22 +30,24 @@ namespace metapod {
 //  std::map<std::string, std::string> repl;
 //  repl["name"] = "world";
 //  repl["mood"] = std::string("lucky");
-//  std::cout << tt.format(repl) << std::endl;
-//  tt.format(repl, std::cout);
+//  std::cout << tt.Format(repl) << std::endl;
+//  tt.Format(repl, std::cout);
 //  std::cout << std::endl;
-class TxtTemplate
-{
-typedef std::map<std::string, std::string> map;
-public:
+class TxtTemplate {
+ private:
+  typedef std::map<std::string, std::string> map;
+
+ public:
   TxtTemplate();
   TxtTemplate(const std::string& template_text);
   TxtTemplate(const char *template_text, size_t template_text_len);
   TxtTemplate(const char *template_text);
   TxtTemplate(const TxtTemplate&);
   ~TxtTemplate();
-  void format(const map& repl, std::ostream& out) const;
-  std::string format(const map& repl) const;
-private:
+  void Format(const map& repl, std::ostream& out) const;
+  std::string Format(const map& repl) const;
+
+ private:
   const std::string tmpl_;
 };
 }

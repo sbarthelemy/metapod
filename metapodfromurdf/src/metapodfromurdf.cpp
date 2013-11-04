@@ -43,12 +43,12 @@ std::string root_floating_joint_name;
 std::map<std::string, int> joint_dof_index;
 
 // Utility functions
-Eigen::Vector3d toEigen(urdf::Vector3 v)
+Eigen::Vector3d ToEigen(urdf::Vector3 v)
 {
   return Eigen::Vector3d(v.x, v.y, v.z);
 }
 
-Eigen::Matrix3d toEigen(urdf::Rotation q, double epsilon = 1e-16)
+Eigen::Matrix3d ToEigen(urdf::Rotation q, double epsilon = 1e-16)
 {
   Eigen::Quaterniond tmp_q(q.w, q.x, q.y, q.z);
   Eigen::Matrix3d R;
@@ -70,7 +70,7 @@ class LinkComparer
 {
 public:
   LinkComparer();
-  Status init(const std::vector<std::string>& joint_names);
+  Status Init(const std::vector<std::string>& joint_names);
   // Returns true when link0 sorts before link1
   bool operator()(boost::shared_ptr<urdf::Link> link0,
                   boost::shared_ptr<urdf::Link> link1);
@@ -80,7 +80,7 @@ private:
 
 LinkComparer::LinkComparer() {}
 
-Status LinkComparer::init(const std::vector<std::string>& joint_names)
+Status LinkComparer::Init(const std::vector<std::string>& joint_names)
 {
   // TODO: check joint_names has no dupe
   joint_ordering_ = joint_names;
@@ -115,7 +115,7 @@ bool LinkComparer::operator()(boost::shared_ptr<urdf::Link> link0,
 }
 
 
-Status convertJoint(
+Status ConvertJoint(
     boost::shared_ptr<const urdf::Joint> urdf_joint,
     std::string &joint_name,
     boost::shared_ptr<metapod::RobotBuilder::Joint> &metapod_joint,
@@ -150,7 +150,7 @@ Status convertJoint(
         logInform("Adding joint '%s' as a REVOLUTE_AXIS_ANY joint",
                   urdf_joint->name.c_str());
         metapod_joint.reset(new metapod::RobotBuilder::RevoluteAxisAnyJoint(
-                            toEigen(urdf_joint->axis)));
+                            ToEigen(urdf_joint->axis)));
       }
       break;
     }
@@ -166,14 +166,14 @@ Status convertJoint(
       break;
     }
   }
-  joint_Xt_E = toEigen(
+  joint_Xt_E = ToEigen(
         urdf_joint->parent_to_joint_origin_transform.rotation).transpose();
-  joint_Xt_r = toEigen(urdf_joint->parent_to_joint_origin_transform.position);
+  joint_Xt_r = ToEigen(urdf_joint->parent_to_joint_origin_transform.position);
   return STATUS_SUCCESS;
 }
 
 // Function that recursively calls itself while traversing the URDF tree.
-Status addSubTree(
+Status AddSubTree(
     metapod::RobotBuilder& builder, const LinkComparer& link_comparer,
     boost::shared_ptr<const urdf::Link> root,
     const std::string& parent_body_name)
@@ -187,7 +187,7 @@ Status addSubTree(
 
   boost::shared_ptr<urdf::Joint> urdf_joint = root->parent_joint;
   if (urdf_joint) {
-    status = convertJoint(urdf_joint,
+    status = ConvertJoint(urdf_joint,
                           joint_name, metapod_joint, joint_Xt_E, joint_Xt_r);
     if (status == STATUS_FAILURE)
       return STATUS_FAILURE;
@@ -214,20 +214,20 @@ Status addSubTree(
     if (root->inertial) {
       mass = root->inertial->mass;
       urdf::Pose& p = root->inertial->origin;
-      center_of_mass = toEigen(p.position);
+      center_of_mass = ToEigen(p.position);
       // metapod expects the rotational inertia in a frame aligned with the
       //  frame of the link, but with origin at center of mass
       // urdf specifies it in a frame whose origin is the link center of mass,
       // and whose basis is arbitrary
       // So, let's rotate it! (Yeah!)
-      Eigen::Matrix3d R = toEigen(p.rotation);
+      Eigen::Matrix3d R = ToEigen(p.rotation);
       Eigen::Matrix3d tmp;
       tmp << root->inertial->ixx, root->inertial->ixy, root->inertial->ixz,
              root->inertial->ixy, root->inertial->iyy, root->inertial->iyz,
              root->inertial->ixz, root->inertial->iyz, root->inertial->izz;
       rotational_inertia.noalias() = R * tmp * R.transpose();
     }
-    status = builder.addLink(
+    status = builder.AddLink(
         parent_body_name,
         joint_name,
         *metapod_joint,
@@ -245,21 +245,11 @@ Status addSubTree(
   std::vector<boost::shared_ptr<urdf::Link> > children = root->child_links;
   std::sort(children.begin(), children.end(), link_comparer);
   for (size_t i=0; i<children.size(); ++i) {
-    status = addSubTree(builder, link_comparer,children[i], root->name);
+    status = AddSubTree(builder, link_comparer,children[i], root->name);
     if (status == STATUS_FAILURE)
       return STATUS_FAILURE;
   }
   return STATUS_SUCCESS;
-}
-
-Status treeFromUrdfModel(const urdf::ModelInterface& robot_model,
-                         metapod::RobotBuilder& builder,
-                         const LinkComparer& link_comparer) {
-  //  add all children
-  boost::shared_ptr<const urdf::Link> root = robot_model.getRoot();
-  return addSubTree(builder, link_comparer,
-                    root,
-                    std::string("NP"));
 }
 
 namespace po = boost::program_options;
@@ -440,14 +430,15 @@ int main(int argc, char** argv) {
     }
   }
   if (vm.count("joint")) {
-    link_comparer.init(vm["joint"].as<std::vector<std::string> >());
+    link_comparer.Init(vm["joint"].as<std::vector<std::string> >());
   }
   if (vm.count("prefer-fixed-axis")) {
     prefer_fixed_axis = true;
   }
-  Status status = treeFromUrdfModel(*robot_model, builder, link_comparer);
-  if (status == STATUS_FAILURE) {
+  Status status = AddSubTree(builder, link_comparer,
+                             robot_model->getRoot(),
+                             std::string("NP"));
+  if (status == STATUS_FAILURE)
     return STATUS_FAILURE;
-  }
-  return builder.write();
+  return builder.Write();
 }

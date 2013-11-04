@@ -26,9 +26,8 @@
 
 namespace metapod {
 
-class Link
-{
-public:
+class Link {
+ public:
   int id_;
   int parent_id_;
   std::string joint_name_;
@@ -57,28 +56,27 @@ public:
     int dof_index);
 };
 
-class RobotModel
-{
-public:
+class RobotModel {
+ public:
   int nb_links() const; // root body (mass-less galilean frame) does not count
   int parent_id(int link_id) const;
-  const std::string& joint_name(int link_id) const;
+  const std::string &joint_name(int link_id) const;
   const RobotBuilder::Joint &joint(int link_id) const;
-  const Eigen::Matrix3d& R_joint_parent(int link_id) const;
-  const Eigen::Vector3d& r_parent_joint(int link_id) const;
-  const std::string& body_name(int link_id) const;
+  const Eigen::Matrix3d &R_joint_parent(int link_id) const;
+  const Eigen::Vector3d &r_parent_joint(int link_id) const;
+  const std::string &body_name(int link_id) const;
   double body_mass(int link_id) const;
-  const Eigen::Vector3d& body_center_of_mass(int link_id) const;
-  const Eigen::Matrix3d& body_rotational_inertia(int link_id) const;
-  const Eigen::Vector3d& joint_axis(int link_id) const;
+  const Eigen::Vector3d &body_center_of_mass(int link_id) const;
+  const Eigen::Matrix3d &body_rotational_inertia(int link_id) const;
+  const Eigen::Vector3d &joint_axis(int link_id) const;
   int dof_index(int link_id) const;
   int nb_children(int link_id) const;
   int child_id(int link_id, unsigned int rank) const;
-  void add_link(const Link& link);
-  int find_link_by_body_name(const std::string& name) const;
-  int find_link_by_joint_name(const std::string& name) const;
+  void AddLink(const Link &link);
+  int FindLinkByBodyName(const std::string &name) const;
+  int FindLinkByJointName(const std::string &name) const;
 
-private:
+ private:
   std::vector<int> roots_id_;
   std::vector<Link> links_; // link_id -> Link mapping
 };

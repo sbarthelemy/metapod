@@ -5,11 +5,10 @@
 
 namespace {
 
-class CompareLinkBodyName
-{
-public:
-  CompareLinkBodyName(const std::string& name):
-      name_(name)
+class CompareLinkBodyName {
+ public:
+  CompareLinkBodyName(const std::string& name)
+      : name_(name)
   {}
   bool operator()(const metapod::Link& link)
   {
@@ -18,15 +17,15 @@ public:
     else
       return false;
   }
-private:
+
+ private:
   const std::string name_;
 };
 
-class CompareLinkJointName
-{
-public:
-  CompareLinkJointName(const std::string& name):
-      name_(name)
+class CompareLinkJointName {
+ public:
+  CompareLinkJointName(const std::string& name)
+      : name_(name)
   {}
   bool operator()(const metapod::Link& link)
   {
@@ -35,7 +34,8 @@ public:
     else
       return false;
   }
-private:
+
+ private:
   const std::string name_;
 };
 
@@ -54,97 +54,83 @@ Link::Link(
     double body_mass,
     const Eigen::Vector3d & body_center_of_mass,
     const Eigen::Matrix3d & body_rotational_inertia,
-    int dof_index):
-  id_(id),
-  parent_id_(parent_id),
-  joint_name_(joint_name),
-  joint_(joint.clone()),
-  R_joint_parent_(R_joint_parent),
-  r_parent_joint_(r_parent_joint),
-  body_name_(body_name),
-  body_mass_(body_mass),
-  body_center_of_mass_(body_center_of_mass),
-  body_rotational_inertia_(body_rotational_inertia),
-  dof_index_(dof_index)
-{}
+    int dof_index)
+    : id_(id),
+      parent_id_(parent_id),
+      joint_name_(joint_name),
+      joint_(joint.clone()),
+      R_joint_parent_(R_joint_parent),
+      r_parent_joint_(r_parent_joint),
+      body_name_(body_name),
+      body_mass_(body_mass),
+      body_center_of_mass_(body_center_of_mass),
+      body_rotational_inertia_(body_rotational_inertia),
+      dof_index_(dof_index) {}
 
 
-int RobotModel::nb_links() const
-{
+int RobotModel::nb_links() const {
   return static_cast<int>(links_.size());
 }
-int RobotModel::parent_id(int link_id) const
-{
+
+int RobotModel::parent_id(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].parent_id_;
 }
 
-const std::string& RobotModel::joint_name(int link_id) const
-{
+const std::string& RobotModel::joint_name(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].joint_name_;
 }
 
-const RobotBuilder::Joint &RobotModel::joint(int link_id) const
-{
+const RobotBuilder::Joint &RobotModel::joint(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return *(links_[link_id].joint_);
 }
 
-const Eigen::Matrix3d& RobotModel::R_joint_parent(int link_id) const
-{
+const Eigen::Matrix3d& RobotModel::R_joint_parent(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].R_joint_parent_;
 }
 
-const Eigen::Vector3d& RobotModel::r_parent_joint(int link_id) const
-{
+const Eigen::Vector3d& RobotModel::r_parent_joint(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].r_parent_joint_;
 }
 
-const std::string& RobotModel::body_name(int link_id) const
-{
+const std::string& RobotModel::body_name(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].body_name_;
 }
 
-double RobotModel::body_mass(int link_id) const
-{
+double RobotModel::body_mass(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].body_mass_;
 }
 
-const Eigen::Vector3d& RobotModel::body_center_of_mass(int link_id) const
-{
+const Eigen::Vector3d& RobotModel::body_center_of_mass(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].body_center_of_mass_;
 }
 
-const Eigen::Matrix3d& RobotModel::body_rotational_inertia(int link_id) const
-{
+const Eigen::Matrix3d& RobotModel::body_rotational_inertia(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].body_rotational_inertia_;
 }
 
-int RobotModel::dof_index(int link_id) const
-{
+int RobotModel::dof_index(int link_id) const {
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].dof_index_;
 }
 
-int RobotModel::nb_children(int link_id) const
-{
+int RobotModel::nb_children(int link_id) const {
   if (link_id == NO_PARENT)
     return static_cast<int>(roots_id_.size());
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return static_cast<int>(links_[link_id].child_id_.size());
 }
 
-int RobotModel::child_id(int link_id, unsigned int rank) const
-{
-  if (link_id == NO_PARENT)
-  {
+int RobotModel::child_id(int link_id, unsigned int rank) const {
+  if (link_id == NO_PARENT) {
     if (rank < roots_id_.size())
       return roots_id_[rank];
     return NO_CHILD;
@@ -155,8 +141,7 @@ int RobotModel::child_id(int link_id, unsigned int rank) const
   return NO_CHILD;
 }
 
-void RobotModel::add_link(const Link& link)
-{
+void RobotModel::AddLink(const Link &link) {
   // we assume the caller as filled the link with the proper id.
   // We might want to change this policy in the following way: set the id
   // ourselves and return it to the caller.
@@ -166,16 +151,13 @@ void RobotModel::add_link(const Link& link)
   assert(links_.size() < static_cast<size_t>(std::numeric_limits<int>::max()));
 
   const int parent_id = link.parent_id_;
-  if (parent_id == NO_PARENT)
-  {
+  if (parent_id == NO_PARENT) {
     // we use int as index type but store links in a std::vector which uses
     // size_t as index type. Check we won't overflow.
     assert(roots_id_.size() <
         static_cast<size_t>(std::numeric_limits<int>::max()));
     roots_id_.push_back(link.id_);
-  }
-  else
-  {
+  } else {
     assert(parent_id >= 0 && static_cast<size_t>(parent_id) < links_.size());
     // we use int as index type but store links in a std::vector which uses
     // size_t as index type. Check we won't overflow.
@@ -186,8 +168,7 @@ void RobotModel::add_link(const Link& link)
   links_.push_back(link);
 }
 
-int RobotModel::find_link_by_body_name(const std::string& name) const
-{
+int RobotModel::FindLinkByBodyName(const std::string &name) const {
   std::vector<Link>::const_iterator it =
       std::find_if(links_.begin(), links_.end(), ::CompareLinkBodyName(name));
   if (it == links_.end())
@@ -195,8 +176,7 @@ int RobotModel::find_link_by_body_name(const std::string& name) const
   return it->id_;
 }
 
-int RobotModel::find_link_by_joint_name(const std::string& name) const
-{
+int RobotModel::FindLinkByJointName(const std::string &name) const {
   std::vector<Link>::const_iterator it =
       std::find_if(links_.begin(), links_.end(), ::CompareLinkJointName(name));
   if (it == links_.end())

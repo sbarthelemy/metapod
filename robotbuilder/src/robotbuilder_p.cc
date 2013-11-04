@@ -22,30 +22,25 @@
 namespace {
 
 template <typename T>
-std::string to_string(T x)
-{
+std::string to_string(T x) {
   std::ostringstream ss;
   ss << x;
   return ss.str();
 }
 
-bool isLetter(char c)
-{
+bool IsLetter(char c) {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-bool isLetterOrNumberOrUnderscore(char c)
-{
-  return isLetter(c) || ('0' <= c && c <= '9') || ( c == '_');
+bool IsLetterOrNumberOrUnderscore(char c) {
+  return IsLetter(c) || ('0' <= c && c <= '9') || ( c == '_');
 }
 
-bool isNotLetterOrNumberOrUnderscore(char c)
-{
-  return !isLetterOrNumberOrUnderscore(c);
+bool IsNotLetterOrNumberOrUnderscore(char c) {
+  return !IsLetterOrNumberOrUnderscore(c);
 }
 
-std::set<std::string> getReservedKeywords()
-{
+std::set<std::string> GetReservedKeywords() {
   std::set<std::string> s;
   s.insert("asm");
   s.insert("auto");
@@ -126,38 +121,34 @@ std::set<std::string> getReservedKeywords()
 }
 
 static
-bool isReservedKeyword(const std::string& name)
-{
-  static const std::set<std::string> reserved_keywords(getReservedKeywords());
+bool IsReservedKeyword(const std::string &name) {
+  static const std::set<std::string> reserved_keywords(GetReservedKeywords());
   return (std::find(reserved_keywords.begin(), reserved_keywords.end(), name)
           != reserved_keywords.end());
 }
 
 static
-bool isValidIdentifier(const std::string& name)
-{
+bool IsValidIdentifier(const std::string &name) {
   return (!name.empty() &&
-          isLetter(name[0]) &&
+          IsLetter(name[0]) &&
           (std::find_if(++(name.begin()), name.end(),
-                           isNotLetterOrNumberOrUnderscore)
+                           IsNotLetterOrNumberOrUnderscore)
               == name.end()) &&
-          !isReservedKeyword(name));
+          !IsReservedKeyword(name));
 }
 
 // coin up a link/node name from joint name and body name.
 // currently simply return the body name.
 static
-std::string node_name(const std::string& /*joint_name*/,
-                      const std::string& body_name)
-{
+std::string node_name(const std::string &/*joint_name*/,
+                      const std::string &body_name) {
   return body_name;
 }
 
 static
-std::string node_name(const metapod::RobotModel& model, int link_id)
-{
+std::string node_name(const metapod::RobotModel &model, int link_id) {
   return node_name(model.joint_name(link_id),
-                     model.body_name(link_id));
+                   model.body_name(link_id));
 }
 
 // text of the template source files
@@ -173,24 +164,23 @@ extern "C" const size_t init_cc_len;
 namespace metapod {
 
 RobotBuilderP::RobotBuilderP()
-  : nb_dof_(0),
-    is_initialized_(false),
-    use_dof_index_(false),
-    root_body_name_("NP")
+    : nb_dof_(0),
+      is_initialized_(false),
+      use_dof_index_(false),
+      root_body_name_("NP")
 {}
 
 RobotBuilderP::~RobotBuilderP()
 {}
 
-RobotBuilder::Status RobotBuilderP::set_directory(const std::string & directory)
+RobotBuilder::Status RobotBuilderP::set_directory(const std::string &directory)
 {
   directory_ = directory;
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::set_name(const std::string & name)
-{
-  if (!::isValidIdentifier(name)) {
+RobotBuilder::Status RobotBuilderP::set_name(const std::string &name) {
+  if (!::IsValidIdentifier(name)) {
     std::cerr
         << "ERROR: name \"" << name << "\" is invalid."
         << std::endl;
@@ -200,9 +190,8 @@ RobotBuilder::Status RobotBuilderP::set_name(const std::string & name)
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::set_libname(const std::string& name)
-{
-  if (!::isValidIdentifier(name)) {
+RobotBuilder::Status RobotBuilderP::set_libname(const std::string &name) {
+  if (!::IsValidIdentifier(name)) {
     std::cerr
         << "ERROR: libname \"" << name << "\" is invalid."
         << std::endl;
@@ -212,79 +201,72 @@ RobotBuilder::Status RobotBuilderP::set_libname(const std::string& name)
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::set_use_dof_index(bool flag)
-{
+RobotBuilder::Status RobotBuilderP::set_use_dof_index(bool flag) {
   if (is_initialized_)
     {
       std::cerr
-        << "ERROR: one cannot call set_use_dof_index() after having called addLink()"
-        << std::endl;
+        << "ERROR: one cannot call set_use_dof_index() after having called"
+        << " addLink()" << std::endl;
       return RobotBuilder::STATUS_FAILURE;
     }
   use_dof_index_ = flag;
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::set_root_body_name(const std::string &name)
-{
+RobotBuilder::Status
+RobotBuilderP::set_root_body_name(const std::string &name) {
   if (is_initialized_) {
     std::cerr
-        << "ERROR: one cannot call set_use_dof_index() after having called addLink()"
-        << std::endl;
+        << "ERROR: one cannot call set_use_dof_index() after having called"
+        << " addLink()" << std::endl;
     return RobotBuilder::STATUS_FAILURE;
   }
   root_body_name_ = name;
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::set_license(const std::string& text)
-{
+RobotBuilder::Status RobotBuilderP::set_license(const std::string &text) {
   license_ = text;
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-void RobotBuilderP::writeTemplate(const std::string& output_filename,
-                                  const std::string& input_template,
-                                  const ReplMap &replacements) const
-{
+void RobotBuilderP::WriteTemplate(const std::string &output_filename,
+                                  const std::string &input_template,
+                                  const ReplMap &replacements) const {
   assert(is_initialized_);
   std::stringstream output_path;
   output_path << directory_ << "/" << output_filename;
   std::ofstream output_stream;
   output_stream.open(output_path.str().c_str());
-  output_stream << metapod::TxtTemplate(input_template).format(replacements);
+  output_stream << metapod::TxtTemplate(input_template).Format(replacements);
   output_stream.close();
 }
 
 
-RobotBuilder::Status RobotBuilderP::init()
-{
+RobotBuilder::Status RobotBuilderP::Init() {
   assert(!is_initialized_);
   is_initialized_ = true;
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-RobotBuilder::Status RobotBuilderP::addLink(
-    const std::string& parent_body_name,
-    const std::string& joint_name,
+RobotBuilder::Status RobotBuilderP::AddLink(
+    const std::string &parent_body_name,
+    const std::string &joint_name,
     const RobotBuilder::Joint &joint,
-    const Eigen::Matrix3d & R_joint_parent,
-    const Eigen::Vector3d & r_parent_joint,
-    const std::string& body_name,
+    const Eigen::Matrix3d &R_joint_parent,
+    const Eigen::Vector3d &r_parent_joint,
+    const std::string &body_name,
     double body_mass,
-    const Eigen::Vector3d & body_center_of_mass,
-    const Eigen::Matrix3d & body_rotational_inertia,
-    int dof_index)
-{
-
+    const Eigen::Vector3d &body_center_of_mass,
+    const Eigen::Matrix3d &body_rotational_inertia,
+    int dof_index) {
   if (!is_initialized_) {
-    RobotBuilder::Status status = init();
-    if (status == RobotBuilder::STATUS_FAILURE) {
+    RobotBuilder::Status status = Init();
+    if (status == RobotBuilder::STATUS_FAILURE)
       return RobotBuilder::STATUS_FAILURE;
-    }
   }
   // find an homonym joint
-  int joint_homonym_id = model_.find_link_by_joint_name(joint_name);
+  int joint_homonym_id = model_.FindLinkByJointName(joint_name);
   if (joint_homonym_id != NO_NODE) {
     std::cerr
         << "ERROR: there is already a joint named '" << joint_name << "'"
@@ -299,7 +281,7 @@ RobotBuilder::Status RobotBuilderP::addLink(
     return RobotBuilder::STATUS_FAILURE;
   }
   // find an homonym body
-  int body_homonym_id = model_.find_link_by_body_name(body_name);
+  int body_homonym_id = model_.FindLinkByBodyName(body_name);
   if (body_homonym_id != NO_NODE) {
     std::cerr
         << "ERROR: there is already a body named '" << body_name << "'"
@@ -308,10 +290,9 @@ RobotBuilder::Status RobotBuilderP::addLink(
   }
   // check node name is ok.
   std::string node_name = ::node_name(joint_name, body_name);
-  if (!::isValidIdentifier(node_name)) {
+  if (!::IsValidIdentifier(node_name)) {
     std::cerr
-        << "ERROR: node name \"" << node_name << "\" is invalid."
-        << std::endl;
+        << "ERROR: node name \"" << node_name << "\" is invalid." << std::endl;
     return RobotBuilder::STATUS_FAILURE;
   }
   // TODO: check joint_Xt_E is a real rotation matrix
@@ -321,71 +302,60 @@ RobotBuilder::Status RobotBuilderP::addLink(
   if (parent_body_name == root_body_name_)
     parent_id = NO_PARENT;
   else
-    parent_id = model_.find_link_by_body_name(parent_body_name);
+    parent_id = model_.FindLinkByBodyName(parent_body_name);
   if (parent_id == NO_NODE) {
     std::cerr
-        << "ERROR: could not find parent body named '" << parent_body_name << ". "
-        << "Check the name and the order you add bodies in."
-        << std::endl;
+        << "ERROR: could not find parent body named '"
+        << parent_body_name << "'. "
+        << "Check the name and the order you add bodies in." << std::endl;
     return RobotBuilder::STATUS_FAILURE;
   }
 
-  if (model_.nb_children(parent_id) >= MAX_NB_CHILDREN_PER_NODE)
-    {
-      std::cerr
+  if (model_.nb_children(parent_id) >= MAX_NB_CHILDREN_PER_NODE) {
+    std::cerr
         << "ERROR: a node cannot have more than " << MAX_NB_CHILDREN_PER_NODE
-        << " children per node."
-        << std::endl;
-      return RobotBuilder::STATUS_FAILURE;
-    }
-
-  if (model_.nb_links() >= MAX_NB_JOINTS)
-    {
-      std::cerr
+        << " children per node." << std::endl;
+    return RobotBuilder::STATUS_FAILURE;
+  }
+  if (model_.nb_links() >= MAX_NB_JOINTS) {
+    std::cerr
         << "ERROR: a model cannot have more than " << MAX_NB_JOINTS
-        << " joints."
-        << std::endl;
-      return RobotBuilder::STATUS_FAILURE;
+        << " joints." << std::endl;
+    return RobotBuilder::STATUS_FAILURE;
     }
 
   // deal with joint_index
   int joint_position_in_conf = -1;
-  if (use_dof_index_)
-    {
-      if (dof_index < 0)
-        {
-          std::cerr
-            << "ERROR: dof_index for joint '" << joint_name << "' is inconsitent"
-            << std::endl;
+  if (use_dof_index_) {
+    if (dof_index < 0) {
+      std::cerr
+          << "ERROR: dof_index for joint '" << joint_name << "' is inconsitent"
+          << std::endl;
           return RobotBuilder::STATUS_FAILURE;
-        }
-      joint_position_in_conf = dof_index;
     }
-  else
-    {
-      joint_position_in_conf = nb_dof_;
-    }
+    joint_position_in_conf = dof_index;
+  } else {
+    joint_position_in_conf = nb_dof_;
+  }
   // add the link for real
   int link_id = model_.nb_links();
-  model_.add_link(Link(
-                       link_id,
-                       parent_id,
-                       joint_name,
-                       joint,
-                       R_joint_parent,
-                       r_parent_joint,
-                       body_name,
-                       body_mass,
-                       body_center_of_mass,
-                       body_rotational_inertia,
-                       joint_position_in_conf));
+  model_.AddLink(Link(link_id,
+                      parent_id,
+                      joint_name,
+                      joint,
+                      R_joint_parent,
+                      r_parent_joint,
+                      body_name,
+                      body_mass,
+                      body_center_of_mass,
+                      body_rotational_inertia,
+                      joint_position_in_conf));
   nb_dof_ += joint.nb_dof();
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
-                              TmpStreams &out) const
-{
+void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
+                              TmpStreams &out) const {
   Eigen::IOFormat comma_fmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                             ", ", ", ");
   const int parent_id = model_.parent_id(link_id);
@@ -431,18 +401,17 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
   repl["parent_id"] = ::to_string(parent_id);
 
   // fill childX_id
-  for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE; ++i)
-    {
-      std::stringstream key;
-      key << "child" << i << "_id";
-      repl[key.str()] = ::to_string(model_.child_id(link_id, i));
-    }
+  for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE; ++i) {
+    std::stringstream key;
+    key << "child" << i << "_id";
+    repl[key.str()] = ::to_string(model_.child_id(link_id, i));
+  }
 
   bool is_last_link = (link_id == model_.nb_links()-1);
 
   const TxtTemplate tpl0(
-                         "    @node_name@ = @node_id@");
-  out.nodeid_enum_definition << tpl0.format(repl);
+      "    @node_name@ = @node_id@");
+  out.nodeid_enum_definition << tpl0.Format(repl);
   if (!is_last_link)
     out.nodeid_enum_definition << ",\n";
 
@@ -468,11 +437,11 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
       "    Joint joint;\n"
       "    Body body;\n"
       "  };\n");
-  out.node_type_definitions << tpl1.format(repl);
+  out.node_type_definitions << tpl1.Format(repl);
 
   const TxtTemplate tpl2(
                          "      Node@node_id@");
-  out.nodes_type_list << tpl2.format(repl);
+  out.nodes_type_list << tpl2.Format(repl);
   if (!is_last_link)
     out.nodes_type_list << ",\n";
 
@@ -486,16 +455,16 @@ void RobotBuilderP::writeLink(int link_id, const ReplMap &replacements,
       "@ROBOT_CLASS_NAME@::Node@node_id@::Node@node_id@():\n"
       "  joint(@joint_args@) {}\n\n");
   repl["joint_args"] = model_.joint(link_id).ctor_args();
-  out.init_nodes << tpl4.format(repl);
+  out.init_nodes << tpl4.Format(repl);
   const TxtTemplate tpl5(
       "    spatialInertiaMaker(\n"
       "        @body_mass@,\n"
       "        @body_center_of_mass@,\n"
       "        @body_rotational_inertia@),\n");
-  out.init_inertias << tpl5.format(repl);
+  out.init_inertias << tpl5.Format(repl);
 }
 
-RobotBuilder::Status RobotBuilderP::write() const
+RobotBuilder::Status RobotBuilderP::Write() const
 {
   if (!is_initialized_) {
     std::cerr
@@ -545,7 +514,7 @@ RobotBuilder::Status RobotBuilderP::write() const
   // add the links to the temporary streams
   TmpStreams streams;
   for (int i = 0; i != model_.nb_links(); ++i)
-    writeLink(i, repl, streams);
+    WriteLink(i, repl, streams);
 
   // complete the replacements map
   repl["nodeid_enum_definition"] = streams.nodeid_enum_definition.str();
@@ -564,13 +533,13 @@ RobotBuilder::Status RobotBuilderP::write() const
 
   // generate files from template and replacements
   const std::string config_hh_templ(::config_hh, ::config_hh_len);
-  writeTemplate("config.hh", config_hh_templ, repl);
+  WriteTemplate("config.hh", config_hh_templ, repl);
 
   const std::string init_hh_templ(::init_hh, ::init_hh_len);
-  writeTemplate(name_ + ".hh", init_hh_templ, repl);
+  WriteTemplate(name_ + ".hh", init_hh_templ, repl);
 
   const std::string init_cc_templ(::init_cc, ::init_cc_len);
-  writeTemplate(name_ + ".cc", init_cc_templ, repl);
+  WriteTemplate(name_ + ".cc", init_cc_templ, repl);
 #ifdef _MSC_VER
   // restore orginal exponent formatting (warning: this may never be reached
   // if an exception is thrown in between).

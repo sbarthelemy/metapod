@@ -31,9 +31,8 @@
 
 namespace metapod {
 
-class RobotBuilderP
-{
-public:
+class RobotBuilderP {
+ public:
   RobotBuilderP();
   ~RobotBuilderP();
   RobotBuilder::Status set_name(const std::string &name);
@@ -42,7 +41,7 @@ public:
   RobotBuilder::Status set_use_dof_index(bool);
   RobotBuilder::Status set_root_body_name(const std::string &name);
   RobotBuilder::Status set_license(const std::string &text);
-  RobotBuilder::Status init();
+  RobotBuilder::Status Init();
 
   // R_joint_parent is the rotation matrix which converts vector from the
   // parent body frame to the joint frame coordinate systems.
@@ -57,19 +56,20 @@ public:
   // dof_index will only be taken into account if set_use_dof_index(true)
   // has been called. In such a case, consistent dof indexes should be provided
   // for each link.
-  RobotBuilder::Status addLink(
+  RobotBuilder::Status AddLink(
       const std::string &parent_body_name,
       const std::string &joint_name,
       const RobotBuilder::Joint &joint,
       const Eigen::Matrix3d &R_joint_parent,
       const Eigen::Vector3d &r_parent_joint,
-      const std::string& body_name,
+      const std::string &body_name,
       double body_mass,
       const Eigen::Vector3d &body_center_of_mass,
       const Eigen::Matrix3d &body_rotational_inertia,
       int dof_index=-1);
-  RobotBuilder::Status write() const;
-private:
+  RobotBuilder::Status Write() const;
+
+ private:
   typedef std::map<std::string, std::string> ReplMap;
   // Tuple-like to hold the stream in which the link are written
   struct TmpStreams {
@@ -81,9 +81,9 @@ private:
     std::ostringstream init_nodes;
     std::ostringstream init_inertias;
   };
-  void writeLink(int link_id, const ReplMap &replacements,
+  void WriteLink(int link_id, const ReplMap &replacements,
                  TmpStreams &out) const;
-  void writeTemplate(const std::string &output_filename,
+  void WriteTemplate(const std::string &output_filename,
                      const std::string &input_template,
                      const ReplMap &replacements) const;
   RobotBuilderP(const RobotBuilderP &); // forbid copy-constuction

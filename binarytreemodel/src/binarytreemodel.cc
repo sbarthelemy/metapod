@@ -53,7 +53,7 @@ void addNode(metapod::RobotBuilder & builder, int label, int parent_label)
     parent_body_name << "B" << parent_label;
   body_name << "B" << label;
   joint_name << "J" << label;
-  builder.addLink(parent_body_name.str(),
+  builder.AddLink(parent_body_name.str(),
                   joint_name.str(),
                   metapod::RobotBuilder::RevoluteAxisXJoint(),
                   randomRotation3d(), Eigen::Vector3d::Random(),
@@ -90,7 +90,7 @@ void generate_model(const std::string & name, int depth)
   addNode(builder, label, 0);
   // add children
   buildTree(builder, &label, depth, 1);
-  builder.write();
+  builder.Write();
 }
 
 int main(int argc, char** argv)

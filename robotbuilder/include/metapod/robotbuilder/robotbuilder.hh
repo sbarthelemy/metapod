@@ -31,8 +31,7 @@ namespace metapod {
 
 class RobotBuilderP; // private implementation
 
-class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder
-{
+class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder {
  public:
   class Joint {
    public:
@@ -109,28 +108,29 @@ class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder
       ss << axis_.format(comma_fmt);
       return ss.str();
     }
+
    private:
     const Eigen::Vector3d axis_;
   };
 
-  enum JointType { FREE_FLYER,
-                   FREE_FLYER_BODY,
-                   REVOLUTE_AXIS_X,
-                   REVOLUTE_AXIS_Y,
-                   REVOLUTE_AXIS_Z,
-                   REVOLUTE_AXIS_ANY };
-  enum Status
-  {
+  enum JointType {
+    FREE_FLYER,
+    FREE_FLYER_BODY,
+    REVOLUTE_AXIS_X,
+    REVOLUTE_AXIS_Y,
+    REVOLUTE_AXIS_Z,
+    REVOLUTE_AXIS_ANY };
+  enum Status {
     STATUS_SUCCESS = 0,
     STATUS_FAILURE = 1
   };
   RobotBuilder();
   ~RobotBuilder();
-  Status set_name(const std::string& name);
-  Status set_libname(const std::string& libname);
-  Status set_directory(const std::string& directory);
+  Status set_name(const std::string &name);
+  Status set_libname(const std::string &libname);
+  Status set_directory(const std::string &directory);
   Status set_use_dof_index(bool);
-  Status set_license(const std::string& text);
+  Status set_license(const std::string &text);
 
   // parent_body_name: "NP" (no parent) or the parent body name
   //
@@ -147,24 +147,24 @@ class  METAPOD_ROBOTBUILDER_DLLAPI RobotBuilder
   // dof_index will only be taken into account if set_use_dof_index(true)
   // has been called. In such a case, consistent dof indexes should be provided
   // for each link.
-  Status addLink(
-      const std::string& parent_body_name,
-      const std::string& joint_name,
+  Status AddLink(
+      const std::string &parent_body_name,
+      const std::string &joint_name,
       const Joint &joint,
-      const Eigen::Matrix3d & R_joint_parent,
-      const Eigen::Vector3d & r_parent_joint,
-      const std::string& body_name,
+      const Eigen::Matrix3d &R_joint_parent,
+      const Eigen::Vector3d &r_parent_joint,
+      const std::string &body_name,
       double body_mass,
-      const Eigen::Vector3d & body_center_of_mass,
-      const Eigen::Matrix3d & body_rotational_inertia,
+      const Eigen::Vector3d &body_center_of_mass,
+      const Eigen::Matrix3d &body_rotational_inertia,
       int dof_index=-1);
-  Status write();
+  Status Write();
  private:
   // returns [1.; 0.; 0.]
   static Eigen::Vector3d axisX();
-  RobotBuilderP * const pimpl_;
-  RobotBuilder(const RobotBuilder&); // forbid copy-constuction
-  RobotBuilder& operator=(const RobotBuilder&); // forbid assignment
+  RobotBuilderP *const pimpl_;
+  RobotBuilder(const RobotBuilder &); // forbid copy-constuction
+  RobotBuilder& operator=(const RobotBuilder &); // forbid assignment
 };
 }
 #endif

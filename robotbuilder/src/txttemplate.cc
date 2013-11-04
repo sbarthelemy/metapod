@@ -81,7 +81,7 @@ TxtTemplate::TxtTemplate(const char *template_text):
 TxtTemplate::~TxtTemplate()
 {}
 
-std::string TxtTemplate::format(const map& repl) const
+std::string TxtTemplate::Format(const map& repl) const
 {
   boost::regex e("@(([a-zA-Z_][a-zA-Z0-9_]+))@");
   ReplFunctor formatter(repl);
@@ -91,9 +91,9 @@ std::string TxtTemplate::format(const map& repl) const
       formatter);
 }
 
-void TxtTemplate::format(const map& repl, std::ostream& os) const
+void TxtTemplate::Format(const map& repl, std::ostream& os) const
 {
-  os << format(repl);
+  os << Format(repl);
 }
 
 }
