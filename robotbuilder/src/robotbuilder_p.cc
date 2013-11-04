@@ -175,7 +175,8 @@ namespace metapod {
 RobotBuilderP::RobotBuilderP()
   : nb_dof_(0),
     is_initialized_(false),
-    use_dof_index_(false)
+    use_dof_index_(false),
+    root_body_name_("NP")
 {}
 
 RobotBuilderP::~RobotBuilderP()
@@ -224,6 +225,18 @@ RobotBuilder::Status RobotBuilderP::set_use_dof_index(bool flag)
   return RobotBuilder::STATUS_SUCCESS;
 }
 
+RobotBuilder::Status RobotBuilderP::set_root_body_name(const std::string &name)
+{
+  if (is_initialized_) {
+    std::cerr
+        << "ERROR: one cannot call set_use_dof_index() after having called addLink()"
+        << std::endl;
+    return RobotBuilder::STATUS_FAILURE;
+  }
+  root_body_name_ = name;
+  return RobotBuilder::STATUS_SUCCESS;
+}
+
 RobotBuilder::Status RobotBuilderP::set_license(const std::string& text)
 {
   license_ = text;
@@ -251,7 +264,6 @@ RobotBuilder::Status RobotBuilderP::init()
   return RobotBuilder::STATUS_SUCCESS;
 }
 
-// parent_body_name: "NP" (no parent) or the parent body name
 RobotBuilder::Status RobotBuilderP::addLink(
     const std::string& parent_body_name,
     const std::string& joint_name,
@@ -280,11 +292,10 @@ RobotBuilder::Status RobotBuilderP::addLink(
     return RobotBuilder::STATUS_FAILURE;
   }
   // check body_name
-  if (body_name == "NP") {
+  if (body_name == root_body_name_) {
     std::cerr
-        << "ERROR: one cannot name a body 'NP'. This name stands for "
-        << "'no parent' and is reserved"
-        << std::endl;
+        << "ERROR: the root body (mass-less galilean frame) is also named '"
+        << body_name << "'" << std::endl;
     return RobotBuilder::STATUS_FAILURE;
   }
   // find an homonym body
@@ -306,15 +317,18 @@ RobotBuilder::Status RobotBuilderP::addLink(
   // TODO: check joint_Xt_E is a real rotation matrix
 
   // find the parent
-  int parent_id = model_.find_link_by_body_name(parent_body_name);
-  if (parent_id == NO_NODE)
-    {
-      std::cerr
+  int parent_id = NO_NODE;
+  if (parent_body_name == root_body_name_)
+    parent_id = NO_PARENT;
+  else
+    parent_id = model_.find_link_by_body_name(parent_body_name);
+  if (parent_id == NO_NODE) {
+    std::cerr
         << "ERROR: could not find parent body named '" << parent_body_name << ". "
         << "Check the name and the order you add bodies in."
         << std::endl;
-      return RobotBuilder::STATUS_FAILURE;
-    }
+    return RobotBuilder::STATUS_FAILURE;
+  }
 
   if (model_.nb_children(parent_id) >= MAX_NB_CHILDREN_PER_NODE)
     {

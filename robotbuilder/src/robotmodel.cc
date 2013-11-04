@@ -69,8 +69,6 @@ Link::Link(
 {}
 
 
-const std::string RobotModel::NP_ = "NP";
-
 int RobotModel::nb_links() const
 {
   return static_cast<int>(links_.size());
@@ -107,8 +105,6 @@ const Eigen::Vector3d& RobotModel::r_parent_joint(int link_id) const
 
 const std::string& RobotModel::body_name(int link_id) const
 {
-  if (link_id == NO_PARENT)
-    return NP_;
   assert(link_id >= 0 && static_cast<size_t>(link_id) < links_.size());
   return links_[link_id].body_name_;
 }
@@ -192,8 +188,6 @@ void RobotModel::add_link(const Link& link)
 
 int RobotModel::find_link_by_body_name(const std::string& name) const
 {
-  if (name == "NP")
-    return NO_PARENT;
   std::vector<Link>::const_iterator it =
       std::find_if(links_.begin(), links_.end(), ::CompareLinkBodyName(name));
   if (it == links_.end())

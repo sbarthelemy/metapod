@@ -60,7 +60,7 @@ public:
 class RobotModel
 {
 public:
-  int nb_links() const; // NP does not count
+  int nb_links() const; // root body (mass-less galilean frame) does not count
   int parent_id(int link_id) const;
   const std::string& joint_name(int link_id) const;
   const RobotBuilder::Joint &joint(int link_id) const;
@@ -77,10 +77,8 @@ public:
   void add_link(const Link& link);
   int find_link_by_body_name(const std::string& name) const;
   int find_link_by_joint_name(const std::string& name) const;
-  /** @} */
 
 private:
-  static const std::string NP_;
   std::vector<int> roots_id_;
   std::vector<Link> links_; // link_id -> Link mapping
 };

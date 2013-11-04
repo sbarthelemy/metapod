@@ -40,6 +40,7 @@ public:
   RobotBuilder::Status set_libname(const std::string &libname);
   RobotBuilder::Status set_directory(const std::string &directory);
   RobotBuilder::Status set_use_dof_index(bool);
+  RobotBuilder::Status set_root_body_name(const std::string &name);
   RobotBuilder::Status set_license(const std::string &text);
   RobotBuilder::Status init();
 
@@ -93,6 +94,7 @@ private:
   std::string name_;
   std::string libname_;
   std::string directory_;
+  std::string root_body_name_;
   std::string license_;
 };
 }
