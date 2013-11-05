@@ -31,13 +31,7 @@ QI_CREATE_LIB(metapod_timer SHARED INTERNAL
   ${METAPOD_TIMER_HEADERS}
   )
 
-QI_USE_LIB(metapod_timer BOOST)
-# BOOST_TIMER was introduced in boost 1.48
-QI_ADD_OPTIONAL_PACKAGE(BOOST_TIMER
-  "Use the new boost timer library (requires boost >= 1.48)")
-IF(WITH_BOOST_TIMER)
-  SET_SOURCE_FILES_PROPERTIES("src/timer.cc" PROPERTIES
-      COMPILE_FLAGS " -DWITH_BOOST_TIMER")
-  QI_USE_LIB(metapod_timer BOOST_TIMER)
-ENDIF()
+SET_SOURCE_FILES_PROPERTIES("src/timer.cc" PROPERTIES
+    COMPILE_FLAGS " -DWITH_BOOST_TIMER")
+QI_USE_LIB(metapod_timer BOOST_TIMER)
 QI_STAGE_LIB(metapod_timer)
