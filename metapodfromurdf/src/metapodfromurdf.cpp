@@ -41,6 +41,7 @@ bool prefer_fixed_axis = false;
 bool add_root_floating_joint = false;
 std::string root_floating_joint_name;
 std::map<std::string, int> joint_dof_index;
+bool treat_mimic_as_coupled = true;
 
 // Utility functions
 Eigen::Vector3d ToEigen(urdf::Vector3 v)
@@ -200,14 +201,24 @@ Status AddSubTree(
 
   if (metapod_joint) {
     // we have a joint to add
+
     std::map<std::string, int>::const_iterator it =
       joint_dof_index.find(joint_name);
-    if (it != joint_dof_index.end() && it->second !=-1) {
-      // a specific dof_index was required, add a joint variable bound to this
-      // joint_index
-      builder.RequireJointVariable(std::vector<std::string>(1, joint_name),
-                                   metapod_joint->nb_dof(), it->second);
+    if (it != joint_dof_index.end() ||
+        (treat_mimic_as_coupled && urdf_joint->mimic)) {
+      // we need to require a joint variable explicitly
+      std::vector<std::string> coupled_joints(1, joint_name);
+      if (treat_mimic_as_coupled && urdf_joint->mimic)
+        // the joint is coupled
+        coupled_joints.push_back(urdf_joint->mimic->joint_name);
+      if (it != joint_dof_index.end())
+        // a specific dof_index was required
+        builder.RequireJointVariable(coupled_joints, metapod_joint->nb_dof(),
+                                     it->second);
+      else
+        builder.RequireJointVariable(coupled_joints, metapod_joint->nb_dof());
     }
+
     // data for the inertia
     double mass = 1.;
     Eigen::Vector3d center_of_mass = Eigen::Vector3d::Zero();
