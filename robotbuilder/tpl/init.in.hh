@@ -25,6 +25,7 @@
 # if defined(FUSION_MAX_VECTOR_SIZE) && (@ROBOT_NB_BODIES@ > FUSION_MAX_VECTOR_SIZE)
 // todo: warn or stop
 # endif
+# include <boost/mpl/list_c.hpp>
 # include <boost/fusion/sequence.hpp>
 # include <boost/fusion/include/sequence.hpp>
 # include <boost/fusion/include/vector.hpp>
