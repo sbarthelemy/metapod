@@ -91,6 +91,11 @@ namespace metapod
     typedef typename boost::fusion::result_of::value_at_c<typename Robot::NodeVector, id>::type type;
   };
 
+  template <typename Robot>
+  struct Nodes<Robot, NO_PARENT> {
+    typedef Robot type;
+  };
+
   // map robot node_ids to node instances.
   template<int id, typename Robot>
   typename Nodes<Robot, id>::type &

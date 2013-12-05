@@ -20,28 +20,63 @@
 // Common test tools
 #include "common.hh"
 #include <metapod/tools/depth_first_traversal.hh>
+#include <metapod/tools/depth_first_traversal_ng.hh>
+#include <metapod/tools/dft.hh>
+#include <boost/mpl/for_each.hpp>
 
 using namespace metapod;
+
+template < typename Node >
+void print(std::ostream & os, int & depth, const std::string &event)
+{
+  const std::string prefix(depth, '\t');
+  os << prefix << event <<  ": "
+     << Node::joint_name << " -- " << Node::body_name << "\n";
+}
 
 // Print events while traversing the tree with indentation showing the level
 // of recursion
 template < typename Robot, int node_id > struct PrintDFTraversalVisitor
 {
-  static void discover(std::ostream & os, int & depth)
+  typedef typename Nodes<Robot, node_id>::type Node;
+
+  static void discover(std::ostream &os, int &depth)
   {
-    const std::string prefix(depth, '\t');
-    typedef typename Nodes<Robot, node_id>::type Node;
-    os << prefix << "discover: "
-        << Node::joint_name << " -- " << Node::body_name << "\n";
+    print<Node>(os, depth, "discover");
     ++depth;
   }
-  static void finish(std::ostream & os, int & depth)
+  static void finish(std::ostream &os, int &depth)
   {
     --depth;
-    const std::string prefix(depth, '\t');
-    typedef typename Nodes<Robot, node_id>::type Node;
-    os << prefix << "finish: "
-        << Node::joint_name << " -- " << Node::body_name << "\n";
+    print<Node>(os, depth, "finish");
+  }
+};
+
+class PrintDFT {
+private:
+  std::ostream &os_;
+  int depth_;
+
+  template< typename Event >
+  void visit_dispatch(Event, dft_discover_tag) {
+    typedef typename Nodes<typename Event::Robot, Event::node_id>::type Node;
+    print<Node>(os_, depth_, "discover");
+    ++depth_;
+  }
+
+  template< typename Event >
+  void visit_dispatch(Event, dft_finish_tag) {
+    --depth_;
+    typedef typename Nodes<typename Event::Robot, Event::node_id>::type Node;
+    print<Node>(os_, depth_, "finish");
+  }
+
+public:
+  PrintDFT(std::ostream &os, int &depth) : os_(os), depth_(depth) {}
+  template< typename Event >
+  void operator()(Event event) {
+    typedef typename Event::event_tag event_tag;
+    visit_dispatch(event, event_tag());
   }
 };
 
@@ -55,3 +90,27 @@ BOOST_AUTO_TEST_CASE (test_depth_first_traversal)
   // Compare results with reference file
   compareTexts(result_file, TEST_DIRECTORY "/depth_first_traversal.ref");
 }
+
+BOOST_AUTO_TEST_CASE (test_depth_first_traversal_ng)
+{
+  const char result_file[] = "depth_first_traversal_ng.log";
+  std::ofstream log(result_file, std::ofstream::out);
+  int depth = 0;
+  depth_first_traversal_ng<PrintDFTraversalVisitor, CURRENT_MODEL_ROBOT>::run(log, depth);
+  log.close();
+  // Compare results with reference file
+  compareTexts(result_file, TEST_DIRECTORY "/depth_first_traversal.ref");
+}
+
+BOOST_AUTO_TEST_CASE (test_dft)
+{
+  const char result_file[] = "dft.log";
+  std::ofstream log(result_file, std::ofstream::out);
+  int depth = 0;
+  // TODO: remove child0_id
+  boost::mpl::for_each< dft<CURRENT_MODEL_ROBOT, CURRENT_MODEL_ROBOT::child0_id> >(PrintDFT(log, depth));
+  log.close();
+  // Compare results with reference file
+  compareTexts(result_file, TEST_DIRECTORY "/depth_first_traversal.ref");
+}
+

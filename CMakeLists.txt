@@ -54,6 +54,8 @@ SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/constants.hh
   include/${PROJECT_NAME}/tools/deepest_common_ancestor.hh
   include/${PROJECT_NAME}/tools/depth_first_traversal.hh
+  include/${PROJECT_NAME}/tools/depth_first_traversal_ng.hh
+  include/${PROJECT_NAME}/tools/dft.hh
   include/${PROJECT_NAME}/tools/fwd.hh
   include/${PROJECT_NAME}/tools/has_parent.hh
   include/${PROJECT_NAME}/tools/initconf.hh

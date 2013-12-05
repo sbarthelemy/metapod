@@ -82,6 +82,10 @@ class RobotModel {
   const Eigen::Vector3d &joint_axis(int link_id) const;
   int nb_children(int link_id) const;
   int child_id(int link_id, unsigned int rank) const;
+  int left_child_id(int link_id) const {
+    return child_id(link_id, 0u);
+  }
+  int right_sibling_id(int link_id) const;
   bool RequireVariable(const std::vector<std::string> &joint_names,
                        unsigned int nb_dof, int dof_index=-1);
   // return the number of degrees of freedom of the joint variable bound to the

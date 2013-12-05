@@ -146,6 +146,17 @@ int RobotModel::child_id(int link_id, unsigned int rank) const {
   return NO_CHILD;
 }
 
+int RobotModel::right_sibling_id(int link_id) const {
+  int my_parent_id = parent_id(link_id);
+  for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE-1; ++i) {
+    if (child_id(my_parent_id, i) == link_id) {
+      return child_id(my_parent_id, i+1);
+      break;
+    }
+  }
+  return NO_CHILD;
+}
+
 bool RobotModel::RequireVariable(const std::vector<std::string> &joint_names,
                                  unsigned int nb_dof, int dof_index) {
   std::vector<std::vector<Variable>::iterator> sets;

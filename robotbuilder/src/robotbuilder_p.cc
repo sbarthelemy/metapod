@@ -383,16 +383,16 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
   repl["body_rotational_inertia"] = ss3.str();
   repl["parent_id"] = ::to_string(parent_id);
 
-  // fill childX_id
-  std::stringstream children_id;
+  // fill childX_id and children_idt
+  std::stringstream children_idt;
   for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE; ++i) {
     std::stringstream key;
     key << "child" << i << "_id";
     repl[key.str()] = ::to_string(model_.child_id(link_id, i));
-    children_id << ", " << i;
+    children_idt << ", " << i;
   }
-  repl["children_id"] = children_id.str();
-
+  repl["children_idt"] = children_idt.str();
+  repl["sibling_id"] = ::to_string(model_.right_sibling_id(link_id));
   bool is_last_link = (link_id == model_.nb_links()-1);
 
   const TxtTemplate tpl0(
@@ -418,8 +418,12 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
       "    static const int child2_id = @child2_id@;\n"
       "    static const int child3_id = @child3_id@;\n"
       "    static const int child4_id = @child4_id@;\n"
+      "    static const int sibling_id = @sibling_id@;\n"
       "    typedef boost::mpl::int_<@parent_id@> parent_idt;\n"
-      "    typedef boost::mpl::list_c<int@children_id@> children_idt;\n"
+      "    typedef boost::mpl::int_<@child0_id@> child0_idt;\n"
+      "    typedef boost::mpl::int_<@sibling_id@> sibling_idt;\n"
+      "    typedef boost::mpl::list_c<int@children_idt@> children_idt;\n"
+
       "    Spatial::TransformT<Spatial::rm_mul_op<@joint_rotation_type@, @R_joint_parent_type@>::rm> sXp;\n"
       "    Eigen::Matrix<FloatType, 6, Joint::NBDOF> joint_F; // used by crba\n"
       "    Joint joint;\n"
