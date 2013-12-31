@@ -53,11 +53,13 @@ public:
   };
 
   // children of the root/NP node
+  static const int parent_id = -3;
   static const int child0_id = @root_child0_id@;
   static const int child1_id = @root_child1_id@;
   static const int child2_id = @root_child2_id@;
   static const int child3_id = @root_child3_id@;
   static const int child4_id = @root_child4_id@;
+  static const int sibling_id = -1;
 
   // definition of the node classes (except the root/NP node)
 @node_type_definitions@
