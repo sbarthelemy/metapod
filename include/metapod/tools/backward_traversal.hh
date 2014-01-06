@@ -121,7 +121,7 @@ template< template <typename AnyRobot, int any_node_id> class Visitor,
 struct backward_traversal
 {
   METAPOD_STATIC_ASSERT(( is_ancestor<Robot, end_node_id, start_node_id>::value ),
-                        "end node should be an ancestor if start node");
+                        "end node should be an ancestor of start node");
   static void run()
   {
     internal::backward_traversal_internal<Visitor, Robot, start_node_id, end_node_id>::run();
