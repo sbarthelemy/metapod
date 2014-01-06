@@ -14,6 +14,9 @@
 
 namespace metapod {
 
+const std::string @ROBOT_CLASS_NAME@::body_name = "Root galilean frame";
+const std::string @ROBOT_CLASS_NAME@::joint_name = "not a joint!";
+
 @init_nodes@
 
 Spatial::Inertia @ROBOT_CLASS_NAME@::inertias[@node_id@] = {

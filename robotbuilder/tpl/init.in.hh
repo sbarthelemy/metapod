@@ -52,8 +52,11 @@ public:
 @nodeid_enum_definition@
   };
 
-  // children of the root/NP node
+  static const std::string joint_name;
+  static const std::string body_name;
   static const int parent_id = -3;
+
+  // children of the root/NP node
   static const int child0_id = @root_child0_id@;
   static const int child1_id = @root_child1_id@;
   static const int child2_id = @root_child2_id@;
