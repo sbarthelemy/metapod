@@ -48,8 +48,11 @@ SET(${PROJECT_NAME}_ALGOS_HEADERS
 SET(${PROJECT_NAME}_TOOLS_HEADERS
   include/${PROJECT_NAME}/tools/backward.hh
   include/${PROJECT_NAME}/tools/backward_traversal.hh
+  include/${PROJECT_NAME}/tools/backward_traversal_ng.hh
   include/${PROJECT_NAME}/tools/backward_traversal_prev.hh
+  include/${PROJECT_NAME}/tools/backward_traversal_prev_ng.hh
   include/${PROJECT_NAME}/tools/bcalc.hh
+  include/${PROJECT_NAME}/tools/bwt.hh
   include/${PROJECT_NAME}/tools/common.hh
   include/${PROJECT_NAME}/tools/constants.hh
   include/${PROJECT_NAME}/tools/deepest_common_ancestor.hh

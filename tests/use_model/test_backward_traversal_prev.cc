@@ -20,6 +20,7 @@
 //Common test tools
 #include "common.hh"
 #include <metapod/tools/backward_traversal_prev.hh>
+#include <metapod/tools/backward_traversal_prev_ng.hh>
 
 using namespace metapod;
 
@@ -59,12 +60,36 @@ BOOST_AUTO_TEST_CASE (test_backward_traversal)
   compareTexts(result_file, TEST_DIRECTORY "/backward_traversal_prev.ref");
 }
 
+BOOST_AUTO_TEST_CASE (test_backward_traversal_ng)
+{
+  const char result_file[] = "backward_traversal_prev_ng.log";
+  std::ofstream log(result_file, std::ofstream::out);
+  int depth = 0;
+  backward_traversal_prev_ng<PrintBwdTraversalVisitor, CURRENT_MODEL_ROBOT,
+      start_node>::run(log, depth);
+  log.close();
+  // Compare results with reference file
+  compareTexts(result_file, TEST_DIRECTORY "/backward_traversal_prev.ref");
+}
+
 BOOST_AUTO_TEST_CASE (test_backward_traversal_end)
 {
   const char result_file[] = "backward_traversal_prev_end.log";
   std::ofstream log(result_file, std::ofstream::out);
   int depth = 0;
   backward_traversal_prev<PrintBwdTraversalVisitor, CURRENT_MODEL_ROBOT,
+      start_node, end_node>::run(log, depth);
+  log.close();
+  // Compare results with reference file
+  compareTexts(result_file, TEST_DIRECTORY "/backward_traversal_prev_end.ref");
+}
+
+BOOST_AUTO_TEST_CASE (test_backward_traversal_ng_end)
+{
+  const char result_file[] = "backward_traversal_prev_end.log";
+  std::ofstream log(result_file, std::ofstream::out);
+  int depth = 0;
+  backward_traversal_prev_ng<PrintBwdTraversalVisitor, CURRENT_MODEL_ROBOT,
       start_node, end_node>::run(log, depth);
   log.close();
   // Compare results with reference file
