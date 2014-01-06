@@ -37,11 +37,9 @@ const int end_node = CURRENT_MODEL_ROBOT::ARM;
 template < typename Robot, int node_id > struct PrintBwdTraversalVisitor
 {
   typedef typename Nodes<Robot, node_id>::type Node;
-  static void discover(std::ostream & os, int & depth)
+  static void discover(std::ostream &os, int &depth)
   {
-    const std::string prefix(depth, '\t');
-    os << prefix << "discover: curr:"
-        << Node::joint_name << " -- " << Node::body_name << "\n";
+    print<Node>(os, depth, "discover curr");
     ++depth;
   }
 };

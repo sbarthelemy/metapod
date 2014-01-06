@@ -41,11 +41,8 @@ template < typename Robot, int node_id, int prev_node_id > struct PrintBwdTraver
   typedef typename Nodes<Robot, prev_node_id>::type PrevNode;
   static void discover(std::ostream & os, int & depth)
   {
-    const std::string prefix(depth, '\t');
-    os << prefix << "discover: curr:"
-        << Node::joint_name << " -- " << Node::body_name << "\n";
-    os << prefix << "          prev: "
-        << PrevNode::joint_name << " -- " << PrevNode::body_name << "\n";
+    print<Node>(os, depth, "discover curr");
+    print<PrevNode>(os, depth, "         prev");
     ++depth;
   }
 };

@@ -35,4 +35,11 @@
 # include <metapod/tools/print.hh>
 # include <metapod/tools/initconf.hh>
 
+template < typename Node >
+void print(std::ostream & os, int & depth, const std::string &event)
+{
+  const std::string prefix(depth, '\t');
+  os << prefix << event <<  ": "
+     << Node::joint_name << " -- " << Node::body_name << "\n";
+}
 #endif

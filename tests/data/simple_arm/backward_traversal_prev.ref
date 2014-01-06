@@ -1,4 +1,4 @@
-discover: curr:ELBOW -- FOREARM
-          prev: WRIST -- HAND
-	discover: curr:SHOULDER -- ARM
-	          prev: ELBOW -- FOREARM
+discover curr: ELBOW -- FOREARM
+         prev: WRIST -- HAND
+	discover curr: SHOULDER -- ARM
+	         prev: ELBOW -- FOREARM

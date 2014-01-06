@@ -26,14 +26,6 @@
 
 using namespace metapod;
 
-template < typename Node >
-void print(std::ostream & os, int & depth, const std::string &event)
-{
-  const std::string prefix(depth, '\t');
-  os << prefix << event <<  ": "
-     << Node::joint_name << " -- " << Node::body_name << "\n";
-}
-
 // Print events while traversing the tree with indentation showing the level
 // of recursion
 template < typename Robot, int node_id > struct PrintDFTraversalVisitor
