@@ -103,8 +103,6 @@ struct jac_point_relative {
       J.template block<6, Node::Joint::NBDOF>(0, Node::q_idx + offset) =
           - node.body.iX0.inverse().toPointFrame(p).apply(node.joint.S);
     }
-
-    static void finish(Robot&, const Vector3d &, Jacobian &) {}
   };
 
   template <typename AnyRobot, int node_id>
@@ -122,8 +120,6 @@ struct jac_point_relative {
       J.template block<6, Node::Joint::NBDOF>(0,  Node::q_idx + offset) =
           node.body.iX0.inverse().toPointFrame(p).apply(node.joint.S);
       }
-
-      static void finish(Robot&, const Vector3d &, Jacobian &) {}
   };
 
   /// \brief Compute the articular jacobian J.

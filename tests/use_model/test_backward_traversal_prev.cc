@@ -48,15 +48,6 @@ template < typename Robot, int node_id, int prev_node_id > struct PrintBwdTraver
         << PrevNode::joint_name << " -- " << PrevNode::body_name << "\n";
     ++depth;
   }
-  static void finish(std::ostream & os, int & depth)
-  {
-    --depth;
-    const std::string prefix(depth, '\t');
-    os << prefix << "finish: curr:"
-        << Node::joint_name << " -- " << Node::body_name << "\n";
-    os << prefix << "        prev: "
-        << PrevNode::joint_name << " -- " << PrevNode::body_name << "\n";
-  }
 };
 
 BOOST_AUTO_TEST_CASE (test_backward_traversal)

@@ -50,9 +50,7 @@ struct jac {
             block<6, Ancestor::Joint::NBDOF>(6*Node::id, Ancestor::q_idx).noalias() =
             sXp_matrix * J.template
             block<6, Ancestor::Joint::NBDOF>(6*Parent::id, Ancestor::q_idx);
-    }
-
-      static void finish(Jacobian&, Matrix6d&) {}
+      }
     };
 
     static void discover(AnyRobot& robot, Jacobian& J) {

@@ -114,7 +114,6 @@ struct backward_traversal_prev_internal
   {
     Visitor<Robot, node_id, prev_node_id>::discover();
     backward_traversal_prev_internal<Visitor, Robot, Node::parent_id, node_id, end_node_id>::run();
-    Visitor<Robot, node_id, prev_node_id>::finish();
   }
 
   template<typename Arg0>
@@ -122,7 +121,6 @@ struct backward_traversal_prev_internal
   {
     Visitor<Robot, node_id, prev_node_id>::discover(arg0);
     backward_traversal_prev_internal<Visitor, Robot, Node::parent_id, node_id, end_node_id>::run(arg0);
-    Visitor<Robot, node_id, prev_node_id>::finish(arg0);
   }
 
   template<typename Arg0, typename Arg1>
@@ -130,7 +128,6 @@ struct backward_traversal_prev_internal
   {
     Visitor<Robot, node_id, prev_node_id>::discover(arg0, arg1);
     backward_traversal_prev_internal<Visitor, Robot, Node::parent_id, node_id, end_node_id>::run(arg0, arg1);
-    Visitor<Robot, node_id, prev_node_id>::finish(arg0, arg1);
   }
 };
 

@@ -1,4 +1,2 @@
 discover: curr:ELBOW -- FOREARM
           prev: WRIST -- HAND
-finish: curr:ELBOW -- FOREARM
-        prev: WRIST -- HAND

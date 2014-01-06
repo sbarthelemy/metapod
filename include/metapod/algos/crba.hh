@@ -88,9 +88,6 @@ template< typename Robot > struct crba<Robot, false>
               block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
                    ( NI::q_idx, NJ::q_idx ).transpose();
       }
-
-      template< typename Derived>
-      static void finish(AnyyRobot &, Eigen::MatrixBase<Derived> &) {}
     };
 
     // forward propagation
