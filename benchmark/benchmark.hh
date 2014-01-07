@@ -52,6 +52,7 @@
 # include <metapod/tools/bcalc.hh>
 # include <metapod/algos/rnea.hh>
 # include <metapod/algos/crba.hh>
+# include <metapod/algos/crba_ng.hh>
 # include <metapod/algos/jac.hh>
 # include <metapod/tools/jac_point_robot.hh>
 
@@ -156,6 +157,23 @@ namespace metapod
       boost::shared_ptr<MassMatrix> H_;
     };
 
+    // wrapping crba_ng directly with boost::bind does not work
+    template <typename Robot>
+    class crba_ng_wrapper {
+    public:
+      typedef Eigen::Matrix<metapod::FloatType, Robot::NBDOF, Robot::NBDOF>
+              MassMatrix;
+
+      crba_ng_wrapper(Robot& robot) : H_(new MassMatrix(MassMatrix::Zero())),
+        algo_(robot, *H_){}
+      void operator()(Robot& robot) {
+        algo_();
+      }
+    private:
+      boost::shared_ptr<MassMatrix> H_;
+      crba_ng<Robot, MassMatrix> algo_;
+    };
+
     // wrapping jac_point_robot directly with boost::bind does not work
     template < typename Robot, bool call_bcalc >
     class jac_point_robot_wrapper {
@@ -196,6 +214,9 @@ namespace metapod
         runners.push_back(Runner<Robot>(
             boost::bind<void>(crba_wrapper<Robot>(), _1),
             std::string("crba (without jcalc)")));
+        runners.push_back(Runner<Robot>(
+            boost::bind<void>(crba_ng_wrapper<Robot>(robot), _1),
+            std::string("crba_ng (without jcalc)")));
         runners.push_back(Runner<Robot>(
             boost::bind<void>(jac_wrapper<Robot>(), _1),
             std::string("jac (without jcalc)")));

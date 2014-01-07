@@ -23,6 +23,7 @@
 #include "common.hh"
 #include <metapod/tools/jcalc.hh>
 #include <metapod/algos/crba.hh>
+#include <metapod/algos/crba_ng.hh>
 
 using namespace metapod;
 
@@ -43,6 +44,34 @@ BOOST_AUTO_TEST_CASE (test_crba)
   // Run the CRBA
   crba< CURRENT_MODEL_ROBOT >::run(robot, H);
   const char result_file[] = "crba.log";
+  std::ofstream log(result_file, std::ofstream::out);
+
+  log << "generalized_mass_matrix\n" << H << std::endl;
+  log.close();
+
+  // Compare results with reference file
+  compareLogs(result_file, TEST_DIRECTORY "/crba.ref", 1e-3);
+}
+
+BOOST_AUTO_TEST_CASE (test_crba_ng)
+{
+  // set configuration vector q to reference value.
+  CURRENT_MODEL_ROBOT::confVector q;
+  std::ifstream qconf(TEST_DIRECTORY "/q_init.conf");
+  initConf<CURRENT_MODEL_ROBOT>::run(qconf, q);
+  qconf.close();
+
+  CURRENT_MODEL_ROBOT robot;
+
+  // Apply the CRBA to the metapod multibody and print the result in a log file
+  typedef Eigen::Matrix<metapod::FloatType, CURRENT_MODEL_ROBOT::NBDOF, CURRENT_MODEL_ROBOT::NBDOF> MassMatrix;
+  MassMatrix H = MassMatrix::Zero();
+  // Update geometry
+  jcalc< CURRENT_MODEL_ROBOT >::run(robot, q, CURRENT_MODEL_ROBOT::confVector::Zero());
+  // Run the CRBA
+  crba_ng< CURRENT_MODEL_ROBOT, MassMatrix > algo(robot, H);
+  algo();
+  const char result_file[] = "crba_ng.log";
   std::ofstream log(result_file, std::ofstream::out);
 
   log << "generalized_mass_matrix\n" << H << std::endl;
