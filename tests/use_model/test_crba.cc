@@ -21,6 +21,7 @@
 
 // Common test tools
 #include "common.hh"
+#include <metapod/tools/jcalc.hh>
 #include <metapod/algos/crba.hh>
 
 using namespace metapod;
@@ -37,7 +38,10 @@ BOOST_AUTO_TEST_CASE (test_crba)
 
   // Apply the CRBA to the metapod multibody and print the result in a log file
   Eigen::Matrix<metapod::FloatType, CURRENT_MODEL_ROBOT::NBDOF, CURRENT_MODEL_ROBOT::NBDOF> H = H.Zero();
-  crba< CURRENT_MODEL_ROBOT, true >::run(robot, H, q); // Update geometry and run the CRBA
+  // Update geometry
+  jcalc< CURRENT_MODEL_ROBOT >::run(robot, q, CURRENT_MODEL_ROBOT::confVector::Zero());
+  // Run the CRBA
+  crba< CURRENT_MODEL_ROBOT >::run(robot, H);
   const char result_file[] = "crba.log";
   std::ofstream log(result_file, std::ofstream::out);
 

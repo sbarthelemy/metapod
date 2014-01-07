@@ -25,7 +25,6 @@
 # define METAPOD_CRBA_HH
 
 # include "metapod/tools/common.hh"
-# include "metapod/tools/jcalc.hh"
 # include "metapod/tools/depth_first_traversal.hh"
 # include "metapod/tools/backward_traversal_prev.hh"
 
@@ -55,8 +54,7 @@ struct crba_update_parent_inertia<Robot, NO_PARENT, node_id>
 } // end of namespace metapod::internal
 
 // frontend
-template< typename Robot, bool jcalc = true > struct crba {};
-template< typename Robot > struct crba<Robot, false>
+template< typename Robot > struct crba
 {
   template <typename AnyRobot, int node_id >
   struct DftVisitor
@@ -113,29 +111,11 @@ template< typename Robot > struct crba<Robot, false>
   };
 
   template< typename Derived>
-  static void run(Robot& robot, Eigen::MatrixBase<Derived> &H, const typename Robot::confVector& )
-  {
-    assert(H.rows() ==  Robot::NBDOF);
-    assert(H.cols() ==  Robot::NBDOF);
-    depth_first_traversal< DftVisitor, Robot >::run(robot, H);
-  }
-  template< typename Derived>
   static void run(Robot& robot, Eigen::MatrixBase<Derived> &H)
   {
     assert(H.rows() ==  Robot::NBDOF);
     assert(H.cols() ==  Robot::NBDOF);
     depth_first_traversal< DftVisitor, Robot >::run(robot, H);
-  }
-};
-
-// frontend
-template< typename Robot > struct crba< Robot, true >
-{
-  template< typename Derived>
-  static void run(Robot& robot, Eigen::MatrixBase<Derived> &H, const typename Robot::confVector& q)
-  {
-    jcalc< Robot >::run(robot, q, Robot::confVector::Zero());
-    crba< Robot, false >::run(robot, H);
   }
 };
 

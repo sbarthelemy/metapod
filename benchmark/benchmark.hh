@@ -150,7 +150,7 @@ namespace metapod
               MassMatrix;
       crba_wrapper() : H_(new MassMatrix(MassMatrix::Zero())) {}
       void operator()(Robot& robot) {
-        crba<Robot, false>::run(robot, *H_);
+        crba<Robot>::run(robot, *H_);
       }
     private:
       boost::shared_ptr<MassMatrix> H_;
