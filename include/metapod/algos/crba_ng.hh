@@ -33,10 +33,31 @@
 namespace mpl = boost::mpl;
 
 namespace metapod {
-// frontend
-template< typename Robot, typename Derived > struct crba_ng
-{
 
+template <typename Robot, int row, int col, typename Event, typename event_tag>
+struct write_to_row_col {
+  typedef mpl::bool_<false> type;
+};
+
+template <typename Robot, int row, int col, typename Event>
+struct write_to_row_col<Robot, row, col, Event, dft_finish_tag> {
+  typedef typename Nodes<Robot, Event::node_id>::type NI;
+  typedef typename mpl::and_<
+      boost::is_same< mpl::int_<row>, mpl::int_<NI::q_idx> >,
+      boost::is_same< mpl::int_<col>, mpl::int_<NI::q_idx> > >::type type;
+};
+
+/*
+template <typename Robot, int row, int col, typename Event>
+struct write_to_row_col<Robot, row, col, Event, bwt_tree_tag> {
+  typedef typename Nodes<Robot, Event::node_id>::type NI;
+  typedef mpl::and_<boost::is_same<mpl::int_<row>, mpl::int_<Event::NI::q_idx> >,
+                    boost::is_same<mpl::int_<col>, mpl::int_<Event::NI::q_idx> >,
+                   >::type type;
+};
+*/
+// frontend
+template< typename Robot, typename Derived > struct crba_ng {
   template <typename NodeI>
   struct BwtVisitor {
     typedef NodeI NI;
@@ -124,6 +145,10 @@ template< typename Robot, typename Derived > struct crba_ng
         mpl::bool_<true> >::type has_parent;
     update_parent_Iic<NI::id>(has_parent()); // update Iic[NI::parent_id]
     Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> F = Iic[NI::id] * ni.joint.S;
+
+    // FIXME: test
+    typedef typename write_to_row_col<Robot, NI::q_idx, NI::q_idx, Event, dft_finish_tag>::type write;
+    //mpl::find_if<Robot, find::>
 
     H.template block<NI::Joint::NBDOF, NI::Joint::NBDOF>(
         NI::q_idx, NI::q_idx).noalias() = ni.joint.S.transpose() * F;
