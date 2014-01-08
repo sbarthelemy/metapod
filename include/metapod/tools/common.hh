@@ -85,6 +85,32 @@ namespace metapod
     {}
   };
 
+  /* Interface to query a Node at runtime */
+  class RtNode {
+  public:
+    virtual int gid() const = 0;
+    virtual int gparent_id() const = 0;
+    virtual int gchild0_id() const = 0;
+    virtual int gsibling_id() const = 0;
+    virtual const std::string &gjoint_name() const = 0;
+    virtual const std::string &gbody_name() const = 0;
+  };
+
+  template <typename Node>
+  class RtNodeImpl : public RtNode
+  {
+  public:
+    int gid() const { return Node::id; }
+    int gparent_id() const { return Node::parent_id; }
+    int gchild0_id() const { return Node::child0_id; }
+    int gsibling_id() const { return Node::sibling_id; }
+    const std::string &gjoint_name() const { return Node::joint_name; }
+    const std::string &gbody_name() const { return Node::body_name; }
+    RtNodeImpl<Node>() {}
+    RtNodeImpl<Node>(const Node &) {}
+  };
+
+
   // map robot node_ids to node classes.
   template <typename Robot, int id>
   struct Nodes {

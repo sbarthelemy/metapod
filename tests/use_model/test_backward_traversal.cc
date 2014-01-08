@@ -135,3 +135,29 @@ BOOST_AUTO_TEST_CASE (test_bwt_end)
   // Compare results with reference file
   compareTexts(result_file, TEST_DIRECTORY "/bwt_end.ref");
 }
+
+
+BOOST_AUTO_TEST_CASE (test_bwt_end_rt)
+{
+  const char result_file[] = "bwt_end_rt.log";
+  std::ofstream log(result_file, std::ofstream::out);
+  int depth = 0;
+  CURRENT_MODEL_ROBOT robot;
+  int node_id = start_node;
+  while (true) {
+    RtNode &node = robot.get_rtnode(node_id);
+    print_(log, depth, "discover", node);
+    ++depth;
+    int parent_id = node.gparent_id();
+    if (parent_id == end_node)
+      break;
+    print_(log, depth, "tree prev", node);
+    print_(log, depth, "     next", robot.get_rtnode(parent_id));
+    ++depth;
+    node_id = parent_id;
+  }
+
+  log.close();
+  // Compare results with reference file
+  compareTexts(result_file, TEST_DIRECTORY "/bwt_end.ref");
+}

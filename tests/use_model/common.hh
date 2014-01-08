@@ -35,8 +35,17 @@
 # include <metapod/tools/print.hh>
 # include <metapod/tools/initconf.hh>
 
+void print_(std::ostream &os, int &depth, const std::string &event,
+            const metapod::RtNode &node)
+{
+  const std::string prefix(depth, '\t');
+  os << prefix << event <<  ": "
+     << node.gjoint_name() << " -- " << node.gbody_name() << "\n";
+}
+
+
 template < typename Node >
-void print(std::ostream & os, int & depth, const std::string &event)
+void print(std::ostream &os, int &depth, const std::string &event)
 {
   const std::string prefix(depth, '\t');
   os << prefix << event <<  ": "

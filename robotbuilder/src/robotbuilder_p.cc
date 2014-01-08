@@ -401,9 +401,16 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
   if (!is_last_link)
     out.nodeid_enum_definition << ",\n";
 
+  const TxtTemplate tpl0bis(
+      "    case @node_id@:\n"
+      "      return boost::fusion::at_c<@node_id@>(nodes);");
+  out.map_node_id_to_rtnode << tpl0bis.Format(repl);
+  if (!is_last_link)
+    out.map_node_id_to_rtnode << "\n";
+
   const TxtTemplate tpl1(
       "\n"
-      "  class @LIBRARY_NAME@_DLLAPI Node@node_id@ {\n"
+      "  class @LIBRARY_NAME@_DLLAPI Node@node_id@ : public RtNodeImpl<Node@node_id@> {\n"
       "  public:\n"
       "    Node@node_id@();\n"
       "    static const int id = @node_id@;\n"
@@ -519,6 +526,7 @@ RobotBuilder::Status RobotBuilderP::Write()
   repl["nodeid_enum_definition"] = streams.nodeid_enum_definition.str();
   repl["node_type_definitions"] = streams.node_type_definitions.str();
   repl["nodes_type_list"] = streams.nodes_type_list.str();
+  repl["map_node_id_to_rtnode"] = streams.map_node_id_to_rtnode.str();
 
   for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE; ++i) {
     std::stringstream key;

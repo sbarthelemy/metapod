@@ -34,7 +34,7 @@
 
 namespace metapod {
 
-class @LIBRARY_NAME@_DLLAPI @ROBOT_CLASS_NAME@ {
+class @LIBRARY_NAME@_DLLAPI @ROBOT_CLASS_NAME@ : public RtNodeImpl<@ROBOT_CLASS_NAME@>{
 public:
   // the following new/delete operators are only needed if there is a
   // member variable of fixed-size vectorizable Eigen type (or a member
@@ -54,6 +54,7 @@ public:
 
   static const std::string joint_name;
   static const std::string body_name;
+  static const int id = -1;
   static const int parent_id = -3;
 
   // children of the root/NP node
@@ -80,6 +81,40 @@ public:
 
   @ROBOT_CLASS_NAME@()
   {}
+
+  // runtime stuff
+  RtNode &get_rtnode(int id)
+  {
+    switch (id) {
+    case NO_PARENT:
+      return *this;
+    @map_node_id_to_rtnode@
+    case NO_NODE:
+    case NO_CHILD:
+      break;
+    }
+    throw std::runtime_error("invalid node id");
+  }
+
+  const RtNode &get_rtnode(int id) const
+  {
+    switch (id) {
+    case NO_PARENT:
+      return *this;
+    @map_node_id_to_rtnode@
+    case NO_NODE:
+    case NO_CHILD:
+      break;
+    }
+    throw std::runtime_error("invalid node id");
+  }
+
+  int parent(int id) const
+  {
+    const RtNode & node = get_rtnode(id);
+    return node.gparent_id();
+  }
+
 };
 
 } // closing namespace metapod

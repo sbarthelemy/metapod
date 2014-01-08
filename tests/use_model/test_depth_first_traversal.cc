@@ -106,3 +106,29 @@ BOOST_AUTO_TEST_CASE (test_dft)
   compareTexts(result_file, TEST_DIRECTORY "/depth_first_traversal.ref");
 }
 
+template <typename Robot>
+void dft_rt(std::ostream &os, int &depth,
+            Robot &robot, int node_id) {
+  const RtNode &node = robot.get_rtnode(node_id);
+  print_(os, depth, "discover", node);
+  ++depth;
+  if (node.gchild0_id() != NO_CHILD)
+    dft_rt(os, depth, robot, node.gchild0_id());
+  --depth;
+  print_(os, depth, "finish", node);
+  if (node.gsibling_id() != NO_CHILD)
+    dft_rt(os, depth, robot, node.gsibling_id());
+}
+
+BOOST_AUTO_TEST_CASE (test_dft_rt)
+{
+  const char result_file[] = "dft_rt.log";
+  std::ofstream log(result_file, std::ofstream::out);
+  int depth = 0;
+  CURRENT_MODEL_ROBOT robot;
+  // TODO: remove child0_id
+  dft_rt(log, depth, robot, CURRENT_MODEL_ROBOT::child0_id);
+  log.close();
+  // Compare results with reference file
+  compareTexts(result_file, TEST_DIRECTORY "/depth_first_traversal.ref");
+}
