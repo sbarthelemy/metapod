@@ -205,6 +205,12 @@ namespace metapod
         // tell which model we are running benchmarks on
         std::cout << "*************\n"
                   << "Model NBDOF : " << Robot::NBDOF << std::endl;
+        // call jcalc once to be sure other algorithms do not use
+        // uninitialized memory (we could happen to contain denormalized
+        // numbers and slow down the algorithm a lot).
+        jcalc<Robot>::run(robot,
+                          confVector::Zero(),
+                          confVector::Zero());
         for(int i=0; i<100; ++i)
         {
           q = confVector::Random();
