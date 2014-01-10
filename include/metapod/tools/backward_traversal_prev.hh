@@ -129,6 +129,12 @@ struct backward_traversal_prev_internal
     Visitor<Robot, node_id, prev_node_id>::discover(arg0, arg1);
     backward_traversal_prev_internal<Visitor, Robot, Node::parent_id, node_id, end_node_id>::run(arg0, arg1);
   }
+  template<typename Arg0, typename Arg1, typename Arg2>
+  static void run(Arg0& arg0, Arg1& arg1, Arg2& arg2)
+  {
+    Visitor<Robot, node_id, prev_node_id>::discover(arg0, arg1, arg2);
+    backward_traversal_prev_internal<Visitor, Robot, Node::parent_id, node_id, end_node_id>::run(arg0, arg1, arg2);
+  }
 };
 
 // end recursion when we reach the end node
@@ -143,6 +149,9 @@ struct backward_traversal_prev_internal<Visitor, Robot, end_node_id, prev_node_i
 
   template<typename Arg0, typename Arg1>
   static void run(Arg0& , Arg1&) {}
+
+  template<typename Arg0, typename Arg1, typename Arg2>
+  static void run(Arg0& , Arg1&, Arg2&) {}
 };
 
 } // end of namespace metapod::internal
@@ -170,6 +179,12 @@ struct backward_traversal_previous
   static void run(Arg0& arg0, Arg1& arg1)
   {
     internal::backward_traversal_prev_internal<Visitor, Robot, start_node_id, NO_NODE, end_node_id>::run(arg0, arg1);
+  }
+
+  template<typename Arg0, typename Arg1, typename Arg2>
+  static void run(Arg0& arg0, Arg1& arg1, Arg2& arg2)
+  {
+    internal::backward_traversal_prev_internal<Visitor, Robot, start_node_id, NO_NODE, end_node_id>::run(arg0, arg1, arg2);
   }
 };
 
@@ -199,6 +214,12 @@ struct backward_traversal_prev
   {
     internal::backward_traversal_prev_internal<Visitor, Robot, StartNode::parent_id, start_node_id, end_node_id>::run(arg0, arg1);
   }
+
+  template<typename Arg0, typename Arg1, typename Arg2>
+  static void run(Arg0& arg0, Arg1& arg1, Arg2& arg2)
+  {
+    internal::backward_traversal_prev_internal<Visitor, Robot, StartNode::parent_id, start_node_id, end_node_id>::run(arg0, arg1, arg2);
+  }
 };
 
 // Specialization: deal with the case where the user called the algorithm
@@ -215,6 +236,9 @@ struct backward_traversal_prev<Visitor, Robot, end_node_id, end_node_id>
 
   template<typename Arg0, typename Arg1>
   static void run(Arg0& , Arg1&) {}
+
+  template<typename Arg0, typename Arg1, typename Arg2>
+  static void run(Arg0& , Arg1&, Arg2&) {}
 };
 } // end of namespace metapod
 #endif
