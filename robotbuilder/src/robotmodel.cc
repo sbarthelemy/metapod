@@ -3,6 +3,7 @@
 #include <metapod/tools/constants.hh>
 #include <limits>
 #include <algorithm>
+#include <cmath>
 
 namespace {
 
@@ -232,6 +233,19 @@ int RobotModel::nb_dof(const std::string &joint_name) const {
   return -1;
 }
 
+int RobotModel::max_dof_index() const {
+  int result = -1;
+  for (std::vector<Variable>::const_iterator var = variables_.begin();
+       var != variables_.end();
+       ++var) {
+    if (var->dof_index == -1)
+      return -1; // one should have called AssignDofIndexes first.
+    result = std::max(result,
+                      var->dof_index -1 + static_cast<int>(var->nb_dof));
+  }
+  return result;
+}
+
 int RobotModel::dof_index(const std::string &joint_name) const {
   for (std::vector<Variable>::const_iterator var = variables_.begin();
        var != variables_.end();
@@ -260,10 +274,8 @@ bool RobotModel::FindVariableByJointName(const std::string &name) const {
 }
 
 bool RobotModel::AssignDofIndexes() {
-  //std::vector<int> dofs(nb_dof(), -1);
   std::vector<int> dof_indexes(variables_.size(), -1);
   int dof_index = 0;
-  int sup_dof_index = 0;
   unsigned int nb_dof = 0;
   for (size_t i=0; i<variables_.size(); ++i) {
     if (variables_[i].dof_index != -1)
@@ -278,10 +290,7 @@ bool RobotModel::AssignDofIndexes() {
     dof_indexes[i] = dof_index;
     nb_dof += variables_[i].nb_dof;
     dof_index += static_cast<int>(variables_[i].nb_dof); // prepare next round
-    sup_dof_index = std::max(sup_dof_index, dof_index);
   }
-  if (static_cast<int>(nb_dof) != sup_dof_index)
-    return false; // dof indexes are not contiguous
   // success! let commit.the new indexes.
   for (size_t i=0; i<variables_.size(); ++i)
     variables_[i].dof_index = dof_indexes[i];

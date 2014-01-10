@@ -91,6 +91,7 @@ class RobotModel {
   // return the number of degrees of freedom of the joint variable bound to the
   // joint, or -1 if the joint is not found
   int nb_dof(const std::string &joint_name) const;
+  int max_dof_index() const;
   int dof_index(const std::string &joint_name) const;
   int dof_index(int link_id) const;
   // return the number of degrees of freedom of all the joint variables

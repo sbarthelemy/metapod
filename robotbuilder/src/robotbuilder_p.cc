@@ -411,6 +411,8 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
 
   const TxtTemplate tpl1(
       "\n"
+      "  // Joint: @joint_name@\n"
+      "  // Body: @body_name@\n"
       "  class @LIBRARY_NAME@_DLLAPI Node@node_id@ : public RtNodeImpl<Node@node_id@> {\n"
       "  public:\n"
       "    Node@node_id@();\n"
@@ -556,7 +558,7 @@ RobotBuilder::Status RobotBuilderP::Write() {
   // except for this line where the model is changed, the Write() would be const
   if (!model_.AssignDofIndexes()) {
     std::cerr
-        << "ERROR: could not assign dof indexes to the joints."
+        << "ERROR: could not assign dof indexes to the joints. "
         << "Try adding the joint variables in another order or set the dof"
         << " indexes explicitly." << std::endl;
     return RobotBuilder::STATUS_FAILURE;
@@ -583,7 +585,8 @@ RobotBuilder::Status RobotBuilderP::Write() {
   repl["ROBOT_CLASS_NAME"] = name_;
   repl["ROBOT_NAME"] = name_;
   repl["LICENSE"] = license_;
-  repl["ROBOT_NB_DOF"] = ::to_string(model_.nb_dof());
+  repl["ROBOT_NB_DOF"] = ::to_string(model_.max_dof_index() + 1);
+  repl["ROBOT_NB_REAL_DOF"] = ::to_string(model_.nb_dof());
   repl["ROBOT_NB_BODIES"] = ::to_string(model_.nb_links());
 
   // add the links to the temporary streams

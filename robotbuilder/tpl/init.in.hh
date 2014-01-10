@@ -42,7 +42,7 @@ public:
   // It's not easy to tell in advance, so let always use the aligned operators.
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // Global constants or variable of the robot
-  enum { NBDOF = @ROBOT_NB_DOF@ };
+  enum { NBDOF = @ROBOT_NB_DOF@ }; // nb of real dof: @ROBOT_NB_REAL_DOF@
   enum { NBBODIES = @ROBOT_NB_BODIES@ };
 
   typedef Eigen::Matrix< FloatType, NBDOF, 1 > confVector;
