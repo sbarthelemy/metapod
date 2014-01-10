@@ -103,17 +103,20 @@ void compareLogs(
         std::cerr << "Could not read result value "
                   << name << "(" << i << ") in " << result_file
                   << std::endl;
+        break;
       }
       else
       {
         bool compare_ok = compareDouble(result_value, reference_value, epsilon);
         BOOST_CHECK(compare_ok);
-        if(!compare_ok)
+        if(!compare_ok) {
           std::cerr << "Difference in result and reference files ("
                     << result_file << " " << reference_file << ")\n"
                     << name << "(" << i << ")\n\t"
                     << result_value << "\n\t"
                     << reference_value << std::endl;
+          break;
+        }
       }
       ++i;
     }
