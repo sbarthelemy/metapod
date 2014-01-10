@@ -68,23 +68,42 @@ template< typename Robot > struct crba
       typedef typename Nodes<AnyyRobot, nj_id>::type NJ;
       typedef typename Nodes<AnyyRobot, prev_nj_id>::type PrevNJ;
 
+      template < bool i_idx_lower_than_j_idx, typename Derived>
+      struct write_block;
+
+      template <typename Derived>
+      struct write_block<true, Derived>
+      {
+        static void run(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H,
+                          Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> &F)
+        {
+          NJ& nj = get_node<nj_id>(robot);
+          H.template block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
+             ( NI::q_idx, NJ::q_idx ).noalias()
+                 = F.transpose() * nj.joint.S.S();
+        }
+      };
+
+      template <typename Derived>
+      struct write_block<false, Derived>
+      {
+        static void run(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H,
+                          Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> &F)
+        {
+          NJ& nj = get_node<nj_id>(robot);
+          H.template block< NJ::Joint::NBDOF, NI::Joint::NBDOF >
+              ( NJ::q_idx, NI::q_idx ).noalias()
+                  = nj.joint.S.S().transpose() * F;
+        }
+      };
+
       template< typename Derived>
       static void discover(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H,
                            Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> &F)
       {
-        NJ& nj = get_node<nj_id>(robot);
         PrevNJ& prev_nj = get_node<prev_nj_id>(robot);
         F = prev_nj.sXp.mulMatrixTransposeBy(F);
-        H.template
-          block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
-               ( NI::q_idx, NJ::q_idx ).noalias()
-          = F.transpose() * nj.joint.S.S();
-        H.template
-          block< NJ::Joint::NBDOF, NI::Joint::NBDOF >
-               ( NJ::q_idx, NI::q_idx )
-          = H.template
-              block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
-                   ( NI::q_idx, NJ::q_idx ).transpose();
+        write_block<(NI::q_idx < NJ::q_idx), Derived>::run(robot, H, F);
       }
     };
 

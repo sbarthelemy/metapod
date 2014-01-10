@@ -476,7 +476,8 @@ void RobotBuilderP::GenCrbaLink(std::ostream &os, int i) const {
   if (model_.parent_id(i) != NO_PARENT) {
     os << boost::format("Iic[%1%] = Iic[%1%] + get_node<%2%>(robot).sXp.applyInv(Iic[%2%]);\n") % model_.parent_id(i) % i;
   }
-  // We create one F per node becouse F depends on the joint number of dof.
+  int idx_i = model_.dof_index(i);
+  // We create one F per node because F depends on the joint number of dof.
   // We could instead reuse the same F, either using a buffer and an Eigen::Map,
   // or one F for all the joints sharing the same number of dof.
   os << boost::format("Eigen::Matrix<FloatType, 6, Robot::Node%1%::Joint::NBDOF> F%1% = Iic[%1%] * get_node<%1%>(robot).joint.S;\n"
@@ -487,13 +488,16 @@ void RobotBuilderP::GenCrbaLink(std::ostream &os, int i) const {
   while (parent_j != NO_PARENT) {
     os << boost::format("F%1% = get_node<%2%>(robot).sXp.mulMatrixTransposeBy(F%1%);\n") % i % j;
     j = parent_j;
-    os << boost::format("H.template block< Robot::Node%1%::Joint::NBDOF, Robot::Node%2%::Joint::NBDOF >(\n"
-                        "    Robot::Node%1%::q_idx, Robot::Node%2%::q_idx ).noalias()\n"
-                        "         = F%1%.transpose() * get_node<%2%>(robot).joint.S.S();\n"
-                        "H.template block< Robot::Node%2%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF >(\n"
-                        "    Robot::Node%2%::q_idx, Robot::Node%1%::q_idx ).noalias()\n"
-                        "         = H.template block< Robot::Node%1%::Joint::NBDOF, Robot::Node%2%::Joint::NBDOF >(\n"
-                        "             Robot::Node%1%::q_idx, Robot::Node%2%::q_idx ).transpose();\n") % i % j;
+    int idx_j = model_.dof_index(j);
+    if (idx_i < idx_j) {
+      os << boost::format("H.template block< Robot::Node%1%::Joint::NBDOF, Robot::Node%2%::Joint::NBDOF >(\n"
+                          "    Robot::Node%1%::q_idx, Robot::Node%2%::q_idx ).noalias()\n"
+                          "         = F%1%.transpose() * get_node<%2%>(robot).joint.S.S();\n") % i % j;
+    } else {
+      os << boost::format("H.template block< Robot::Node%2%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF >(\n"
+                          "    Robot::Node%2%::q_idx, Robot::Node%1%::q_idx ).noalias()\n"
+                          "         = get_node<%2%>(robot).joint.S.S().transpose() * F%1%;\n") % i % j;
+    }
     parent_j = model_.parent_id(j);
   }
   // recursively explore sibling, if any

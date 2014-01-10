@@ -65,6 +65,39 @@ template< typename Robot, typename Derived > struct crba_ng {
     Eigen::Matrix<FloatType, 6, NodeI::Joint::NBDOF> &F;
     Eigen::MatrixBase<Derived> &H;
 
+    template < bool i_idx_lower_than_j_idx, int nj, typename Derived0>
+    struct write_block;
+
+    template <int nj_id, typename Derived0>
+    struct write_block<true, nj_id, Derived0>
+    {
+      typedef typename Nodes<Robot, nj_id>::type NJ;
+
+      static void run(Robot& robot, Eigen::MatrixBase<Derived0> &H,
+                      Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> &F) {
+        NJ& nj = get_node<nj_id>(robot);
+        H.template block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
+            ( NI::q_idx, NJ::q_idx ).noalias()
+                = F.transpose() * nj.joint.S.S();
+      }
+    };
+
+    template <int nj_id, typename Derived0>
+    struct write_block<false, nj_id, Derived0>
+    {
+      typedef typename Nodes<Robot, nj_id>::type NJ;
+
+      static void run(Robot& robot, Eigen::MatrixBase<Derived0> &H,
+                      Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> &F) {
+        NJ& nj = get_node<nj_id>(robot);
+        H.template block< NJ::Joint::NBDOF, NI::Joint::NBDOF >
+            ( NJ::q_idx, NI::q_idx ).noalias()
+                = nj.joint.S.S().transpose() * F;
+      }
+    };
+
+
+
     template< typename Derived0 >
     BwtVisitor(Robot &robot,
                Eigen::Matrix<FloatType, 6, NodeI::Joint::NBDOF> &F,
@@ -78,16 +111,10 @@ template< typename Robot, typename Derived > struct crba_ng {
     void dispatch(bwt_tree_tag) {
       typedef typename Nodes<Robot, Event::next_node_id>::type NJ; //parent
       typedef typename Nodes<Robot, Event::prev_node_id>::type PrevNJ; //child
-      const NJ& nj = get_node<Event::next_node_id>(robot);
+
       const PrevNJ& prev_nj = get_node<Event::prev_node_id>(robot);
       F = prev_nj.sXp.mulMatrixTransposeBy(F);
-      H.template block< NI::Joint::NBDOF, NJ::Joint::NBDOF >(
-          NI::q_idx, NJ::q_idx ).noalias()
-               = F.transpose() * nj.joint.S.S();
-      H.template block< NJ::Joint::NBDOF, NI::Joint::NBDOF >(
-          NJ::q_idx, NI::q_idx ).noalias()
-          = H.template block< NI::Joint::NBDOF, NJ::Joint::NBDOF >(
-              NI::q_idx, NJ::q_idx ).transpose();
+      write_block<(NI::q_idx < NJ::q_idx), Event::next_node_id, Derived>::run(robot, H, F);
     }
 
     template< typename Event >
