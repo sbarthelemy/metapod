@@ -32,6 +32,13 @@
 # ifdef CURRENT_MODEL_IS_SIMPLE_ARM
 #  include <metapod/models/simple_arm/simple_arm.hh>
 # endif
+# ifdef CURRENT_MODEL_IS_SIMPLE_ARM_COUPLED
+#  include <metapod/models/simple_arm_coupled/simple_arm_coupled.hh>
+# endif
+# ifdef CURRENT_MODEL_IS_SIMPLE_HUMANOID_COUPLED
+#  include <metapod/models/simple_humanoid_coupled/simple_humanoid_coupled.hh>
+# endif
+
 # include <metapod/tools/print.hh>
 # include <metapod/tools/initconf.hh>
 

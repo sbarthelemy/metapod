@@ -1,0 +1,4 @@
+discover: WRIST -- HAND
+	tree prev: WRIST -- HAND
+	     next: ELBOW -- FOREARM
+		discover: ELBOW -- FOREARM

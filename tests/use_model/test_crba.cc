@@ -27,6 +27,7 @@
 
 using namespace metapod;
 
+#if defined(CURRENT_MODEL_IS_SIMPLE_ARM_COUPLED) && defined(CURRENT_MODEL_IS_SIMPLE_HUMANOID_COUPLED)
 BOOST_AUTO_TEST_CASE (test_crba)
 {
   // set configuration vector q to reference value.
@@ -80,6 +81,7 @@ BOOST_AUTO_TEST_CASE (test_crba_ng)
   // Compare results with reference file
   compareLogs(result_file, TEST_DIRECTORY "/crba.ref", 1e-3);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE (test_crba_cg)
 {

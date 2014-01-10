@@ -25,7 +25,7 @@
 using namespace metapod;
 
 // start at the hand and finish with the arm
-#ifdef CURRENT_MODEL_IS_SIMPLE_HUMANOID
+#if defined(CURRENT_MODEL_IS_SIMPLE_HUMANOID) || defined(CURRENT_MODEL_IS_SIMPLE_HUMANOID_COUPLED)
 const int start_node = CURRENT_MODEL_ROBOT::LARM_LINK7;
 const int end_node = CURRENT_MODEL_ROBOT::LARM_LINK3;
 #else

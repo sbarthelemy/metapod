@@ -1,0 +1,3 @@
+discover curr: WRIST -- HAND
+	discover curr: ELBOW -- FOREARM
+		discover curr: SHOULDER -- ARM

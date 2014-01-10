@@ -1,0 +1,10 @@
+discover: LARM_WRIST_R -- LARM_LINK7
+	tree prev: LARM_WRIST_R -- LARM_LINK7
+	     next: LARM_WRIST_P -- LARM_LINK6
+		discover: LARM_WRIST_P -- LARM_LINK6
+			tree prev: LARM_WRIST_P -- LARM_LINK6
+			     next: LARM_WRIST_Y -- LARM_LINK5
+				discover: LARM_WRIST_Y -- LARM_LINK5
+					tree prev: LARM_WRIST_Y -- LARM_LINK5
+					     next: LARM_ELBOW -- LARM_LINK4
+						discover: LARM_ELBOW -- LARM_LINK4
