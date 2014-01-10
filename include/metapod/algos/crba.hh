@@ -69,16 +69,16 @@ template< typename Robot > struct crba
       typedef typename Nodes<AnyyRobot, prev_nj_id>::type PrevNJ;
 
       template< typename Derived>
-      static void discover(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H)
+      static void discover(AnyyRobot& robot, Eigen::MatrixBase<Derived> &H,
+                           Eigen::Matrix<FloatType, 6, NI::Joint::NBDOF> &F)
       {
-        NI& ni = get_node<node_id>(robot);
         NJ& nj = get_node<nj_id>(robot);
         PrevNJ& prev_nj = get_node<prev_nj_id>(robot);
-        ni.joint_F = prev_nj.sXp.mulMatrixTransposeBy(ni.joint_F);
+        F = prev_nj.sXp.mulMatrixTransposeBy(F);
         H.template
           block< NI::Joint::NBDOF, NJ::Joint::NBDOF >
                ( NI::q_idx, NJ::q_idx ).noalias()
-          = ni.joint_F.transpose() * nj.joint.S.S();
+          = F.transpose() * nj.joint.S.S();
         H.template
           block< NJ::Joint::NBDOF, NI::Joint::NBDOF >
                ( NJ::q_idx, NI::q_idx )
@@ -101,12 +101,12 @@ template< typename Robot > struct crba
     {
       Node& node = get_node<node_id>(robot);
       internal::crba_update_parent_inertia<AnyRobot, Node::parent_id, node_id>::run(robot);
-      node.joint_F = node.body.Iic * node.joint.S;
+      Eigen::Matrix<FloatType, 6, Node::Joint::NBDOF> F = node.body.Iic * node.joint.S;
 
       H.template block<Node::Joint::NBDOF, Node::Joint::NBDOF>(
               Node::q_idx, Node::q_idx).noalias()
-                       = node.joint.S.transpose() * node.joint_F;
-      backward_traversal_prev< BwdtVisitor, Robot, node_id >::run(robot, H);
+                       = node.joint.S.transpose() * F;
+      backward_traversal_prev< BwdtVisitor, Robot, node_id >::run(robot, H, F);
     }
   };
 
