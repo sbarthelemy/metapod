@@ -467,44 +467,55 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
 }
 
 // an iteration of the depth-first traversal
-void RobotBuilderP::GenCrbaLink(std::ostream &os, int i) const {
+void RobotBuilderP::GenCrbaLink(std::ostream &os,
+                                std::set<IntPair> &written_blocks,
+                                int i) const {
   assert(i != NO_CHILD);
   // dft_discover(i)
   os << boost::format("Iic[%1%] = robot.inertias[%1%];\n") % i;
   // recursively explore children, if any
   if (model_.left_child_id(i) != NO_CHILD)
-    GenCrbaLink(os, model_.left_child_id(i));
+    GenCrbaLink(os, written_blocks, model_.left_child_id(i));
   // dft_finish(i)
   if (model_.parent_id(i) != NO_PARENT) {
     os << boost::format("Iic[%1%] = Iic[%1%] + get_node<%2%>(robot).sXp.applyInv(Iic[%2%]);\n") % model_.parent_id(i) % i;
   }
-  int idx_i = model_.dof_index(i);
   // We create one F per node because F depends on the joint number of dof.
   // We could instead reuse the same F, either using a buffer and an Eigen::Map,
   // or one F for all the joints sharing the same number of dof.
-  os << boost::format("Eigen::Matrix<FloatType, 6, Robot::Node%1%::Joint::NBDOF> F%1% = Iic[%1%] * get_node<%1%>(robot).joint.S;\n"
-                      "H.template block<Robot::Node%1%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF>(\n"
-                      "    Robot::Node%1%::q_idx, Robot::Node%1%::q_idx).noalias() = get_node<%1%>(robot).joint.S.transpose() * F%1%;\n") % i;
+  os << boost::format("Eigen::Matrix<FloatType, 6, Robot::Node%1%::Joint::NBDOF> F%1% = Iic[%1%] * get_node<%1%>(robot).joint.S;\n") % i;
+
+  int idx_i = model_.dof_index(i);
+  const bool first_write = written_blocks.insert(std::make_pair(idx_i, idx_i)).second;
+  const std::string op(first_write ? "=" : "+=");
+  os << boost::format("H.template block<Robot::Node%1%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF>(\n"
+                      "    Robot::Node%1%::q_idx, Robot::Node%1%::q_idx).noalias() %2% get_node<%1%>(robot).joint.S.transpose() * F%1%;\n") % i % op;
   int j = i;
   int parent_j = model_.parent_id(j);
   while (parent_j != NO_PARENT) {
     os << boost::format("F%1% = get_node<%2%>(robot).sXp.mulMatrixTransposeBy(F%1%);\n") % i % j;
     j = parent_j;
     int idx_j = model_.dof_index(j);
+
+    const bool do_assign = (idx_i < idx_j) ?
+        written_blocks.insert(std::make_pair(idx_i, idx_j)).second :
+        written_blocks.insert(std::make_pair(idx_j, idx_i)).second;
+    const std::string op(do_assign ? "=" : "+=");
+    const std::string pre_mul((idx_i == idx_j) ? "2 *" : "");
     if (idx_i < idx_j) {
       os << boost::format("H.template block< Robot::Node%1%::Joint::NBDOF, Robot::Node%2%::Joint::NBDOF >(\n"
                           "    Robot::Node%1%::q_idx, Robot::Node%2%::q_idx ).noalias()\n"
-                          "         = F%1%.transpose() * get_node<%2%>(robot).joint.S.S();\n") % i % j;
+                          "         %3% %4% F%1%.transpose() * get_node<%2%>(robot).joint.S.S();\n") % i % j % op % pre_mul;
     } else {
       os << boost::format("H.template block< Robot::Node%2%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF >(\n"
                           "    Robot::Node%2%::q_idx, Robot::Node%1%::q_idx ).noalias()\n"
-                          "         = get_node<%2%>(robot).joint.S.S().transpose() * F%1%;\n") % i % j;
+                          "         %3% %4% get_node<%2%>(robot).joint.S.S().transpose() * F%1%;\n") % i % j % op % pre_mul;
     }
     parent_j = model_.parent_id(j);
   }
   // recursively explore sibling, if any
   if (model_.right_sibling_id(i) != NO_CHILD)
-    GenCrbaLink(os, model_.right_sibling_id(i));
+    GenCrbaLink(os, written_blocks, model_.right_sibling_id(i));
 }
 
 
@@ -528,8 +539,10 @@ std::string RobotBuilderP::GenCrba(const ReplMap &replacements) const {
       "  {\n");
    os << tpl.Format(replacements);
    // TODO: remove child_id
-  GenCrbaLink(os, model_.child_id(NO_PARENT,0u));
-  os << "  }\n"
+  std::set<IntPair> written_blocks;
+  GenCrbaLink(os, written_blocks, model_.child_id(NO_PARENT, 0u));
+  os << "//H.triangularView<Eigen::Lower>() = \n"
+        "  }\n"
         "};\n";
   return os.str();
 }
