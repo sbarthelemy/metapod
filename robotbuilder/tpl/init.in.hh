@@ -114,8 +114,9 @@ public:
     const RtNode & node = get_rtnode(id);
     return node.gparent_id();
   }
-
 };
+
+@crba@
 
 } // closing namespace metapod
 

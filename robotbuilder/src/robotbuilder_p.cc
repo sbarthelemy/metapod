@@ -7,6 +7,7 @@
 #include <sstream>
 #include <boost/tokenizer.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/format.hpp>
 #include <set>
 
 #if BOOST_VERSION <=104000
@@ -463,8 +464,71 @@ void RobotBuilderP::WriteLink(int link_id, const ReplMap &replacements,
   out.init_inertias << tpl5.Format(repl);
 }
 
-RobotBuilder::Status RobotBuilderP::Write()
-{
+// an iteration of the depth-first traversal
+void RobotBuilderP::GenCrbaLink(std::ostream &os, int i) const {
+  assert(i != NO_CHILD);
+  // dft_discover(i)
+  os << boost::format("Iic[%1%] = robot.inertias[%1%];\n") % i;
+  // recursively explore children, if any
+  if (model_.left_child_id(i) != NO_CHILD)
+    GenCrbaLink(os, model_.left_child_id(i));
+  // dft_finish(i)
+  if (model_.parent_id(i) != NO_PARENT) {
+    os << boost::format("Iic[%1%] = Iic[%1%] + get_node<%2%>(robot).sXp.applyInv(Iic[%2%]);\n") % model_.parent_id(i) % i;
+  }
+  // We create one F per node becouse F depends on the joint number of dof.
+  // We could instead reuse the same F, either using a buffer and an Eigen::Map,
+  // or one F for all the joints sharing the same number of dof.
+  os << boost::format("Eigen::Matrix<FloatType, 6, Robot::Node%1%::Joint::NBDOF> F%1% = Iic[%1%] * get_node<%1%>(robot).joint.S;\n"
+                      "H.template block<Robot::Node%1%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF>(\n"
+                      "    Robot::Node%1%::q_idx, Robot::Node%1%::q_idx).noalias() = get_node<%1%>(robot).joint.S.transpose() * F%1%;\n") % i;
+  int j = i;
+  int parent_j = model_.parent_id(j);
+  while (parent_j != NO_PARENT) {
+    os << boost::format("F%1% = get_node<%2%>(robot).sXp.mulMatrixTransposeBy(F%1%);\n") % i % j;
+    j = parent_j;
+    os << boost::format("H.template block< Robot::Node%1%::Joint::NBDOF, Robot::Node%2%::Joint::NBDOF >(\n"
+                        "    Robot::Node%1%::q_idx, Robot::Node%2%::q_idx ).noalias()\n"
+                        "         = F%1%.transpose() * get_node<%2%>(robot).joint.S.S();\n"
+                        "H.template block< Robot::Node%2%::Joint::NBDOF, Robot::Node%1%::Joint::NBDOF >(\n"
+                        "    Robot::Node%2%::q_idx, Robot::Node%1%::q_idx ).noalias()\n"
+                        "         = H.template block< Robot::Node%1%::Joint::NBDOF, Robot::Node%2%::Joint::NBDOF >(\n"
+                        "             Robot::Node%1%::q_idx, Robot::Node%2%::q_idx ).transpose();\n") % i % j;
+    parent_j = model_.parent_id(j);
+  }
+  // recursively explore sibling, if any
+  if (model_.right_sibling_id(i) != NO_CHILD)
+    GenCrbaLink(os, model_.right_sibling_id(i));
+}
+
+
+std::string RobotBuilderP::GenCrba(const ReplMap &replacements) const {
+  std::ostringstream os;
+  const TxtTemplate tpl(
+      "template<typename Robot, typename Derived>\n"
+      "struct crba_cg;\n"
+      "template<typename Derived>\n"
+      "struct crba_cg<@ROBOT_NAME@, Derived> {\n"
+      "  typedef @ROBOT_NAME@ Robot;\n"
+      "  Robot &robot;\n" // TODO: add const
+      "  Eigen::MatrixBase<Derived> &H;\n"
+      "  Spatial::Inertia Iic[Robot::NBBODIES];\n"
+      "  crba_cg(Robot &robot, Eigen::MatrixBase<Derived> &H) :\n"
+      "    robot(robot), H(H) {\n"
+      "    assert(H.rows() ==  Robot::NBDOF);\n"
+      "    assert(H.cols() ==  Robot::NBDOF);\n"
+      "  }\n"
+      "  void operator()()\n"
+      "  {\n");
+   os << tpl.Format(replacements);
+   // TODO: remove child_id
+  GenCrbaLink(os, model_.child_id(NO_PARENT,0u));
+  os << "  }\n"
+        "};\n";
+  return os.str();
+}
+
+RobotBuilder::Status RobotBuilderP::Write() {
   if (!is_initialized_) {
     std::cerr
         << "ERROR: the robot has no link."
@@ -485,6 +549,7 @@ RobotBuilder::Status RobotBuilderP::Write()
         << std::endl;
     return RobotBuilder::STATUS_FAILURE;
   }
+  // except for this line where the model is changed, the Write() would be const
   if (!model_.AssignDofIndexes()) {
     std::cerr
         << "ERROR: could not assign dof indexes to the joints."
@@ -527,7 +592,7 @@ RobotBuilder::Status RobotBuilderP::Write()
   repl["node_type_definitions"] = streams.node_type_definitions.str();
   repl["nodes_type_list"] = streams.nodes_type_list.str();
   repl["map_node_id_to_rtnode"] = streams.map_node_id_to_rtnode.str();
-
+  repl["crba"] = GenCrba(repl);
   for (int i = 0; i<MAX_NB_CHILDREN_PER_NODE; ++i) {
     std::stringstream key;
     key << "root_child" << i << "_id";

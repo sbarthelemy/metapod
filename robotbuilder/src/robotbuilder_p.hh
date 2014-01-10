@@ -77,6 +77,8 @@ class RobotBuilderP {
 
  private:
   typedef std::map<std::string, std::string> ReplMap;
+  void GenCrbaLink(std::ostream &os, int node_id) const;
+  std::string GenCrba(const ReplMap &replacements) const;
   // Tuple-like to hold the stream in which the link are written
   struct TmpStreams {
     // for content in robot.hh
