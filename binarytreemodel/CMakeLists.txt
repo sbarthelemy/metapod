@@ -1,3 +1,4 @@
+# Copyright 2013
 #
 # Sébastien Barthélémy (Aldebaran Robotics)
 #
