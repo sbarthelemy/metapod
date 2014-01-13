@@ -45,6 +45,7 @@
 # include <iostream>
 # include <boost/bind.hpp>
 # include <boost/function.hpp>
+# include <boost/shared_ptr.hpp>
 
 # include <metapod/timer/timer.hh>
 # include <metapod/tools/jcalc.hh>
@@ -124,28 +125,35 @@ namespace metapod
       int outer_loop_count_;
     };
 
-    // wrapping jac directly with boost::bind
-    // does not work because the J argument (an Eigen matrix) has
-    // alignement constraints.
+    // wrapping jac directly with boost::bind does not work because the J
+    // argument (an Eigen matrix) has alignement constraints.
+    // We store a pointer to J instead of storing J directly so that
+    // jac_wrapper does not have alignement constraints.
+    // Another solution would be to add boost::ref support to the algorithm.
     template <typename Robot>
     class jac_wrapper {
     public:
-      static void run(Robot& robot) {
-        typename jac<Robot>::Jacobian J;
-        jac<Robot>::run(robot, J);
+      typedef typename jac<Robot>::Jacobian Jacobian;
+      jac_wrapper() : J_(new Jacobian(Jacobian::Zero())) {}
+      void operator()(Robot& robot) {
+        jac<Robot>::run(robot, *J_);
       }
+    private:
+      boost::shared_ptr<Jacobian> J_;
     };
 
-    // wrapping jac_point_robot directly with boost::bind
-    // does not work because the J argument (an Eigen matrix) has
-    // alignement constraints.
+    // wrapping jac_point_robot directly with boost::bind does not work
     template < typename Robot, bool call_bcalc >
     class jac_point_robot_wrapper {
     public:
-      static void run(Robot& robot, typename Robot::confVector q) {
-        typename jac_point_robot<Robot, call_bcalc>::RobotJacobian J;
-        jac_point_robot<Robot, call_bcalc>::run(robot, q, J);
+      typedef typename jac_point_robot<Robot, call_bcalc>::RobotJacobian
+              RobotJacobian;
+      jac_point_robot_wrapper() : J_(new RobotJacobian(RobotJacobian::Zero())) {}
+      void operator()(Robot& robot, typename Robot::confVector q) {
+        jac_point_robot<Robot, call_bcalc>::run(robot, q, *J_);
       }
+    private:
+      boost::shared_ptr<RobotJacobian> J_;
     };
 
     template < typename Robot >
@@ -178,10 +186,10 @@ namespace metapod
             boost::bind<void>(crba<Robot, false>::run, _1, _2),
             std::string("crba (without jcalc)")));
         runners.push_back(Runner<Robot>(
-            boost::bind<void>(jac_wrapper<Robot>::run, _1),
+            boost::bind<void>(jac_wrapper<Robot>(), _1),
             std::string("jac (without jcalc)")));
         runners.push_back(Runner<Robot>(
-            boost::bind<void>(jac_point_robot_wrapper<Robot, false>::run, _1, _2),
+            boost::bind<void>(jac_point_robot_wrapper<Robot, false>(), _1, _2),
             std::string("jac_point_robot (without bcalc)")));
         // tell which model we are running benchmarks on
         std::cout << "*************\n"
