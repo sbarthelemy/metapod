@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/include)
 
@@ -27,17 +26,12 @@ SET(METAPOD_TIMER_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/timer/config.hh
   include/metapod/timer/timer.hh
   )
-INSTALL(FILES ${METAPOD_TIMER_HEADERS}
-  DESTINATION include/metapod/timer
-  )
-ADD_LIBRARY(metapod_timer SHARED
+QI_CREATE_LIB(metapod_timer SHARED INTERNAL
   src/timer.cc
   ${METAPOD_TIMER_HEADERS}
   )
 
-# BOOST_TIMER was introduced in boost 1.48
-IF(Boost_TIMER_FOUND)
-  SET_SOURCE_FILES_PROPERTIES("src/timer.cc" PROPERTIES
-        COMPILE_FLAGS " -DWITH_BOOST_TIMER")
-  TARGET_LINK_LIBRARIES(metapod_timer ${Boost_LIBRARIES})
-ENDIF()
+SET_SOURCE_FILES_PROPERTIES("src/timer.cc" PROPERTIES
+    COMPILE_FLAGS " -DWITH_BOOST_TIMER")
+QI_USE_LIB(metapod_timer BOOST_TIMER)
+QI_STAGE_LIB(metapod_timer)

@@ -15,10 +15,15 @@
 # GNU General Lesser Public License for more details.
 # You should have received a copy of the GNU Lesser General Public License
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/timer/include)
-INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/timer/include)
 
-ADD_TESTCASE(test_timer test_timer.cc)
-TARGET_LINK_LIBRARIES(test_timer metapod_timer)
+IF(TARGET metapod_timer)
+  ADD_TESTCASE(test_timer test_timer.cc)
+  IF(TARGET test_timer)
+    QI_USE_LIB(test_timer metapod_timer)
+  ENDIF()
+ENDIF()
 
 ADD_TESTCASE(test_eigenalign test_eigenalign.cc)
+IF(TARGET test_eigenalign)
+  QI_USE_LIB(test_eigenalign eigen3)
+ENDIF()

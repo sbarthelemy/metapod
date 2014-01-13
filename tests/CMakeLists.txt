@@ -19,9 +19,6 @@
 #
 # Creation: 14/06/2011
 
-# Add Boost path to include directories.
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-
 # Make Boost.Test generate the main function in test cases.
 ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
 IF(NOT WIN32 AND NOT APPLE)
@@ -42,13 +39,11 @@ ENDIF()
 #
 # The test should #include the common.hh header
 #
-MACRO(ADD_TESTCASE NAME)
-  ADD_EXECUTABLE(${NAME}
-    ${ARGN}
-    ${PROJECT_SOURCE_DIR}/tests/common.hh)
-  ADD_TEST(${NAME} ${RUNTIME_OUTPUT_DIRECTORY}/${NAME})
-  TARGET_LINK_LIBRARIES(${NAME} ${Boost_LIBRARIES})
-ENDMACRO(ADD_TESTCASE)
+FUNCTION(ADD_TESTCASE NAME)
+  QI_CREATE_TEST(${NAME}
+    SRC ${ARGN} ${PROJECT_SOURCE_DIR}/tests/common.hh
+    DEPENDS BOOST BOOST_UNIT_TEST_FRAMEWORK)
+ENDFUNCTION()
 
 # the "use_model" subfolder is included once per tested model. The tests
 # defined within it should use the "CURRENT_MODEL" macro to use the

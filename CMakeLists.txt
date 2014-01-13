@@ -18,56 +18,20 @@
 # along with metapod.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Creation: 14/06/2011
+cmake_minimum_required(VERSION 2.8)
+project(metapod)
+find_package(qibuild)
+include(CMakeDependentOption)
+include(cmakeutils.cmake)
+enable_testing()
+qi_sanitize_compile_flags(HIDDEN_SYMBOLS)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakemodules")
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/cpack.cmake)
-INCLUDE(cmake/boost.cmake)
-INCLUDE(cmake/ros.cmake)
-INCLUDE(cmakeutils.cmake)
-INCLUDE(CMakeDependentOption)
-
-SET(PROJECT_NAME metapod)
-SET(PROJECT_DESCRIPTION "Implementation of a robot dynamics library")
-SET(PROJECT_URL "https://github.com/laas/metapod")
-
-SET(CXX_DISABLE_WERROR True)
-CMAKE_POLICY(SET CMP0012 NEW)
-
-IF(UNIX OR MINGW)
-  ADD_DEFINITIONS("-fvisibility=hidden")
-  ADD_DEFINITIONS("-Wno-variadic-macros")
-ENDIF()
-
-SETUP_PROJECT()
-
-# Search for Boost.
-# Boost.Test is used by the test suite.
-# Boost program_options is used by the embedfile utility, which is used
-# by metapod_robotbuilder
-# Boost filesystem and regex are used by metapod_robotbuilder.
-# Boost filesystem depends on Boost system.
-SET(BOOST_COMPONENTS
-  filesystem system unit_test_framework program_options regex)
-SEARCH_FOR_BOOST()
-# If Boost is recent enough, we look for Boost timer which can be used by
-# by metapod_timer, which is in turn used by the benchmark.
-# Boost timer depends on Boost chrono and system.
-IF((BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
-   AND NOT Boost_VERSION LESS 104800)
-  SET(BOOST_COMPONENTS ${BOOST_COMPONENTS} timer chrono system)
-  SEARCH_FOR_BOOST()
-ENDIF()
-
-# Search for Eigen.
-ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
-# Eigen (at least version 3.0.5) makes gcc report conversion warnings
-# when one assigns to a block. This floods the compilation results.
-# So we include Eigen headers as if they were system headers: the compiler
-# won't report warning coming from them.
-INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
-
+# generate config.hh using the same template as JRL-cmake
+generate_config_header(
+  ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
+  metapod)
 # Set header files.
 SET(${PROJECT_NAME}_ROOT_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/include/metapod/config.hh
@@ -127,20 +91,27 @@ SET(${PROJECT_NAME}_SPATIAL_HEADERS
   include/${PROJECT_NAME}/tools/spatial/rotation-matrix.hh
   include/${PROJECT_NAME}/tools/spatial/transform.hh
   )
-INSTALL(FILES ${${PROJECT_NAME}_ROOT_HEADERS}
-  DESTINATION include/${PROJECT_NAME}
-  )
-INSTALL(FILES ${${PROJECT_NAME}_ALGOS_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/algos
-  )
-INSTALL(FILES ${${PROJECT_NAME}_TOOLS_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/tools
-  )
-INSTALL(FILES ${${PROJECT_NAME}_SPATIAL_HEADERS}
-  DESTINATION include/${PROJECT_NAME}/tools/spatial
-  )
+
+FIND_PACKAGE(BOOST)
+INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
+
+# Eigen (at least version 3.0.5) makes gcc report conversion warnings
+# when one assigns to a block. This floods the compilation results.
+# So we include Eigen headers as if they were system headers: the compiler
+# won't report warning coming from them.
+FIND_PACKAGE(EIGEN3)
+INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
 
 INCLUDE_DIRECTORIES("include" "${CMAKE_CURRENT_BINARY_DIR}/include")
+QI_STAGE_HEADER_ONLY_LIB(metapod DEPENDS BOOST EIGEN3)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_ROOT_HEADERS}
+  SUBFOLDER metapod)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_ALGOS_HEADERS}
+  SUBFOLDER metapod/algos)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_TOOLS_HEADERS}
+  SUBFOLDER metapod/tools)
+QI_INSTALL_HEADER(${${PROJECT_NAME}_SPATIAL_HEADERS}
+  SUBFOLDER metapod/tools/spatial)
 
 # We build the generator tools only if we are not cross compiling.
 # When cross compiling, the generators are searched for on the building host.
@@ -188,18 +159,12 @@ ELSE()
   FIND_GENERATOR(METAPODFROMURDF)
 ENDIF()
 
-CMAKE_DEPENDENT_OPTION(WITH_SIMPLE_HUMANOID
-  "Generate and build the simple humanoid example model and the related tests.
-  (Only possible if metapodfromurdf is available.)"
-  ON
-  WITH_METAPODFROMURDF
-  OFF)
-CMAKE_DEPENDENT_OPTION(WITH_SIMPLE_ARM
-  "Generate and build the simple arm example model and the related tests.
-  (Only possible if metapodfromurdf is available.)"
-  ON
-  WITH_METAPODFROMURDF
-  OFF)
+OPTION(WITH_SIMPLE_HUMANOID
+  "Build the simple humanoid example model and the related tests."
+  ON)
+OPTION(WITH_SIMPLE_ARM
+  "Build the simple arm example model and the related tests."
+  ON)
 
 OPTION(BUILD_MULTI_MODEL_BENCHMARK
     "Generate and build the multi-model benchmark" TRUE)
@@ -220,6 +185,3 @@ IF(BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
 ENDIF()
 
 ADD_SUBDIRECTORY(tests)
-
-SETUP_PROJECT_FINALIZE()
-SETUP_PROJECT_CPACK()

@@ -24,13 +24,16 @@
 # OUTPUT:   name of a variable in the caller scope, the absolute path of the
 #           generated file will be appended to it.
 FUNCTION(EMBED_TEMPLATE OUTPUT TEMPLATE NAME)
+
+  SET(GENERATED_FILE "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c")
   ADD_CUSTOM_COMMAND(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c
+    OUTPUT ${GENERATED_FILE}
     COMMAND embedfile ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c
             ${CMAKE_CURRENT_SOURCE_DIR}/tpl/${TEMPLATE} ${NAME}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tpl/${TEMPLATE} embedfile
     )
-  SET(${OUTPUT} "${${OUTPUT}};${CMAKE_CURRENT_BINARY_DIR}/${NAME}.c" PARENT_SCOPE)
+  SET_SOURCE_FILES_PROPERTIES(${GENERATED_FILE} GENERATED)
+  SET(${OUTPUT} "${${OUTPUT}};${GENERATED_FILE}" PARENT_SCOPE)
 ENDFUNCTION()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -48,10 +51,7 @@ EMBED_TEMPLATE(EMBEDDED_FILES "config.in.hh" "config_hh")
 EMBED_TEMPLATE(EMBEDDED_FILES "init.in.hh" "init_hh")
 EMBED_TEMPLATE(EMBEDDED_FILES "init.in.cc" "init_cc")
 
-INSTALL(FILES ${METAPOD_ROBOTBUILDER_MODEL_HEADERS}
-  DESTINATION include/metapod/robotbuilder
-  )
-ADD_LIBRARY(metapod_robotbuilder SHARED
+QI_CREATE_LIB(metapod_robotbuilder SHARED
   src/robotbuilder.cc
   src/robotbuilder_p.hh
   src/robotbuilder_p.cc
@@ -62,4 +62,7 @@ ADD_LIBRARY(metapod_robotbuilder SHARED
   ${EMBEDDED_FILES}
   ${METAPOD_ROBOTBUILDER_HEADERS}
   )
-TARGET_LINK_LIBRARIES(metapod_robotbuilder ${Boost_LIBRARIES})
+QI_USE_LIB(metapod_robotbuilder boost boost_filesystem boost_regex eigen3)
+QI_STAGE_LIB(metapod_robotbuilder)
+QI_INSTALL_HEADER(${METAPOD_ROBOTBUILDER_HEADERS}
+  SUBFOLDER metapod/robotbuilder)

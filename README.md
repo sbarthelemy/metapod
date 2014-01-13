@@ -10,6 +10,13 @@ for a particular robot at compile-time.
 It makes use of R. Featherstone's Spatial Algebra to describe forces, motions
 and inertias (cf. Rigid Body Dynamics Algorithms, Roy Featherstone).
 
+The metapod project was initiated at JRL/LAAS, CNRS/AIST. This version
+is a fork, used at Aldebaran Robotics.
+
+While the upstream metapod uses jrl-cmake as a build system, the Aldebaran
+Robotics fork uses
+[qibuild](www.aldebaran-robotics.com/documentation/qibuild/index.html).
+
 Content
 -------
 
@@ -45,6 +52,12 @@ Content
 
   * doc: some doc.
 
+  * pregeneratedmodels: a cached copy of the generated source code of the
+    (ususally generated on the fly) robot models. Only used when the source
+    code cannot be generated (because liburdfdom is not available, or the
+    generator cannot be run because we're cross-compiling).
+
+
 Dependencies
 ------------
 
@@ -52,9 +65,9 @@ The package depends on several packages which have to be available on
 your machine.
 
  - System tools:
-   - CMake (>=2.6)
-   - pkg-config
+   - CMake (>=2.8)
    - usual compilation tools (GCC/G++, make, etc.)
+   - qibuild
  - Libraries:
    - Eigen (>=3.0.0)
    - Boost (>=1.40.0)
@@ -64,17 +77,24 @@ your machine.
 Setup
 -----
 
-To compile this package, it is recommended to create a separate build
-directory:
+Install qibuild then
 
-    mkdir _build
-    cd _build
-    cmake -DBUILD_METAPODFROMURDF=OFF ..
-    make install
+    qc --release
+    qm --release
 
-Please note that CMake produces a `CMakeCache.txt` file which should
-be deleted to reconfigure a package from scratch.
 
+If you want to cross compile (say, for the atom cross toolchain), you can
+first compile the code generators on your build host, then cross compile,
+while passing the path to the code generators:
+
+    BIN_DIR=${HOME}/work/master/lib/metapod/build-linux64-release/sdk/bin
+    qc --release -c atom \
+      -DMETAPOD_BINARYTREEMODEL_EXECUTABLE=${BIN_DIR}/metapod_binarytreemodel
+      -DMETAPODFROMURDF_EXECUTABLE=${BIN_DIR}/metapodfromurdf
+    qm --release -c atom
+
+If you do not provide the generators, then pregenerated (and commited) source
+files will be used.
 
 In order to build the urdf converter, you'll need to install liburdfdom or
 liburdf. There are several options:
@@ -106,13 +126,13 @@ liburdf. There are several options:
 
        source /opt/ros/groovy/setup.bash
 
-   before running cmake.
+   before running qc.
 
  - Or install ROS fuerte using the ubuntu packages and just do
 
        source /opt/ros/fuerte/setup.bash
 
-   before running cmake.
+   before running qc.
 
 Documentation
 -------------

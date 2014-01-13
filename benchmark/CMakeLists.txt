@@ -19,10 +19,6 @@
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/robotbuilder/include)
-INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/robotbuilder/include)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/timer/include)
-INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/timer/include)
 
 SET(benchmark_cc_definitions "")
 
@@ -38,8 +34,12 @@ IF(WITH_METAPOD_BINARYTREEMODEL)
         ADD_CUSTOM_COMMAND(
             OUTPUT ${_sources}
             COMMAND ${METAPOD_BINARYTREEMODEL_EXECUTABLE} ${depth}
-            DEPENDS ${METAPOD_BINARYTREEMODEL_EXECUTABLE})
-        ADD_LIBRARY(${_libname} SHARED ${_sources})
+            DEPENDS ${METAPOD_BINARYTREEMODEL_EXECUTABLE}
+        )
+        SET_SOURCE_FILES_PROPERTIES(${_sources} GENERATED)
+        QI_CREATE_LIB(${_libname} SHARED ${_sources})
+        QI_USE_LIB(${_libname} metapod)
+        QI_STAGE_LIB(${_libname})
 
         # add the library to a list in order to bench it together with the
         # others
@@ -52,11 +52,12 @@ IF(WITH_METAPOD_BINARYTREEMODEL)
                 ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.in.cc
                 ${CMAKE_CURRENT_BINARY_DIR}/${_benchname}.cc
                 @ONLY)
-            ADD_EXECUTABLE(benchmark_${_libname}
+            QI_CREATE_BIN(${_benchname}
                 ${CMAKE_CURRENT_BINARY_DIR}/${_benchname}.cc
-                benchmark.hh)
-            TARGET_LINK_LIBRARIES(${_benchname} metapod_timer ${_libname})
-         ENDIF()
+                benchmark.hh
+                NO_INSTALL)
+            QI_USE_LIB(${_benchname} metapod_timer ${_libname})
+        ENDIF()
     ENDFOREACH()
     SET(benchmark_cc_definitions
         "${benchmark_cc_definitions} -DWITH_METAPOD_BINARYTREEMODEL")
@@ -64,8 +65,6 @@ ENDIF()
 
 # add simple humanoid model
 IF(WITH_SIMPLE_HUMANOID)
-    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/simple_humanoid/include)
-    INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/simple_humanoid/include)
     SET(_libname "metapod_simple_humanoid")
     # add the library to a list in order to bench it together with the other
     SET(benchmark_cc_definitions
@@ -74,10 +73,8 @@ IF(WITH_SIMPLE_HUMANOID)
     # benchmark it alone
     IF(BUILD_SINGLE_MODEL_BENCHMARKS)
         SET(_benchname "benchmark_${_libname}")
-        ADD_EXECUTABLE(benchmark_${_libname}
-            ${_benchname}.cc
-            benchmark.hh)
-        TARGET_LINK_LIBRARIES(${_benchname} metapod_timer ${_libname})
+        QI_CREATE_BIN(${_benchname} ${_benchname}.cc benchmark.hh NO_INSTALL)
+        QI_USE_LIB(${_benchname} metapod_timer ${_libname})
     ENDIF()
 ENDIF()
 
@@ -85,6 +82,6 @@ ENDIF()
 IF(BUILD_MULTI_MODEL_BENCHMARK AND _model_libs)
     SET_SOURCE_FILES_PROPERTIES("benchmark.cc" PROPERTIES
         COMPILE_FLAGS "${benchmark_cc_definitions}")
-    ADD_EXECUTABLE(benchmark benchmark.cc benchmark.hh)
-    TARGET_LINK_LIBRARIES(benchmark metapod_timer ${_model_libs})
+    QI_CREATE_BIN(benchmark benchmark.cc benchmark.hh NO_INSTALL)
+    QI_USE_LIB(benchmark metapod_timer ${_model_libs})
 ENDIF()
