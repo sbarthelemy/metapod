@@ -1,3 +1,5 @@
-<project name="metapod">
-  <!-- Add your project dependencies here -->
+<project version="3">
+  <qibuild name="metapod">
+    <depends buildtime="true" names="boost" />
+  </qibuild>
 </project>
