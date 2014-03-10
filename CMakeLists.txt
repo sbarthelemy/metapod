@@ -132,7 +132,7 @@ SET(USE_URDF_FROM_ROS_FUERTE FALSE)
 # we detect urdfdom or ros. Since the detection part is not fool proof,
 # we let the user override it.
 IF(NOT CMAKE_CROSSCOMPILING)
-  FIND_PACKAGE(URDFDOM QUIET)
+  QI_ADD_OPTIONAL_PACKAGE(URDFDOM)
   IF(URDFDOM_FOUND)
     SET(BUILD_METAPODFROMURDF_DEFAULT TRUE)
   ELSE()
