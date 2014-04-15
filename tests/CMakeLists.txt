@@ -19,10 +19,10 @@
 #
 # Creation: 14/06/2011
 
-# Make Boost.Test generate the main function in test cases.
-ADD_DEFINITIONS(-DBOOST_TEST_MAIN)
-IF(NOT WIN32 AND NOT APPLE)
-  # we use dynamic libraries for boost, except on Windows and Mac OS X
+# Boost.Test should get the main() function from the lib if the lib is static
+# or generate it from the header if the lib is dynamic
+IF(NOT WIN32)
+  # we use dynamic libraries for boost, except on Windows
   ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
 ENDIF()
 
