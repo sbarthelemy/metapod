@@ -159,7 +159,6 @@ Status addSubTree(
     default: {
       logError("Joint '%s' is of unknown type", jnt->name.c_str());
       return STATUS_FAILURE;
-      break;
     }
   }
   // constructs the optional inertia
