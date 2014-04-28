@@ -33,5 +33,8 @@ QI_CREATE_LIB(metapod_timer SHARED INTERNAL
 
 SET_SOURCE_FILES_PROPERTIES("src/timer.cc" PROPERTIES
     COMPILE_FLAGS " -DWITH_BOOST_TIMER")
-QI_USE_LIB(metapod_timer BOOST_TIMER)
+# BOOST_SYSTEM should be brought by BOOST_TIMER, but
+# for some reason it does not always work, so add it
+# explicitly
+QI_USE_LIB(metapod_timer BOOST_TIMER BOOST_SYSTEM)
 QI_STAGE_LIB(metapod_timer)
