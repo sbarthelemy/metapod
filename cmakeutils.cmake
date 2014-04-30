@@ -72,56 +72,28 @@ FUNCTION(ADD_SAMPLEURDFMODEL name)
   SET(_config_file "${PROJECT_SOURCE_DIR}/data/${name}.config")
   SET(_license_file "${PROJECT_SOURCE_DIR}/data/metapod_license_file.txt")
   SET(_gen_dir "${CMAKE_CURRENT_BINARY_DIR}/include/metapod/models")
-  SET(_pregen_dir "${PROJECT_SOURCE_DIR}/pregeneratedmodels")
   INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
   SET(_gen_sources "")
-  SET(_pregen_sources "")
   SET(_sources
       config.hh
       ${name}.hh
       ${name}.cc)
   FOREACH(f ${_sources})
     LIST(APPEND _gen_sources ${_gen_dir}/${name}/${f})
-    LIST(APPEND _pregen_sources ${_pregen_dir}/${name}/${f})
   ENDFOREACH()
-  IF(WITH_METAPODFROMURDF)
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${_gen_sources}
-      COMMAND ${METAPODFROMURDF_EXECUTABLE}
-      --name ${name}
-      --libname ${_libname}
-      --directory ${_gen_dir}/${name}
-      --config-file ${_config_file}
-      --license-file ${_license_file}
-      ${_urdf_file}
-      DEPENDS ${METAPODFROMURDF_EXECUTABLE} ${_urdf_file} ${_config_file}
-        ${_license_file}
-      MAIN_DEPENDENCY ${_urdf_file}
-      )
-
-    FIND_PROGRAM(python_executable
-      NAMES python2 python python.exe
-      NO_CMAKE_FIND_ROOT_PATH)
-    IF(python_executable)
-      QI_ADD_TEST(
-        check_pregenerated_${name}_is_up_to_date
-        ${python_executable}
-        ARGUMENTS ${PROJECT_SOURCE_DIR}/cmp_files.py
-                  ${_gen_dir}/${name}
-                  ${_pregen_dir}/${name}
-                  ${_sources})
-    ENDIF()
-
-  ELSE()
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${_gen_sources}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory
-              ${_pregen_dir}/${name}
-              ${_gen_dir}/${name}
-      DEPENDS ${_pregen_sources}
-      COMMENT "metapodfromurdf is not available, copying pregenerated files instead"
-      )
-  ENDIF()
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${_gen_sources}
+    COMMAND ${METAPODFROMURDF_EXECUTABLE}
+    --name ${name}
+    --libname ${_libname}
+    --directory ${_gen_dir}/${name}
+    --config-file ${_config_file}
+    --license-file ${_license_file}
+    ${_urdf_file}
+    DEPENDS ${METAPODFROMURDF_EXECUTABLE} ${_urdf_file} ${_config_file}
+      ${_license_file}
+    MAIN_DEPENDENCY ${_urdf_file}
+    )
   SET_SOURCE_FILES_PROPERTIES(${_gen_sources} GENERATED)
 
   QI_CREATE_LIB(${_libname} SHARED ${_gen_sources})
