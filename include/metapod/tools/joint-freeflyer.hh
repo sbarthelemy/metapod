@@ -31,7 +31,6 @@ namespace metapod
     Spatial::Motion vj; // used in rnea
     Spatial::ConstraintMotionFreeFlyer S;
     Spatial::Force f; // used by rnea
-    Vector6d torque; // used by rnea
 
     void bcalc(const Vector6d& qi);
     void jcalc(const Vector6d& qi, const Vector6d& dqi);

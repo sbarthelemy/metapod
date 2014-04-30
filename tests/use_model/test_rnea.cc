@@ -28,7 +28,6 @@ using namespace metapod;
 BOOST_AUTO_TEST_CASE (test_rnea)
 {
   typedef CURRENT_MODEL_ROBOT Robot;
-  // Set configuration vectors (q, dq, ddq) to reference values.
   Robot::confVector q, dq, ddq, torques, ref_torques;
 
   std::ifstream qconf(TEST_DIRECTORY "/q.conf");
@@ -39,24 +38,9 @@ BOOST_AUTO_TEST_CASE (test_rnea)
   initConf< Robot >::run(dqconf, dq);
   initConf< Robot >::run(ddqconf, ddq);
 
-  qconf.close();
-  dqconf.close();
-  ddqconf.close();
-
   Robot robot;
-  // Apply the RNEA to the metapod multibody and print the result in a log file.
-  rnea< Robot, true >::run(robot, q, dq, ddq);
-  const char result_file[] = "rnea.log";
-  std::ofstream log(result_file, std::ofstream::out);
-  printTorques<Robot>(robot, log);
-  log.close();
-
-  // Compare results with reference file
-  compareLogs(result_file, TEST_DIRECTORY "/rnea.ref", 1e-3);
-
-  // smoke test: torques variable value is not checked
-  getTorques(robot, torques);
+  rnea< Robot, true >::run(robot, q, dq, ddq, torques);
   std::ifstream torquesconf(TEST_DIRECTORY "/rnea.ref");
-  initConf< Robot >::run(torquesconf, ref_torques);
+  initConf<Robot>::run(torquesconf, ref_torques);
   BOOST_CHECK(ref_torques.isApprox(torques, 1e-3));
 }

@@ -116,7 +116,8 @@ template< typename Robot > struct rnea< Robot, false >
 
     METAPOD_HOT
     static void discover(AnyRobot & robot,
-                         const confVector & ddq)
+                         const confVector & ddq,
+                         confVector &)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
       // Extract subvector corresponding to current Node
@@ -136,22 +137,23 @@ template< typename Robot > struct rnea< Robot, false >
 
     METAPOD_HOT
     static void finish(AnyRobot & robot,
-                       const confVector & )
+                       const confVector &,
+                       confVector & torques)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
       // backward computations follow
       // τi = SiT * fi
-      node.joint.torque.noalias() = node.joint.S.S().transpose()
-                                    * node.joint.f.toVector();
+      torques.template segment<Node::Joint::NBDOF>(Node::q_idx).noalias() =
+          node.joint.S.S().transpose() * node.joint.f.toVector();
       update_force<node_id, Node::parent_id>::run(robot);
     }
-
   };
 
   static void run(Robot & robot,
-                  const typename Robot::confVector & ddq)
+                  const typename Robot::confVector & ddq,
+                  typename Robot::confVector & torques)
   {
-    depth_first_traversal<DftVisitor, Robot>::run(robot, ddq);
+    depth_first_traversal<DftVisitor, Robot>::run(robot, ddq, torques);
   }
 };
 
@@ -160,10 +162,11 @@ template< typename Robot > struct rnea< Robot, true >
   static void run(Robot & robot,
                   const typename Robot::confVector & q,
                   const typename Robot::confVector & dq,
-                  const typename Robot::confVector & ddq)
+                  const typename Robot::confVector & ddq,
+                  typename Robot::confVector & torques)
   {
     jcalc< Robot >::run(robot, q, dq);
-    rnea< Robot, false >::run(robot, ddq);
+    rnea< Robot, false >::run(robot, ddq, torques);
   }
 };
 

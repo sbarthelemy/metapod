@@ -45,7 +45,6 @@ template < typename Robot, int node_id > struct PrintStateVisitor
        << "ai :\n" << node.body.ai << "\n"
        << "I :\n" << robot.inertias[node_id] << "\n"
        << "f :\n" << node.joint.f << "\n"
-       << "τ :\n" << node.joint.torque << "\n"
        << std::endl;
   }
   static void finish(const Robot &, std::ostream & ) {}
@@ -100,51 +99,5 @@ void printTransforms(const Robot& robot, std::ostream & os)
 {
   depth_first_traversal<internal::PrintTransformsVisitor, Robot>::run(robot, os);
 }
-
-// Print Torques of the robot in a stream.
-namespace internal {
-template < typename Robot, int node_id> struct PrintTorquesVisitor
-{
-  typedef typename Nodes<Robot, node_id>::type Node;
-
-  static void discover(const Robot& robot, std::ostream& os)
-  {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    os << Node::joint_name << "\n"
-       << node.joint.torque << "\n"
-       << std::endl;
-  }
-  static void finish(const Robot&, std::ostream & ) {}
-};
-} // end of namespace metapod::internal.
-
-template< typename Robot >
-void printTorques(Robot& robot, std::ostream & os)
-{
-  depth_first_traversal<internal::PrintTorquesVisitor, Robot>::run(robot, os);
-}
-
-// save the Torques of the robot in a vector.
-namespace internal {
-template < typename Robot, int node_id> struct GetTorquesVisitor
-{
-  typedef typename Nodes<Robot, node_id>::type Node;
-
-  static void discover(const Robot& robot, typename Robot::confVector& v)
-  {
-    const Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-    v.template
-    segment<Node::Joint::NBDOF>(Node::q_idx) = node.joint.torque;
-  }
-  static void finish(const Robot&, typename Robot::confVector&) {}
-};
-} // end of namespace metapod::internal.
-
-template< typename Robot >
-void getTorques(Robot& robot, typename Robot::confVector& v)
-{
-  depth_first_traversal<internal::GetTorquesVisitor, Robot>::run(robot, v);
-}
 } // end of namespace metapod
-
 #endif

@@ -172,6 +172,20 @@ namespace metapod
       boost::shared_ptr<RobotJacobian> J_;
     };
 
+    // wrapping rnea directly with boost::bind does not work
+    template <typename Robot>
+    class rnea_wrapper {
+    public:
+
+      rnea_wrapper() : torques_(new typename Robot::confVector(
+                                  Robot::confVector::Zero())) {}
+      void operator()(Robot& robot, typename Robot::confVector ddq) {
+        rnea<Robot, false>::run(robot, ddq, *torques_);
+      }
+    private:
+      boost::shared_ptr<typename Robot::confVector> torques_;
+    };
+
     template < typename Robot >
     struct benchmark
     {
@@ -190,11 +204,8 @@ namespace metapod
             boost::bind<void>(bcalc<Robot>::run, _1, _2),
             std::string("bcalc")));
         runners.push_back(Runner<Robot>(
-            boost::bind<void>(rnea<Robot, true>::run, _1, _2, _3, _4),
-                  std::string("rnea")));
-        runners.push_back(Runner<Robot>(
-            boost::bind<void>(rnea<Robot, false>::run, _1, _2, _3, _4),
-            std::string("rnea (without jcalc)")));
+            boost::bind<void>(rnea_wrapper<Robot>(), _1, _4),
+            std::string("rnea")));
         runners.push_back(Runner<Robot>(
             boost::bind<void>(crba_wrapper<Robot>(), _1),
             std::string("crba (without jcalc)")));
