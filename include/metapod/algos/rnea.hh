@@ -51,10 +51,8 @@ template< typename Robot > struct rnea< Robot, false >
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
       Parent& parent = boost::fusion::at_c<parent_id>(robot.nodes);
-      // iX0 = iXλ(i) * λ(i)X0
       // vi = iXλ(i) * vλ(i) + vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
-      node.body.iX0 = node.sXp * parent.body.iX0;
       node.body.vi = node.sXp * parent.body.vi + node.joint.vj;
       node.body.ai = sum(node.sXp * parent.body.ai,
                          Spatial::Motion(node.joint.S.S() * ddqi),
@@ -73,14 +71,13 @@ template< typename Robot > struct rnea< Robot, false >
         const Eigen::Matrix< FloatType, Node::Joint::NBDOF, 1 > & ddqi)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
-      // iX0 = iXλ(i)
       // vi = vj
       // ai = iXλ(i) * aλ(i) + Si * ddqi + cj + vi x vj
-      // (with aλ(i) = a0 = -g, cf. Rigid Body Dynamics Algorithms for a
+      // (with aλ(i) = iX0*a0 = iX0*(-g), cf. Rigid Body Dynamics Algorithms for a
       // detailed explanation of how the gravity force is applied)
-      node.body.iX0 = node.sXp;
+      // Note that since we are at the root body, node.body.iX0 == node.sXp.
       node.body.vi = node.joint.vj;
-      node.body.ai = sum((node.body.iX0 * minus_g),
+      node.body.ai = sum((node.sXp * minus_g),
                           Spatial::Motion(node.joint.S.S() * ddqi),
                           node.joint.cj,
                           (node.body.vi^node.joint.vj));
@@ -117,6 +114,7 @@ template< typename Robot > struct rnea< Robot, false >
     METAPOD_HOT
     static void discover(AnyRobot & robot,
                          const confVector & ddq,
+                         const Spatial::Force * const ext_forces,
                          confVector &)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
@@ -128,16 +126,17 @@ template< typename Robot > struct rnea< Robot, false >
       // different when the node has a parent and when it does not.
       update_kinematics<node_id, Node::parent_id>::run(robot, ddqi);
 
-      // fi = Ii * ai + vi x* (Ii * vi) - iX0* * fix
+      // fi = Ii * ai + vi x* (Ii * vi) - * fix
       Spatial::Inertia &I = robot.inertias[node_id];
       node.joint.f = sum((I * node.body.ai),
                          (node.body.vi^( I * node.body.vi )),
-                         (node.body.iX0 * -node.body.Fext ));
+                         (-ext_forces[node_id]));
     }
 
     METAPOD_HOT
     static void finish(AnyRobot & robot,
                        const confVector &,
+                       const Spatial::Force * const,
                        confVector & torques)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
@@ -149,11 +148,14 @@ template< typename Robot > struct rnea< Robot, false >
     }
   };
 
+  // ext_forces pointer is used as random access iterator
   static void run(Robot & robot,
                   const typename Robot::confVector & ddq,
+                  const Spatial::Force * const ext_forces,
                   typename Robot::confVector & torques)
   {
-    depth_first_traversal<DftVisitor, Robot>::run(robot, ddq, torques);
+    depth_first_traversal<DftVisitor, Robot>::run(robot, ddq, ext_forces,
+                                                  torques);
   }
 };
 
@@ -163,10 +165,11 @@ template< typename Robot > struct rnea< Robot, true >
                   const typename Robot::confVector & q,
                   const typename Robot::confVector & dq,
                   const typename Robot::confVector & ddq,
+                  const Spatial::Force * const ext_forces,
                   typename Robot::confVector & torques)
   {
     jcalc< Robot >::run(robot, q, dq);
-    rnea< Robot, false >::run(robot, ddq, torques);
+    rnea< Robot, false >::run(robot, ddq, ext_forces, torques);
   }
 };
 

@@ -177,13 +177,18 @@ namespace metapod
     class rnea_wrapper {
     public:
 
-      rnea_wrapper() : torques_(new typename Robot::confVector(
-                                  Robot::confVector::Zero())) {}
-      void operator()(Robot& robot, typename Robot::confVector ddq) {
-        rnea<Robot, false>::run(robot, ddq, *torques_);
+      rnea_wrapper() :
+        torques_(new typename Robot::confVector(Robot::confVector::Zero())),
+        ext_forces_(Robot::NBBODIES, Spatial::Force::Zero())
+      {}
+      void operator()(Robot& robot,
+                      typename Robot::confVector ddq) {
+        rnea<Robot, false>::run(robot, ddq, &ext_forces_[0], *torques_);
       }
     private:
       boost::shared_ptr<typename Robot::confVector> torques_;
+      std::vector<Spatial::Force> ext_forces_;
+
     };
 
     template < typename Robot >
