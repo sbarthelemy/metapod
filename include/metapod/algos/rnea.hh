@@ -116,8 +116,6 @@ template< typename Robot > struct rnea< Robot, false >
 
     METAPOD_HOT
     static void discover(AnyRobot & robot,
-                         const confVector & ,
-                         const confVector & ,
                          const confVector & ddq)
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
@@ -138,8 +136,6 @@ template< typename Robot > struct rnea< Robot, false >
 
     METAPOD_HOT
     static void finish(AnyRobot & robot,
-                       const confVector & ,
-                       const confVector & ,
                        const confVector & )
     {
       Node& node = boost::fusion::at_c<node_id>(robot.nodes);
@@ -153,11 +149,9 @@ template< typename Robot > struct rnea< Robot, false >
   };
 
   static void run(Robot & robot,
-                  const typename Robot::confVector & q,
-                  const typename Robot::confVector & dq,
                   const typename Robot::confVector & ddq)
   {
-    depth_first_traversal<DftVisitor, Robot>::run(robot, q, dq, ddq);
+    depth_first_traversal<DftVisitor, Robot>::run(robot, ddq);
   }
 };
 
@@ -169,7 +163,7 @@ template< typename Robot > struct rnea< Robot, true >
                   const typename Robot::confVector & ddq)
   {
     jcalc< Robot >::run(robot, q, dq);
-    rnea< Robot, false >::run(robot, q, dq, ddq);
+    rnea< Robot, false >::run(robot, ddq);
   }
 };
 
