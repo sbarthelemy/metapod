@@ -16,22 +16,13 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <boost/tokenizer.hpp>
-#ifdef USE_URDF_FROM_ROS_FUERTE
-# include <ros/console.h>
-# include <urdf_interface/model.h>
-# include <urdf/model.h>
-# define logInform(...) ROS_INFO(__VA_ARGS__)
-# define logError(...) ROS_ERROR(__VA_ARGS__)
-#else
-# include <console_bridge/console.h>
-# include <boost/filesystem.hpp>
-# include <sstream>
-# include <fstream>
-# include <urdf_model/model.h>
-# include <urdf_parser/urdf_parser.h>
-#endif
+#include <console_bridge/console.h>
+#include <boost/filesystem.hpp>
+#include <sstream>
+#include <fstream>
+#include <urdf_model/model.h>
+#include <urdf_parser/urdf_parser.h>
 #include <metapod/robotbuilder/robotbuilder.hh>
-
 
 typedef metapod::RobotBuilder::Status Status;
 const Status STATUS_SUCCESS = metapod::RobotBuilder::STATUS_SUCCESS;
@@ -349,13 +340,6 @@ int main(int argc, char** argv) {
     return 0;
   }
   const std::string input_file = vm["input-file"].as<std::string>();
-#ifdef USE_URDF_FROM_ROS_FUERTE
-  boost::shared_ptr<urdf::Model> robot_model = boost::make_shared<urdf::Model>();
-  if (!robot_model->initFile(input_file)) {
-    logError("Could not generate robot model from file '%s'", input_file.c_str());
-    return STATUS_FAILURE;
-  }
-#else
   std::stringstream buffer;
   try
   {
@@ -384,7 +368,6 @@ int main(int argc, char** argv) {
     logError("Could not generate robot model from file '%s'", input_file.c_str());
     return STATUS_FAILURE;
   }
-#endif
   if (vm.count("name")) {
     builder.set_name(vm["name"].as<std::string>());
   }

@@ -128,12 +128,6 @@ liburdf. There are several options:
 
    before running qc.
 
- - Or install ROS fuerte using the ubuntu packages and just do
-
-       source /opt/ros/fuerte/setup.bash
-
-   before running qc.
-
 Documentation
 -------------
 

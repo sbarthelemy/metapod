@@ -124,33 +124,16 @@ ELSE()
   FIND_GENERATOR(METAPOD_BINARYTREEMODEL)
 ENDIF()
 
-# Even when not cross compiling, we cannot always build metapodfromurdf,
-# because it depends on ROS bits, which are not always available.
-SET(BUILD_METAPODFROMURDF_DEFAULT FALSE)
-SET(USE_URDF_FROM_ROS_FUERTE FALSE)
 # by default, we build metapodfromurdf if we are not cross compiling and
-# we detect urdfdom or ros. Since the detection part is not fool proof,
+# we detect urdfdom . Since the detection part is not fool proof,
 # we let the user override it.
 IF(NOT CMAKE_CROSSCOMPILING)
   QI_ADD_OPTIONAL_PACKAGE(URDFDOM)
-  IF(URDFDOM_FOUND)
-    SET(BUILD_METAPODFROMURDF_DEFAULT TRUE)
-  ELSE()
-    # urdfdom is not available alone, but if ros is there, we'll use liburdf
-    # instead and assume we are using fuerte.
-    # Note: that on fuerte, we'd better use liburdf_parser instead of liburdf.
-    # However, fuerte support won't last long, it's not worth changing it now.
-    FIND_PROGRAM(ROSPACK_EXECUTABLE rospack)
-    IF(ROSPACK_EXECUTABLE)
-      SET(BUILD_METAPODFROMURDF_DEFAULT TRUE)
-      SET(USE_URDF_FROM_ROS_FUERTE TRUE)
-    ENDIF()
-  ENDIF()
 ENDIF()
 CMAKE_DEPENDENT_OPTION(BUILD_METAPODFROMURDF
   "Build the urdf parser"
-  ${BUILD_METAPODFROMURDF_DEFAULT}
-  "NOT CMAKE_CROSSCOMPILING"
+  ON
+  "NOT CMAKE_CROSSCOMPILING;URDFDOM_FOUND"
   OFF)
 IF(BUILD_METAPODFROMURDF)
   ADD_SUBDIRECTORY(metapodfromurdf)
