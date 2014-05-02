@@ -61,6 +61,7 @@
 
 #include <metapod/tools/depth_first_traversal.hh>
 #include <metapod/tools/has_parent.hh>
+#include <boost/fusion/include/vector.hpp>
 
 namespace metapod {
 namespace internal {
