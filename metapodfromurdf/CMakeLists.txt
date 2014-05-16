@@ -7,7 +7,7 @@ QI_CREATE_BIN(metapodfromurdf
 QI_USE_LIB(metapodfromurdf
   metapod_robotbuilder
   boost boost_program_options metapod_robotbuilder eigen3)
-QI_USE_LIB(metapodfromurdf urdfdom)
+QI_USE_LIB(metapodfromurdf urdfdom tinyxml)
 # without the following line, it won't compile
 target_link_libraries(metapodfromurdf ${urdfdom_LIBRARIES})
 QI_STAGE_BIN(metapodfromurdf)

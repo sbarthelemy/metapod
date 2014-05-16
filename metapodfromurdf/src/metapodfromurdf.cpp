@@ -16,6 +16,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <boost/tokenizer.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <console_bridge/console.h>
 #include <boost/filesystem.hpp>
 #include <sstream>
@@ -23,6 +24,7 @@
 #include <urdf_model/model.h>
 #include <urdf_parser/urdf_parser.h>
 #include <metapod/robotbuilder/robotbuilder.hh>
+#include <tinyxml.h>
 
 typedef metapod::RobotBuilder::Status Status;
 const Status STATUS_SUCCESS = metapod::RobotBuilder::STATUS_SUCCESS;
@@ -49,6 +51,21 @@ Eigen::Matrix3d toEigen(urdf::Rotation q, double epsilon = 1e-16)
     }
   }
   return R;
+}
+
+std::vector<std::string> listJointNames(const TiXmlNode* doc)
+{
+  const TiXmlNode *parent = doc->FirstChild("robot");
+  assert(parent != 0);
+  std::vector<std::string> res;
+  const TiXmlNode *child = 0;
+  while((child = parent->IterateChildren("joint", child)))
+  {
+    // todo: reading the name is probably quite fragile
+    res.push_back(child->ToElement()->Attribute("name"));
+    std::cerr << child->ToElement()->Attribute("name") << std::endl;
+  }
+  return res;
 }
 
 // LinkComparer: for use with std::sort.
@@ -387,8 +404,17 @@ int main(int argc, char** argv) {
                                         std::istreambuf_iterator<char>()));
     }
   }
+  // urdfdom mixes all the elements.
+  // Let get a sane ordering either from direct user output of from the
+  // Joint XML node in the urdf XML file.
   if (vm.count("joint")) {
     link_comparer.init(vm["joint"].as<std::vector<std::string> >());
+  }
+  else
+  {
+    boost::scoped_ptr<TiXmlDocument> doc(new TiXmlDocument);
+    doc->LoadFile(input_file.c_str());
+    link_comparer.init(listJointNames(doc.get()));
   }
   bool prefer_fixed_axis = false;
   if (vm.count("prefer-fixed-axis")) {
