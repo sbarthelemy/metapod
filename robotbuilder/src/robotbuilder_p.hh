@@ -43,19 +43,6 @@ public:
   RobotBuilder::Status set_license(const std::string& text);
   RobotBuilder::Status init();
 
-  // R_joint_parent is the rotation matrix which converts vector from the
-  // parent body frame to the joint frame coordinate systems.
-  // r_parent_joint is a 3D vector giving the position of the joint frame
-  // origin in the parent frame coordinate system.
-  //
-  // Thus if p_parent is the coordinates vector of the point p in the parent
-  // frame, then p_joint is given by
-  //
-  //   p_joint = R_joint_parent * (p_parent - r_parent_joint)
-  //
-  // dof_index will only be taken into account if set_use_dof_index(true)
-  // has been called. In such a case, consistent dof indexes should be provided
-  // for each link.
   RobotBuilder::Status addLink(
       const std::string& parent_body_name,
       const std::string& joint_name,

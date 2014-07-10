@@ -67,6 +67,11 @@ public:
   // dof_index will only be taken into account if set_use_dof_index(true)
   // has been called. In such a case, consistent dof indexes should be provided
   // for each link.
+  //
+  // body_center_of_mass is given in the joint frame
+  //
+  // body_rotational_inertia is given in the joint frame basis, but at the
+  // body center of mass.
   Status addLink(
       const std::string& parent_body_name,
       const std::string& joint_name,
