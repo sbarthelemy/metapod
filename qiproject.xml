@@ -1,5 +1,6 @@
 <project version="3">
   <qibuild name="metapod">
     <depends buildtime="true" names="boost" />
+    <depends buildtime="true" runtime="true" names="gtest" />
   </qibuild>
 </project>
